@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAA.StateManagement", "DAA.StateManagement\DAA.StateManagement.csproj", "{CD6B5D85-D3D0-4787-9D90-A8902B57174C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAA.StateManagement.Tests", "DAA.StateManagement.Tests\DAA.StateManagement.Tests.csproj", "{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD6B5D85-D3D0-4787-9D90-A8902B57174C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD6B5D85-D3D0-4787-9D90-A8902B57174C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD6B5D85-D3D0-4787-9D90-A8902B57174C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD6B5D85-D3D0-4787-9D90-A8902B57174C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4163FFCE-C446-4461-81FD-126B8442D738}
+	EndGlobalSection
+EndGlobal
