@@ -2,23 +2,24 @@
 
 using Moq;
 
+using DAA.StateManagement.Interfaces;
+
 namespace DAA.StateManagement.Tests
 {
     [TestClass]
     public class UnitTest_StateManagementServiceBuildingDirector
     {
-        private Mock<IStateManagementServiceBuilder> BuilderMock { get; set; }
+        private Mock<IStateManagementServiceBuildingInterface> BuildingInterfaceMock { get; set; }
 
-        private IStateManagementServiceBuilder Builder { get; set; }
+        private IStateManagementServiceBuildingInterface BuildingInterface { get => this.BuildingInterfaceMock.Object; }
         private StateManagementServiceBuildingDirector TestInstance { get; set; }
 
 
         [TestInitialize]
         public void BeforeEach()
         {
-            this.BuilderMock = new Mock<IStateManagementServiceBuilder>();
+            this.BuildingInterfaceMock = new Mock<IStateManagementServiceBuildingInterface>();
 
-            this.Builder = this.BuilderMock.Object;
             this.TestInstance = new StateManagementServiceBuildingDirector();
         }
         
@@ -26,11 +27,11 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void Build__EventsAggregatorBuildFirst()
         {
-            this.BuilderMock.Setup(_ => _.BuildEventsAggregator()).Verifiable();
+            this.BuildingInterfaceMock.Setup(_ => _.BuildEventsAggregator()).Verifiable();
 
-            this.TestInstance.Build(this.Builder);
+            this.TestInstance.Build(this.BuildingInterface);
 
-            this.BuilderMock.Verify();
+            this.BuildingInterfaceMock.Verify();
         }
 
         [TestMethod]
@@ -39,12 +40,12 @@ namespace DAA.StateManagement.Tests
             var callCounter = 0;
             var callOrderFollowed = false;
 
-            this.BuilderMock.Setup(_ => _.BuildEventsAggregator()).Callback(() => ++callCounter);
-            this.BuilderMock.Setup(_ => _.BuildDataQualitySupervisor()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
+            this.BuildingInterfaceMock.Setup(_ => _.BuildEventsAggregator()).Callback(() => ++callCounter);
+            this.BuildingInterfaceMock.Setup(_ => _.BuildDataQualitySupervisor()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
 
-            this.TestInstance.Build(this.Builder);
+            this.TestInstance.Build(this.BuildingInterface);
 
-            this.BuilderMock.Verify();
+            this.BuildingInterfaceMock.Verify();
             Assert.IsTrue(callOrderFollowed);
         }
 
@@ -54,12 +55,12 @@ namespace DAA.StateManagement.Tests
             var callCounter = 0;
             var callOrderFollowed = false;
 
-            this.BuilderMock.Setup(_ => _.BuildDataQualitySupervisor()).Callback(() => ++callCounter);
-            this.BuilderMock.Setup(_ => _.BuildDataRetriever()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
+            this.BuildingInterfaceMock.Setup(_ => _.BuildDataQualitySupervisor()).Callback(() => ++callCounter);
+            this.BuildingInterfaceMock.Setup(_ => _.BuildDataRetriever()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
 
-            this.TestInstance.Build(this.Builder);
+            this.TestInstance.Build(this.BuildingInterface);
 
-            this.BuilderMock.Verify();
+            this.BuildingInterfaceMock.Verify();
             Assert.IsTrue(callOrderFollowed);
         }
 
@@ -69,12 +70,12 @@ namespace DAA.StateManagement.Tests
             var callCounter = 0;
             var callOrderFollowed = false;
 
-            this.BuilderMock.Setup(_ => _.BuildDataRetriever()).Callback(() => ++callCounter);
-            this.BuilderMock.Setup(_ => _.BuildDataManipulator()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
+            this.BuildingInterfaceMock.Setup(_ => _.BuildDataRetriever()).Callback(() => ++callCounter);
+            this.BuildingInterfaceMock.Setup(_ => _.BuildDataManipulator()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
 
-            this.TestInstance.Build(this.Builder);
+            this.TestInstance.Build(this.BuildingInterface);
 
-            this.BuilderMock.Verify();
+            this.BuildingInterfaceMock.Verify();
             Assert.IsTrue(callOrderFollowed);
         }
 
@@ -84,12 +85,12 @@ namespace DAA.StateManagement.Tests
             var callCounter = 0;
             var callOrderFollowed = false;
 
-            this.BuilderMock.Setup(_ => _.BuildDataManipulator()).Callback(() => ++callCounter);
-            this.BuilderMock.Setup(_ => _.BuildDataPool()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
+            this.BuildingInterfaceMock.Setup(_ => _.BuildDataManipulator()).Callback(() => ++callCounter);
+            this.BuildingInterfaceMock.Setup(_ => _.BuildDataPool()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
 
-            this.TestInstance.Build(this.Builder);
+            this.TestInstance.Build(this.BuildingInterface);
 
-            this.BuilderMock.Verify();
+            this.BuildingInterfaceMock.Verify();
             Assert.IsTrue(callOrderFollowed);
         }
 
@@ -99,12 +100,12 @@ namespace DAA.StateManagement.Tests
             var callCounter = 0;
             var callOrderFollowed = false;
 
-            this.BuilderMock.Setup(_ => _.BuildDataPool()).Callback(() => ++callCounter);
-            this.BuilderMock.Setup(_ => _.BuildDataCollectionsManager()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
+            this.BuildingInterfaceMock.Setup(_ => _.BuildDataPool()).Callback(() => ++callCounter);
+            this.BuildingInterfaceMock.Setup(_ => _.BuildDataCollectionsManager()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
 
-            this.TestInstance.Build(this.Builder);
+            this.TestInstance.Build(this.BuildingInterface);
 
-            this.BuilderMock.Verify();
+            this.BuildingInterfaceMock.Verify();
             Assert.IsTrue(callOrderFollowed);
         }
     }

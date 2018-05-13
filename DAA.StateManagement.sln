@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAA.StateManagement", "DAA.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAA.StateManagement.Tests", "DAA.StateManagement.Tests\DAA.StateManagement.Tests.csproj", "{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAA.StateManagement.Interfaces", "DAA.StateManagement.Interfaces\DAA.StateManagement.Interfaces.csproj", "{041352F0-EC8B-488F-9239-9EE83BFBA1E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{041352F0-EC8B-488F-9239-9EE83BFBA1E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{041352F0-EC8B-488F-9239-9EE83BFBA1E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{041352F0-EC8B-488F-9239-9EE83BFBA1E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{041352F0-EC8B-488F-9239-9EE83BFBA1E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

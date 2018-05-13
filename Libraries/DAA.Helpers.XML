@@ -1,0 +1,494 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DAA.Helpers</name>
+    </assembly>
+    <members>
+        <member name="T:DAA.Helpers.ArraysHelper">
+            <summary>
+            Provides methods that facilitate working with arrays.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.ArraysHelper.CreateWithContent``1(``0[])">
+            <summary>
+            Creates a new array that has the specified content.
+            </summary>
+            <typeparam name="T">The type of the contained items.</typeparam>
+            <param name="content">The content of the new array.</param>
+        </member>
+        <member name="T:DAA.Helpers.CollectionsHelper">
+            <summary>
+            Provides methods that facilitate working with collections.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.ForEach``1(System.Collections.Generic.IEnumerable{``0},System.Action{``0})">
+            <summary>
+            Executes the specified action for each item found in the collection.
+            </summary>
+            <typeparam name="T">The type of the collection's items.</typeparam>
+            <param name="coll">The collection that is to be iterated.</param>
+            <param name="action">The action that will be executed for each element in the collection.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.Update``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0},System.Action{``0,``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+                <para>Updates the received collection using only the <see cref="M:System.Collections.Generic.ICollection`1.Add(`0)"/>, <see cref="M:System.Collections.Generic.ICollection`1.Remove(`0)"/> and the received updater, making it set equal to the new collection.</para>
+                <para>This method does not support collections with duplicates. The specified comparer can also lead to artificial duplicates.</para>
+            </summary>
+            <typeparam name="T">The type of the collections' items.</typeparam>
+            <param name="coll">The collection that is to be updated.</param>
+            <param name="newItems">The collection that contains the new items.</param>
+            <param name="itemUpdater">The items updater.</param>
+            <param name="comparer">The items comparer.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.Update``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            <para>Calls the <see cref="M:DAA.Helpers.CollectionsHelper.Update``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0},System.Action{``0,``0},System.Collections.Generic.IEqualityComparer{``0})"/> method with a null updater and the specified parameters.</para>
+            <para>This method does not support collections with duplicates. The specified comparer can also lead to artificial duplicates!</para>
+            </summary>
+            <typeparam name="T">The type of the collections' items.</typeparam>
+            <param name="coll">The collection that is to be updated.</param>
+            <param name="newItems">The collection that contains the new items.</param>
+            <param name="comparer">The items comparer.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.RemoveClear``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            Clears the received collection by only using the <see cref="M:System.Collections.Generic.IList`1.RemoveAt(System.Int32)"/> method.
+            </summary>
+            <typeparam name="T">The type of the collection's items.</typeparam>
+            <param name="coll">The collection that is to be cleared.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.ContainsDuplicates``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Checks if the received collection contains duplicates.
+            </summary>
+            <typeparam name="T">The type of the items found in the collection.</typeparam>
+            <param name="items">The collection that is to be tested.</param>
+            <param name="comparer">An optional comparer. If not specified, the <see cref="M:DAA.Helpers.EqualityComparersHelper`1.Default"/> comparer will be used.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.Append``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Appends the received items to the collection.
+            </summary>
+            <typeparam name="T">The type of the collection's items.</typeparam>
+            <param name="coll">The collection that the items will be appended to.</param>
+            <param name="items">The appended items.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.AppendClones``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Appends clones of the received items to the collection.
+            </summary>
+            <typeparam name="T">The type of the collection's items. T must implement <see cref="T:System.ICloneable"/>.</typeparam>
+            <param name="coll">The collection that the items will be appended to.</param>
+            <param name="items">The items whose clones are to be appended.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.Equivalent``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Checks if two collections have the same elements without necessarily being in the same order. This method counts the duplicates.
+            </summary>
+            <typeparam name="T">The type of the collection's items.</typeparam>
+            <param name="coll1">The tested collection.</param>
+            <param name="coll2">The collection to which the tested collection is compared.</param>
+            <param name="comparer">An optional comparer. If not specified, the <see cref="M:DAA.Helpers.EqualityComparersHelper`1.Default"/> comparer will be used.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.Includes``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Checks if the first collection includes the second collection. Duplicates are not considered.
+            </summary>
+            <typeparam name="T">The type of the collection's items.</typeparam>
+            <param name="coll1">The base collection.</param>
+            <param name="coll2">The collection whose inclusion in the base collection is checked.</param>
+            <param name="comparer">An optional comparer. If not specified, the <see cref="M:DAA.Helpers.EqualityComparersHelper`1.Default"/> comparer will be used.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.Intersects``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Checks if the first collection intersects the second collection.
+            </summary>
+            <typeparam name="T">The type of the collection's items.</typeparam>
+            <param name="coll1">The collections whose intersection with the second collection is checked.</param>
+            <param name="coll2">The collections whose intersection with the first collection is checked.</param>
+            <param name="comparer">An optional comparer. If not specified, the <see cref="M:DAA.Helpers.EqualityComparersHelper`1.Default"/> comparer will be used.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.RemoveDuplicates``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Removes the duplicates from the received collection.
+            </summary>
+            <typeparam name="T">The type of the collection's items.</typeparam>
+            <param name="coll">The collection whose duplicates will be removed.</param>
+            <param name="comparer">An optional comparer. If not specified, the <see cref="M:DAA.Helpers.EqualityComparersHelper`1.Default"/> comparer will be used.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.CountOccurrences``1(System.Collections.Generic.IEnumerable{``0},``0,System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Counts the occurrences of the received object in among the items.
+            </summary>
+            <typeparam name="T">The type of the collection's items.</typeparam>
+            <param name="items">The haystack items.</param>
+            <param name="needle">The needle whose occurrences will be counted.</param>
+            <param name="comparer">An optional comparer. If not specified, the <see cref="M:DAA.Helpers.EqualityComparersHelper`1.Default"/> comparer will be used.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.Remove``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Removes all the items for which the test returns true from the collection.
+            </summary>
+            <typeparam name="T">The type of the collection's items.</typeparam>
+            <param name="coll">The collection from which the items will be removed.</param>
+            <param name="test">The test that should return true if an items it to be removed.</param>
+        </member>
+        <member name="T:DAA.Helpers.EqualityComparersHelper`1">
+            <summary>
+            Facilitates the creation of <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> components.
+            </summary>
+            <typeparam name="T">The type of the compared objects.</typeparam>
+        </member>
+        <member name="P:DAA.Helpers.EqualityComparersHelper`1.EqualsDelegate">
+            <summary>
+            The delegate that will compare the equality.
+            </summary>
+        </member>
+        <member name="P:DAA.Helpers.EqualityComparersHelper`1.GetHashCodeDelegate">
+            <summary>
+            The delegate that will provide the objects' hashcode.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.EqualityComparersHelper`1.#ctor(System.Func{`0,`0,System.Boolean},System.Func{`0,System.Int32})">
+            <summary>
+            Initializes a new <see cref="T:DAA.Helpers.EqualityComparersHelper`1"/> object.
+            </summary>
+            <param name="equalsDelegate">The delegate that will compare the equality.</param>
+            <param name="getHashCodeDelegate">The delegate that will provide the objects' hashcode.</param>
+        </member>
+        <member name="M:DAA.Helpers.EqualityComparersHelper`1.Equals(`0,`0)">
+            <summary>
+            Checks if the two objects are equal using the <see cref="P:DAA.Helpers.EqualityComparersHelper`1.EqualsDelegate"/> delegate, if specified, otherwise it uses the <see cref="M:System.Object.Equals(System.Object)"/> method.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.EqualityComparersHelper`1.GetHashCode(`0)">
+            <summary>
+            Returns the hashcode of the received object using the <see cref="P:DAA.Helpers.EqualityComparersHelper`1.GetHashCodeDelegate"/> delegate, if specified, otherwise it uses the <see cref="M:System.Object.GetHashCode"/> method.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.EqualityComparersHelper`1.Create(System.Func{`0,`0,System.Boolean})">
+            <summary>
+            Creates a new <see cref="T:DAA.Helpers.EqualityComparersHelper`1"/> object with the specified equality comparer delegate.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.EqualityComparersHelper`1.Create(System.Func{`0,System.Int32})">
+            <summary>
+            Creates a new <see cref="T:DAA.Helpers.EqualityComparersHelper`1"/> object with the specified hashcode providing delegate.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.EqualityComparersHelper`1.Create(System.Func{`0,`0,System.Boolean},System.Func{`0,System.Int32})">
+            <summary>
+            Creates a new <see cref="T:DAA.Helpers.EqualityComparersHelper`1"/> object with the specified equality comparer and hashcode providing delegates.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.EqualityComparersHelper`1.Default">
+            <summary>
+            Creates a new <see cref="T:DAA.Helpers.EqualityComparersHelper`1"/> object with default functionality.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.EqualityComparersHelper`1.ReferenceComparer">
+            <summary>
+            Creates a new <see cref="T:DAA.Helpers.EqualityComparersHelper`1"/> object used to compare by reference.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.EqualityComparersHelper`1.BlindEquality">
+            <summary>
+            Creates a new <see cref="T:DAA.Helpers.EqualityComparersHelper`1"/> object which returns True when <see cref="M:System.Collections.Generic.IEqualityComparer`1.Equals(`0,`0)"/> is called and 1 when <see cref="M:System.Collections.Generic.IEqualityComparer`1.GetHashCode(`0)"/> is called.
+            </summary>
+        </member>
+        <member name="T:DAA.Helpers.EventsHelper">
+            <summary>
+            Provides methods that facilitate working with events.
+            </summary>
+        </member>
+        <member name="F:DAA.Helpers.EventsHelper.PropertyChangedEvent">
+            <summary>
+            Holds the name of the <see cref="E:System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.EventsHelper.GetEventAsDelegate``1(``0,System.String)">
+            <summary>
+            Searches among the members of the received object for an event with the given name. The method takes into account the inherited members.
+            </summary>
+            <typeparam name="T">The type of the event owner.</typeparam>
+            <param name="obj">The event owner.</param>
+            <param name="eventName">The event name.</param>
+        </member>
+        <member name="M:DAA.Helpers.EventsHelper.IsListenedTo``1(``0,System.String)">
+            <summary>
+            Checks if the event with the given name, owned by the received object, is listened to.
+            </summary>
+            <typeparam name="T">The type of the event owner.</typeparam>
+            <param name="obj">The event owner.</param>
+            <param name="eventName">The event name.</param>
+        </member>
+        <member name="M:DAA.Helpers.EventsHelper.ListenersCount``1(``0,System.String)">
+            <summary>
+            Returns the number of listeners subscribed to the event with the given name, owned by the received object.
+            </summary>
+            <typeparam name="T">The type of the event owner.</typeparam>
+            <param name="obj">The event owner.</param>
+            <param name="eventName">The event name.</param>
+        </member>
+        <member name="T:DAA.Helpers.FloatingPointPrecisionHelper">
+            <summary>
+            Manages the floating point precision requirements.
+            </summary>
+        </member>
+        <member name="P:DAA.Helpers.FloatingPointPrecisionHelper.DecimalsCount">
+            <summary>
+            The number of decimals that must be kept.
+            </summary>
+        </member>
+        <member name="P:DAA.Helpers.FloatingPointPrecisionHelper.PrecisionThreshold">
+            <summary>
+            The maximum difference that is allowed between floating point values to consider them equal with respect to the required precision.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.FloatingPointPrecisionHelper.#cctor">
+            <summary>
+            Initializes the <see cref="T:DAA.Helpers.FloatingPointPrecisionHelper"/> class.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.FloatingPointPrecisionHelper.IsDifferenceWithinThreshold(System.Double,System.Double)">
+            <summary>
+            Checks if the difference between the two <see cref="T:System.Double"/> values is withing the required precision.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.FloatingPointPrecisionHelper.IsDifferenceWithinThreshold(System.Decimal,System.Decimal)">
+            <summary>
+            Checks if the difference between the two <see cref="T:System.Decimal"/> values is withing the required precision.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.FloatingPointPrecisionHelper.RoundUp(System.Decimal)">
+            <summary>
+            Rounds the received value to the expected precision.
+            </summary>
+            <param name="value">The value that is to be rounded up.</param>
+        </member>
+        <member name="T:DAA.Helpers.JsonSerializationHelper">
+            <summary>
+            Helps the serialization and deserialization of objects using a JSON data contract serializer. 
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.JsonSerializationHelper.Serialize(System.Object,System.Type)">
+            <summary>
+            Serializes the received object using a <see cref="T:System.Runtime.Serialization.Json.DataContractJsonSerializer"/> and returns its serialization's string representation.
+            </summary>
+            <param name="o">The object that is to be serialized.</param>
+            <param name="type">The type of the root data contract.</param>
+        </member>
+        <member name="M:DAA.Helpers.JsonSerializationHelper.Deserialize(System.String,System.Type)">
+            <summary>
+            De-serializes the received JSON serialization into its object representation.
+            </summary>
+            <param name="serialization">The object's JSON serialization.</param>
+            <param name="type">The type of the root data contract.</param>
+        </member>
+        <member name="T:DAA.Helpers.ObjectsHelper">
+            <summary>
+            Provides methods that facilitate working with objects.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.ObjectsHelper.AllNullOrEqual``1(System.Func{``0,``0,System.Boolean},``0[])">
+            <summary>
+                <para>Returns True if all the specified objects are Null, or no object is null and the objects are equal according to the specified comparer. Returns False otherwise.</para>
+                <para>If a single object is specified, the method returns True.</para>
+                <para>If the specified objects collection is null, the method returns False.</para>
+            </summary>
+            <typeparam name="T">The type of the compared objects.</typeparam>
+            <param name="comparer">The comparer used to determine whether two objects are equal or not.</param>
+            <param name="objects">The tested objects.</param>
+        </member>
+        <member name="M:DAA.Helpers.ObjectsHelper.AllNullOrEqual``1(``0[])">
+            <summary>
+                <para>Returns True if all the specified objects are Null, or no object is null and the objects are equal according to the <see cref="M:System.Object.Equals(System.Object)"/> method. Returns False otherwise.</para>
+                <para>If a single object is specified, the method returns True.</para>
+            </summary>
+            <typeparam name="T">The type of the compared objects.</typeparam>
+            <param name="objects">The tested objects.</param>
+        </member>
+        <member name="T:DAA.Helpers.ObservableCollectionsSyncer`2">
+            <summary>
+            Provides the necessary functionality to sync two observable collections.
+            </summary>
+            <typeparam name="TTarget">The target collection's generic type.</typeparam>
+            <typeparam name="TSource">The source collection's generic type.</typeparam>
+        </member>
+        <member name="F:DAA.Helpers.ObservableCollectionsSyncer`2._sourceCollectionChangedHandler">
+            <summary>
+            The event handler used to listen to the source collection's collection changed event.
+            </summary>
+        </member>
+        <member name="P:DAA.Helpers.ObservableCollectionsSyncer`2.TargetCollection">
+            <summary>
+            Gets the target collection.
+            </summary>
+        </member>
+        <member name="P:DAA.Helpers.ObservableCollectionsSyncer`2.SourceCollection">
+            <summary>
+            Gets the source collection.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.ObservableCollectionsSyncer`2.#ctor(System.Collections.ObjectModel.ObservableCollection{`0},System.Collections.ObjectModel.ObservableCollection{`1})">
+            <summary>
+            Initializes a new <see cref="T:DAA.Helpers.ObservableCollectionsSyncer`2"/> object.
+            </summary>
+            <param name="targetCollection">The target collection.</param>
+            <param name="sourceCollection">The source collection.</param>
+        </member>
+        <member name="M:DAA.Helpers.ObservableCollectionsSyncer`2.Start">
+            <summary>
+            Starts syncing the two collections.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.ObservableCollectionsSyncer`2.Stop">
+            <summary>
+            Stops syncing the two collection.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.ObservableCollectionsSyncer`2.CreateCollectionChangedHandler(System.Collections.IList)">
+            <summary>
+            Creates a collection changed event handler that targets the specified collection.
+            </summary>
+            <param name="targetCollection">The collection that is to be updated according to the event.</param>
+        </member>
+        <member name="T:DAA.Helpers.PercentageCalculationsHelper">
+            <summary>
+            Various methods used to perform percentage calculations.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.PercentageCalculationsHelper.PercentageOf(System.Decimal,System.Decimal)">
+            <summary>
+            Returns the percentage that the specified value represents in the specified base value.
+            </summary>
+            <param name="value">The value.</param>
+            <param name="baseValue">The base value.</param>
+        </member>
+        <member name="M:DAA.Helpers.PercentageCalculationsHelper.DeltaPercentageOf(System.Decimal,System.Decimal)">
+            <summary>
+            Returns the percentage that difference between the base value and the specified value represents in the base value.
+            </summary>
+            <param name="value">The value.</param>
+            <param name="baseValue">The base value.</param>
+        </member>
+        <member name="M:DAA.Helpers.PercentageCalculationsHelper.GetPercentage(System.Decimal,System.Decimal)">
+            <summary>
+            Gets the value that the specified percentage represents in the specified base value.
+            </summary>
+            <param name="baseValue">The base value.</param>
+            <param name="percentage">The percentage value.</param>
+        </member>
+        <member name="M:DAA.Helpers.PercentageCalculationsHelper.IncreaseByPercentage(System.Decimal,System.Decimal)">
+            <summary>
+            Increases the specified base value by the specified percentage.
+            </summary>
+            <param name="baseValue">The value that is to be increased by the specified percentage.</param>
+            <param name="percentageValue">The percentage by which the base value will be increased.</param>
+        </member>
+        <member name="M:DAA.Helpers.PercentageCalculationsHelper.DecreaseByPercentage(System.Decimal,System.Decimal)">
+            <summary>
+            Decreases the specified base value by the specified percentage.
+            </summary>
+            <param name="baseValue">The value that is to be decreased by the specified percentage.</param>
+            <param name="percentageValue">The percentage by which the base value will be decreased.</param>
+        </member>
+        <member name="M:DAA.Helpers.PercentageCalculationsHelper.TakeAwayPercentage(System.Decimal,System.Decimal)">
+            <summary>
+            Returns the value resulted from taking away the specified percentage from the specified base value.
+            </summary>
+            <param name="baseValue">The base value.</param>
+            <param name="percentageValue">The percentage value.</param>
+        </member>
+        <member name="M:DAA.Helpers.PercentageCalculationsHelper.DeltaValueTakeAwayPercentage(System.Decimal,System.Decimal)">
+            <summary>
+            Returns the delta between the base value and the value resulted from taking away the specified percentage from the specified value.
+            </summary>
+            <param name="baseValue">The base value.</param>
+            <param name="percentageValue">The percentage value.</param>
+        </member>
+        <member name="T:DAA.Helpers.RandomizationHelper">
+            <summary>
+            Generates pseudo-random data.
+            </summary>
+        </member>
+        <member name="F:DAA.Helpers.RandomizationHelper._rand">
+            <summary>
+            The <see cref="T:System.Random"/> object used by the instance.
+            </summary>
+        </member>
+        <member name="P:DAA.Helpers.RandomizationHelper.Instance">
+            <summary>
+            Gets the singleton <see cref="T:DAA.Helpers.RandomizationHelper"/> instance.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.GetInt(System.Int32,System.Int32)">
+            <summary>
+            Returns a pseudo-random integer contained by the specified range.
+            </summary>
+            <param name="minValue">The range's lower limit.</param>
+            <param name="maxValue">The range's upper limit.</param>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.GetDecimal(System.Int32)">
+            <summary>
+            Gets a pseudo-random decimal value contained by the (0, 1] range, with the bounds multiplied by the specified factor.
+            </summary>
+            <param name="multiplicationFactor">The multiplication factor that alters the range's bounds/</param>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.GetDouble(System.Int32)">
+            <summary>
+            Gets a pseudo-random double value contained by the (0, 1] range, with the bounds multiplied by the specified factor.
+            </summary>
+            <param name="multiplicationFactor">The multiplication factor that alters the range's bounds/</param>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.GetString">
+            <summary>
+            Gets the <see cref="P:System.Text.Encoding.UTF8"/> bytes of a new <see cref="T:System.Guid"/> instance's string representation, converted to base64.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.GetDateTime(System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Gets a pseudo-random <see cref="T:System.DateTime"/> value contained by the specified [start, end] range. If the start value is not specified, <see cref="P:System.DateTime.Today"/> will be considered. If the end value is not specified, the considered value will result from adding an year to <see cref="P:System.DateTime.Today"/>.
+            </summary>
+            <param name="start">The first <see cref="T:System.DateTime"/> value that could be returned.</param>
+            <param name="end">The last <see cref="T:System.DateTime"/> value that could be returned.</param>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.GetBool">
+            <summary>
+            Returns a pseudo-random <see cref="T:System.Boolean"/> value.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.GetEnumValue``1(System.Boolean)">
+            <summary>
+            Returns a pseudo-random contained by the specified enumeration.
+            </summary>
+            <typeparam name="T">The type of the enumeration whose values will be the selection scope.</typeparam>
+            <param name="allowDefault">A value that specifies whether the default enumeration value is to be allowed or not.</param>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.#ctor">
+            <summary>
+            Initializes a new <see cref="T:DAA.Helpers.RandomizationHelper"/> instance.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.#cctor">
+            <summary>
+            Initializes the <see cref="T:DAA.Helpers.RandomizationHelper"/> class.
+            </summary>
+        </member>
+        <member name="T:DAA.Helpers.ReflectionHelper">
+            <summary>
+            Provides methods that facilitate working with reflection.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.ReflectionHelper.Invoke(System.Object,System.String,System.Object[])">
+            <summary>
+            Invokes the method or property with the specified name, on the given object, regardless
+            of the access modifier. The return value of the invokation is returned. If the method or
+            property return void, NULL will be returned.
+            </summary>
+            <param name="obj">The object whose method or property is to be invoked.</param>
+            <param name="memberName">The name of the desired method or property.</param>
+            <param name="arguments">The arguments used when invoking the method or property.</param>
+        </member>
+    </members>
+</doc>

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace DAA.StateManagement
+namespace DAA.StateManagement.Interfaces
 {
     public interface IDataPool<TData> where TData : IData
     {
-        void Store(IDescriptor descriptor, ICollection<TData> data);
+        void Store(IDescriptor descriptor, IEnumerable<TData> data);
     }
 }
