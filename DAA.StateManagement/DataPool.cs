@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using DAA.StateManagement.Interfaces;
 
@@ -7,21 +8,29 @@ namespace DAA.StateManagement
     public class DataPool<TData> : IDataPool<TData>
         where TData : IData
     {
+        private IDictionary<ITerminalDescriptor, TData> _terminalDescriptorToDataMap;
         private ITerminalDescriptorsFlyweightFactory _terminalDescriptorsFlyweightFactory;
 
+
+        protected virtual IDictionary<ITerminalDescriptor, TData> TerminalDescriptorToDataMap { get => _terminalDescriptorToDataMap; }
         protected virtual ITerminalDescriptorsFlyweightFactory TerminalDescriptorsFlyweightFactory { get => _terminalDescriptorsFlyweightFactory; }
+
 
         public DataPool(ITerminalDescriptorsFlyweightFactory terminalDescriptorsFlyweightFactory)
         {
+            this._terminalDescriptorToDataMap = new Dictionary<ITerminalDescriptor, TData>();
             this._terminalDescriptorsFlyweightFactory = terminalDescriptorsFlyweightFactory;
         }
 
 
-        public void Store(IDescriptor descriptor, IEnumerable<TData> data)
+        public TData Retrieve(ITerminalDescriptor descriptor)
         {
-            var terminalDescriptorsOfStoredData = this.StoreDataAndProvideTerminalDescriptors(data);
+            return this.TerminalDescriptorToDataMap[descriptor];
+        }
 
-            this.StoreNonTerminalDescriptorIfNonTerminal(descriptor, terminalDescriptorsOfStoredData);
+        public IEnumerable<TData> Retrieve(INonTerminalDescriptor nonTerminalDescriptor)
+        {
+            return null;
         }
 
         public bool Contains(IDescriptor descriptor)
@@ -34,6 +43,13 @@ namespace DAA.StateManagement
             return this.ContainsTerminalDescriptor(descriptor as ITerminalDescriptor);
         }
 
+        public void Store(IDescriptor descriptor, IEnumerable<TData> data)
+        {
+            var terminalDescriptorsOfStoredData = this.StoreDataAndProvideTerminalDescriptors(data);
+
+            this.StoreDescriptorIfNonTerminal(descriptor, terminalDescriptorsOfStoredData);
+        }
+        
         public virtual IEnumerable<ITerminalDescriptor> UpdateNonTerminalDescriptorComposition(INonTerminalDescriptor nonTerminalDescriptor, IEnumerable<ITerminalDescriptor> terminalDescriptors)
         {
             //
@@ -59,6 +75,15 @@ namespace DAA.StateManagement
             return terminalDescriptors;
         }
 
+
+        protected virtual void StoreDescriptorIfNonTerminal(IDescriptor descriptor, IEnumerable<ITerminalDescriptor> terminalDescriptors)
+        {
+            if (descriptor is INonTerminalDescriptor)
+            {
+                this.StoreNonTerminalDescriptor(descriptor as INonTerminalDescriptor, terminalDescriptors);
+            }
+        }
+
         protected virtual void StoreTerminalDescriptor(ITerminalDescriptor descriptor, TData data)
         {
             if (this.ContainsTerminalDescriptor(descriptor))
@@ -71,18 +96,26 @@ namespace DAA.StateManagement
             }
         }
 
-        protected virtual void StoreNonTerminalDescriptorIfNonTerminal(IDescriptor descriptor, IEnumerable<ITerminalDescriptor> terminalDescriptors)
-        {
-            if (descriptor is INonTerminalDescriptor)
-            {
-                this.StoreNonTerminalDescriptor(descriptor as INonTerminalDescriptor, terminalDescriptors);
-            }
-        }
-
         protected virtual void StoreNonTerminalDescriptor(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> terminalDescriptors)
         {
             this.RegisterNonTerminalDescriptorIfUnknown(descriptor);
             this.UpdateNonTerminalDescriptorComposition(descriptor, terminalDescriptors);
+        }
+
+
+        protected virtual void RegisterTerminalDescriptor(ITerminalDescriptor descriptor, TData data)
+        {
+            if (null == data)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            if (this.ContainsTerminalDescriptor(descriptor))
+            {
+                throw new InvalidOperationException();
+            }
+
+            this.TerminalDescriptorToDataMap.Add(descriptor, data);
         }
 
         protected virtual void RegisterNonTerminalDescriptorIfUnknown(INonTerminalDescriptor nonTerminalDescriptor)
@@ -93,10 +126,13 @@ namespace DAA.StateManagement
             }
         }
 
+        protected virtual void RegisterNonTerminalDescriptor(INonTerminalDescriptor nonTerminalDescriptor)
+        { }
+
 
         protected virtual bool ContainsTerminalDescriptor(ITerminalDescriptor descriptor)
         {
-            return false;
+            return this.TerminalDescriptorToDataMap.ContainsKey(descriptor);
         }
 
         protected virtual bool ContainsNonTerminalDescriptor(INonTerminalDescriptor nonTerminalDescriptor)
@@ -104,11 +140,6 @@ namespace DAA.StateManagement
             return false;
         }
 
-        protected virtual void RegisterTerminalDescriptor(ITerminalDescriptor descriptor, IData data)
-        { }
-
-        protected virtual void RegisterNonTerminalDescriptor(INonTerminalDescriptor nonTerminalDescriptor)
-        { }
 
         protected virtual void UpdateData(ITerminalDescriptor descriptor, TData data)
         { }

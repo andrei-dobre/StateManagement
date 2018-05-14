@@ -61,12 +61,25 @@ namespace DAA.StateManagement.Tests
             Assert.IsTrue(Object.ReferenceEquals(this.TerminalDescriptorsFlyweightFactory, result));
         }
 
+        [TestMethod]
+        public void GetTerminalDescriptorToDataMap__NotNull_Constant()
+        {
+            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory);
+
+            var resultOne = ReflectionHelper.Invoke(testInstance, "TerminalDescriptorToDataMap");
+            var resultTwo = ReflectionHelper.Invoke(testInstance, "TerminalDescriptorToDataMap");
+
+            Assert.IsNotNull(resultOne);
+            Assert.IsNotNull(resultTwo);
+            Assert.IsTrue(Object.ReferenceEquals(resultOne, resultTwo));
+        }
+
 
         [TestMethod]
         public void Store__DataStored()
         {
             this.TestInstanceMockProtected.Setup("StoreDataAndProvideTerminalDescriptors", ItExpr.IsAny<IEnumerable<IData>>());
-            this.TestInstanceMockProtected.Setup("StoreNonTerminalDescriptorIfNonTerminal", ItExpr.IsAny<IDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>());
+            this.TestInstanceMockProtected.Setup("StoreDescriptorIfNonTerminal", ItExpr.IsAny<IDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>());
 
             this.TestInstance.Store(this.Descriptor, this.DataCollection);
 
@@ -79,30 +92,30 @@ namespace DAA.StateManagement.Tests
             this.TestInstanceMockProtected
                 .Setup<IEnumerable<ITerminalDescriptor>>("StoreDataAndProvideTerminalDescriptors", ItExpr.IsAny<IEnumerable<IData>>())
                 .Returns(this.TerminalDescriptorsCollection);
-            this.TestInstanceMockProtected.Setup("StoreNonTerminalDescriptorIfNonTerminal", ItExpr.IsAny<IDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>());
+            this.TestInstanceMockProtected.Setup("StoreDescriptorIfNonTerminal", ItExpr.IsAny<IDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>());
 
             this.TestInstance.Store(this.Descriptor, this.DataCollection);
 
-            this.TestInstanceMockProtected.Verify("StoreNonTerminalDescriptorIfNonTerminal", Times.Once(), this.Descriptor, this.TerminalDescriptorsCollection);
+            this.TestInstanceMockProtected.Verify("StoreDescriptorIfNonTerminal", Times.Once(), this.Descriptor, this.TerminalDescriptorsCollection);
         }
 
 
         [TestMethod]
-        public void StoreNonTerminalDescriptorIfNonTerminal_NonTerminalDescriptor_Stored()
+        public void StoreDescriptorIfNonTerminal_NonTerminalDescriptor_Stored()
         {
             this.TestInstanceMockProtected.Setup("StoreNonTerminalDescriptor", ItExpr.IsAny<INonTerminalDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>());
 
-            ReflectionHelper.Invoke(this.TestInstance, "StoreNonTerminalDescriptorIfNonTerminal", this.NonTerminalDescriptor, this.TerminalDescriptorsCollection);
+            ReflectionHelper.Invoke(this.TestInstance, "StoreDescriptorIfNonTerminal", this.NonTerminalDescriptor, this.TerminalDescriptorsCollection);
 
             this.TestInstanceMockProtected.Verify("StoreNonTerminalDescriptor", Times.Once(), this.NonTerminalDescriptor, this.TerminalDescriptorsCollection);
         }
 
         [TestMethod]
-        public void StoreNonTerminalDescriptorIfNonTerminal_TerminalDescriptor_NotStored()
+        public void StoreDescriptorIfNonTerminal_TerminalDescriptor_NotStored()
         {
             this.TestInstanceMockProtected.Setup("StoreNonTerminalDescriptor", ItExpr.IsAny<INonTerminalDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>());
 
-            ReflectionHelper.Invoke(this.TestInstance, "StoreNonTerminalDescriptorIfNonTerminal", this.TerminalDescriptor, this.TerminalDescriptorsCollection);
+            ReflectionHelper.Invoke(this.TestInstance, "StoreDescriptorIfNonTerminal", this.TerminalDescriptor, this.TerminalDescriptorsCollection);
 
             this.TestInstanceMockProtected.Verify("StoreNonTerminalDescriptor", Times.Never(), ItExpr.IsAny<INonTerminalDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>());
         }
@@ -279,6 +292,88 @@ namespace DAA.StateManagement.Tests
             ReflectionHelper.Invoke(this.TestInstance, "StoreTerminalDescriptor", this.TerminalDescriptor, this.Data);
 
             this.TestInstanceMockProtected.Verify("RegisterTerminalDescriptor", Times.Never(), this.TerminalDescriptor, this.Data);
+        }
+
+
+        [TestMethod]
+        public void RegisterTerminalDescriptor_DescriptorNotContained_CanRetrieveData()
+        {
+            ReflectionHelper.Invoke(this.TestInstance, "RegisterTerminalDescriptor", this.TerminalDescriptor, this.Data);
+
+            var result = this.TestInstance.Retrieve(this.TerminalDescriptor);
+
+            Assert.IsTrue(Object.ReferenceEquals(result, this.Data));
+        }
+
+        [TestMethod]
+        public void RegisterTerminalDescriptor_DescriptorContained_InvalidOperationException()
+        {
+            var correctExceptionCaught = false;
+
+            ReflectionHelper.Invoke(this.TestInstance, "RegisterTerminalDescriptor", this.TerminalDescriptor, this.Data);
+
+            try
+            {
+                ReflectionHelper.Invoke(this.TestInstance, "RegisterTerminalDescriptor", this.TerminalDescriptor, this.Data);
+            }
+            catch (Exception e)
+            {
+                correctExceptionCaught = e.InnerException is InvalidOperationException;
+            }
+
+            Assert.IsTrue(correctExceptionCaught);
+        }
+
+        [TestMethod]
+        public void RegisterTerminalDescriptor__DescriptorNotContained_OtherDescriptorContained__CanRetrieveData()
+        {
+            var terminalDescriptor = new Mock<ITerminalDescriptor>().Object;
+            var data = new Mock<IData>().Object;
+
+            ReflectionHelper.Invoke(this.TestInstance, "RegisterTerminalDescriptor", terminalDescriptor, data);
+            ReflectionHelper.Invoke(this.TestInstance, "RegisterTerminalDescriptor", this.TerminalDescriptor, this.Data);
+
+            var resultOne = this.TestInstance.Retrieve(this.TerminalDescriptor);
+            var resultTwo = this.TestInstance.Retrieve(terminalDescriptor);
+
+            Assert.IsTrue(Object.ReferenceEquals(resultOne, this.Data));
+            Assert.IsTrue(Object.ReferenceEquals(resultTwo, data));
+        }
+
+        [TestMethod]
+        public void RegisterTerminalDescriptor_NullData_ArgumentNullException()
+        {
+            var correctExceptionCaught = false;
+
+            try
+            {
+                ReflectionHelper.Invoke(this.TestInstance, "RegisterTerminalDescriptor", this.TerminalDescriptor, null);
+            }
+            catch (Exception e)
+            {
+                correctExceptionCaught = e.InnerException is ArgumentNullException;
+            }
+
+            Assert.IsTrue(correctExceptionCaught);
+        }
+
+
+        [TestMethod]
+        public void ContainsTerminalDescriptor_NotRegistered_False()
+        {
+            var result = (bool)ReflectionHelper.Invoke(this.TestInstance, "ContainsTerminalDescriptor", this.TerminalDescriptor);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void ContainsTerminalDescriptor_Registered_True()
+        {
+            ReflectionHelper.Invoke(this.TestInstance, "RegisterTerminalDescriptor", this.TerminalDescriptor, this.Data);
+
+            var result = (bool)ReflectionHelper.Invoke(this.TestInstance, "ContainsTerminalDescriptor", this.TerminalDescriptor);
+
+            Assert.IsTrue(result);
         }
     }
 }
