@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using DAA.StateManagement.Interfaces;
 
@@ -23,14 +24,16 @@ namespace DAA.StateManagement
         }
 
 
-        public TData Retrieve(ITerminalDescriptor descriptor)
+        public virtual TData Retrieve(ITerminalDescriptor descriptor)
         {
             return this.TerminalDescriptorToDataMap[descriptor];
         }
 
-        public IEnumerable<TData> Retrieve(INonTerminalDescriptor nonTerminalDescriptor)
+        public virtual IEnumerable<TData> Retrieve(INonTerminalDescriptor nonTerminalDescriptor)
         {
-            return null;
+            return
+                this.RetrieveCompositionOfNonTerminalDescriptor(nonTerminalDescriptor)
+                    .Select(terminalDescriptor => this.Retrieve(terminalDescriptor));
         }
 
         public bool Contains(IDescriptor descriptor)
@@ -50,11 +53,14 @@ namespace DAA.StateManagement
             this.StoreDescriptorIfNonTerminal(descriptor, terminalDescriptorsOfStoredData);
         }
         
-        public virtual IEnumerable<ITerminalDescriptor> UpdateNonTerminalDescriptorComposition(INonTerminalDescriptor nonTerminalDescriptor, IEnumerable<ITerminalDescriptor> terminalDescriptors)
+        public virtual IEnumerable<ITerminalDescriptor> ChangeCompositionOfNonTerminalDescriptor(INonTerminalDescriptor nonTerminalDescriptor, IEnumerable<ITerminalDescriptor> terminalDescriptors)
         {
-            //
-            // Should update the composition of the registered descriptor, not the
-            // received instance.
+            return null;
+        }
+
+
+        protected virtual IEnumerable<ITerminalDescriptor> RetrieveCompositionOfNonTerminalDescriptor(INonTerminalDescriptor nonTerminalDescriptor)
+        {
             return null;
         }
 
@@ -99,7 +105,7 @@ namespace DAA.StateManagement
         protected virtual void StoreNonTerminalDescriptor(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> terminalDescriptors)
         {
             this.RegisterNonTerminalDescriptorIfUnknown(descriptor);
-            this.UpdateNonTerminalDescriptorComposition(descriptor, terminalDescriptors);
+            this.ChangeCompositionOfNonTerminalDescriptor(descriptor, terminalDescriptors);
         }
 
 

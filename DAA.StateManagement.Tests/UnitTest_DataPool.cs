@@ -125,7 +125,7 @@ namespace DAA.StateManagement.Tests
         public void StoreNonTerminalDescriptor__RegisteredIfUnknown()
         {
             this.TestInstanceMockProtected.Setup("RegisterNonTerminalDescriptorIfUnknown", ItExpr.IsAny<INonTerminalDescriptor>());
-            this.TestInstanceMock.Setup(_ => _.UpdateNonTerminalDescriptorComposition(It.IsAny<INonTerminalDescriptor>(), It.IsAny<IEnumerable<ITerminalDescriptor>>()));
+            this.TestInstanceMock.Setup(_ => _.ChangeCompositionOfNonTerminalDescriptor(It.IsAny<INonTerminalDescriptor>(), It.IsAny<IEnumerable<ITerminalDescriptor>>()));
 
             ReflectionHelper.Invoke(this.TestInstance, "StoreNonTerminalDescriptor", this.NonTerminalDescriptor, this.TerminalDescriptorsCollection);
 
@@ -136,11 +136,11 @@ namespace DAA.StateManagement.Tests
         public void StoreNonTerminalDescriptor__CompositionUpdated()
         {
             this.TestInstanceMockProtected.Setup("RegisterNonTerminalDescriptorIfUnknown", ItExpr.IsAny<INonTerminalDescriptor>());
-            this.TestInstanceMock.Setup(_ => _.UpdateNonTerminalDescriptorComposition(It.IsAny<INonTerminalDescriptor>(), It.IsAny<IEnumerable<ITerminalDescriptor>>()));
+            this.TestInstanceMock.Setup(_ => _.ChangeCompositionOfNonTerminalDescriptor(It.IsAny<INonTerminalDescriptor>(), It.IsAny<IEnumerable<ITerminalDescriptor>>()));
 
             ReflectionHelper.Invoke(this.TestInstance, "StoreNonTerminalDescriptor", this.NonTerminalDescriptor, this.TerminalDescriptorsCollection);
 
-            this.TestInstanceMock.Verify(_ => _.UpdateNonTerminalDescriptorComposition(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection), Times.Once());
+            this.TestInstanceMock.Verify(_ => _.ChangeCompositionOfNonTerminalDescriptor(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection), Times.Once());
         }
 
 
@@ -374,6 +374,39 @@ namespace DAA.StateManagement.Tests
             var result = (bool)ReflectionHelper.Invoke(this.TestInstance, "ContainsTerminalDescriptor", this.TerminalDescriptor);
 
             Assert.IsTrue(result);
+        }
+
+
+        [TestMethod]
+        public void Retrieve_NonTerminalDescriptor_DataOfTheTerminalDescriptorsThatComposeIt()
+        {
+            var terminalDescriptors = 
+                ArraysHelper.CreateWithContent(
+                    new Mock<ITerminalDescriptor>().Object,
+                    new Mock<ITerminalDescriptor>().Object,
+                    new Mock<ITerminalDescriptor>().Object
+                );
+            var data = new IData[terminalDescriptors.Length];
+
+            for (int i = 0; i < terminalDescriptors.Length; ++i)
+            {
+                var terminalDescriptor = terminalDescriptors[i];
+                var dataItem = new Mock<IData>().Object;
+                
+                this.TestInstanceMock
+                    .Setup<IData>(_ => _.Retrieve(terminalDescriptor))
+                    .Returns(dataItem);
+
+                data[i] = dataItem;
+            }
+
+            this.TestInstanceMockProtected
+                .Setup<IEnumerable<ITerminalDescriptor>>("RetrieveCompositionOfNonTerminalDescriptor", this.NonTerminalDescriptor)
+                .Returns(() => terminalDescriptors);
+
+            var result = this.TestInstance.Retrieve(this.NonTerminalDescriptor);
+
+            Assert.IsTrue(data.Equivalent(result));
         }
     }
 }
