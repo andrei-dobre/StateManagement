@@ -28,7 +28,7 @@ namespace DAA.StateManagement.DataManagement
 
         public bool Contains(ITerminalDescriptor descriptor)
         {
-            return this.Data.Contains(descriptor as ITerminalDescriptor);
+            return this.Data.Contains(descriptor);
         }
 
         public bool Contains(INonTerminalDescriptor descriptor)
