@@ -53,7 +53,7 @@ namespace DAA.StateManagement.DataManagement
 
         public virtual IEnumerable<ITerminalDescriptor> UpdateDescriptorCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
         {
-            return null;
+            return this.NonTerminalDescriptorCompositions.UpdateAndProvideAdditions(descriptor, composition);
         }
 
 

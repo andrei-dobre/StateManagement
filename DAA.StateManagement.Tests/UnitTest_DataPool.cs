@@ -272,5 +272,22 @@ namespace DAA.StateManagement.Tests
             this.DataStoreMock.Verify();
             Assert.IsTrue(terminalDescriptors.Equivalent(result));
         }
+
+
+        [TestMethod]
+        public void UpdateDescriptorCompositionAndProvideAdditions__ProxiesNonTerminalDescriptorCompositionsStore()
+        {
+            var additions = ArraysHelper.CreateWithContent(new Mock<ITerminalDescriptor>().Object, new Mock<ITerminalDescriptor>().Object);
+
+            this.NonTerminalDescriptorCompositionsMock
+                .Setup(_ => _.UpdateAndProvideAdditions(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection))
+                .Returns(additions)
+                .Verifiable();
+
+            var result = this.TestInstance.UpdateDescriptorCompositionAndProvideAdditions(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection);
+
+            this.NonTerminalDescriptorCompositionsMock.Verify();
+            Assert.AreSame(additions, result);
+        }
     }
 }

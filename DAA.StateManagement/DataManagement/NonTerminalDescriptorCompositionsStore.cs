@@ -6,10 +6,12 @@ namespace DAA.StateManagement.DataManagement
 {
     public class NonTerminalDescriptorCompositionsStore : Store<INonTerminalDescriptor, IEnumerable<ITerminalDescriptor>>
     {
-        public override void Update(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> data)
+        public override void Update(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
         { }
 
-        public virtual void UpdateAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> data)
-        { }
+        public virtual IEnumerable<ITerminalDescriptor> UpdateAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
+        {
+            return null;
+        }
     }
 }
