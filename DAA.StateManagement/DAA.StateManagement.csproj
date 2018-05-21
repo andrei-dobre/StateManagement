@@ -33,6 +33,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataManagement\DataInformationStore.cs" />
     <Compile Include="DataManagement\DataPool.cs" />
     <Compile Include="DataManagement\NonTerminalDescriptorCompositionsStore.cs" />
     <Compile Include="DataManagement\Store.cs" />

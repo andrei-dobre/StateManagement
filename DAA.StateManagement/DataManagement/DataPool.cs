@@ -51,12 +51,6 @@ namespace DAA.StateManagement.DataManagement
         }
 
 
-        public virtual IEnumerable<ITerminalDescriptor> UpdateDescriptorCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
-        {
-            return this.NonTerminalDescriptorCompositions.UpdateAndProvideAdditions(descriptor, composition);
-        }
-
-
         public void Save(ITerminalDescriptor descriptor, TData data)
         {
             this.Data.Save(descriptor, data);
@@ -86,7 +80,21 @@ namespace DAA.StateManagement.DataManagement
 
         public IEnumerable<IDescriptor> FindIntersectingDescriptors(IDescriptor descriptor)
         {
-            return null;
+            return this.RetrieveAllDescriptors().Where(_ => _.Intersects(descriptor)).ToArray();
+        }
+
+        protected virtual IEnumerable<IDescriptor> RetrieveAllDescriptors()
+        {
+            var terminalDescriptors = this.Data.RetrieveDescriptors().Cast<IDescriptor>();
+            var nonTerminalDescriptors = this.NonTerminalDescriptorCompositions.RetrieveDescriptors().Cast<IDescriptor>();
+
+            return terminalDescriptors.Concat(nonTerminalDescriptors);
+        }
+
+
+        public virtual IEnumerable<ITerminalDescriptor> UpdateDescriptorCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
+        {
+            return this.NonTerminalDescriptorCompositions.UpdateAndProvideAdditions(descriptor, composition);
         }
     }
 }

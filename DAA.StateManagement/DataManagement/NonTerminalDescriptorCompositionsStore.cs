@@ -4,7 +4,7 @@ using DAA.StateManagement.Interfaces;
 
 namespace DAA.StateManagement.DataManagement
 {
-    public class NonTerminalDescriptorCompositionsStore : Store<INonTerminalDescriptor, IEnumerable<ITerminalDescriptor>>
+    public class NonTerminalDescriptorCompositionsStore : DataInformationStore<INonTerminalDescriptor, IEnumerable<ITerminalDescriptor>>
     {
         public override void Update(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
         { }

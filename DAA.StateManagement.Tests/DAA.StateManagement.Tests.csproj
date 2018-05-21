@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UnitTest_DataInformationStore.cs" />
     <Compile Include="UnitTest_Store.cs" />
     <Compile Include="UnitTest_DataStore.cs" />
     <Compile Include="UnitTest_TerminalDescriptorsFlyweightFactory.cs" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -43,6 +44,7 @@ namespace DAA.StateManagement.Tests
             Assert.IsNotNull(resultTwo);
             Assert.AreSame(resultOne, resultTwo);
         }
+
 
         [TestMethod]
         public void Save_DescriptorNotContained_Inserted()
@@ -150,6 +152,20 @@ namespace DAA.StateManagement.Tests
             var result = this.TestInstance.Contains(this.Key);
 
             Assert.IsTrue(result);
+        }
+
+
+        [TestMethod]
+        public void RetrieveKeys__AllInsertedKeys()
+        {
+            var expectedValues = ArraysHelper.CreateWithContent(new object(), new object(), new object());
+
+            expectedValues.ForEach(_ => this.TestInstance.Insert(_, new object()));
+
+            var result = ReflectionHelper.Invoke(this.TestInstance, "RetrieveKeys")
+                            as IEnumerable<object>;
+
+            Assert.IsTrue(expectedValues.Equivalent(result));
         }
     }
 }

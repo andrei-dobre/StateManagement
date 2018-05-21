@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace DAA.StateManagement.DataManagement
 {
+    // TODO: Move to the framework.
     public abstract class Store<TKey, TValue>
     {
         private IDictionary<TKey, TValue> keyToValueMap;
@@ -16,43 +17,49 @@ namespace DAA.StateManagement.DataManagement
         }
 
 
-        public virtual bool Contains(TKey descriptor)
+        public virtual bool Contains(TKey key)
         {
-            return this.KeyToValueMap.ContainsKey(descriptor);
+            return this.KeyToValueMap.ContainsKey(key);
         }
 
-        public virtual TValue Retrieve(TKey descriptor)
+        public virtual TValue Retrieve(TKey key)
         {
-            return this.KeyToValueMap[descriptor];
+            return this.KeyToValueMap[key];
         }
-
-        public virtual void Save(TKey descriptor, TValue data)
+        
+        public virtual void Save(TKey key, TValue data)
         {
-            if (this.Contains(descriptor))
+            if (this.Contains(key))
             {
-                this.Update(descriptor, data);
+                this.Update(key, data);
             }
             else
             {
-                this.Insert(descriptor, data);
+                this.Insert(key, data);
             }
         }
 
-        public virtual void Insert(TKey descriptor, TValue data)
+        public virtual void Insert(TKey key, TValue data)
         {
             if (null == data)
             {
                 throw new ArgumentNullException(nameof(data));
             }
 
-            if (this.Contains(descriptor))
+            if (this.Contains(key))
             {
                 throw new InvalidOperationException();
             }
 
-            this.KeyToValueMap.Add(descriptor, data);
+            this.KeyToValueMap.Add(key, data);
         }
         
-        public abstract void Update(TKey descriptor, TValue data);
+        public abstract void Update(TKey key, TValue data);
+
+
+        protected virtual IEnumerable<TKey> RetrieveKeys()
+        {
+            return this.KeyToValueMap.Keys;
+        }
     }
 }

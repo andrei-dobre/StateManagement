@@ -1,16 +1,18 @@
-﻿using DAA.StateManagement.Interfaces;
+﻿using System.Collections.Generic;
+
+using DAA.StateManagement.Interfaces;
 
 namespace DAA.StateManagement.DataManagement
 {
-    public class DataStore<TData> : Store<ITerminalDescriptor, TData>
+    public class DataStore<TData> : DataInformationStore<ITerminalDescriptor, TData>
         where TData : IData
     {
         public DataStore()
         { }
-        
+
         public override void Update(ITerminalDescriptor descriptor, TData data)
         {
-            // TODO: Implement me using the data manipulator.
+            // TODO: Implement using the data manipulator.
         }
     }
 }

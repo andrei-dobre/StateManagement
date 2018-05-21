@@ -289,5 +289,83 @@ namespace DAA.StateManagement.Tests
             this.NonTerminalDescriptorCompositionsMock.Verify();
             Assert.AreSame(additions, result);
         }
+
+
+        [TestMethod]
+        public void FindIntersectingDescriptors__AllIntersectingDescriptors()
+        {
+            var providedDescriptor = new Mock<IDescriptor>().Object;
+            var disjunctDescriptorMocks = ArraysHelper.CreateWithContent(new Mock<IDescriptor>(), new Mock<IDescriptor>());
+            var intersectingDescriptorMocks = ArraysHelper.CreateWithContent(new Mock<IDescriptor>(), new Mock<IDescriptor>());
+            var allDescriptorMocks = this.ShuffledMerge(intersectingDescriptorMocks, disjunctDescriptorMocks);
+
+            var intersectingDescriptors = intersectingDescriptorMocks.Select(_ => _.Object);
+            var allDescriptors = allDescriptorMocks.Select(_ => _.Object);
+
+            disjunctDescriptorMocks.ForEach(_ => _.Setup(__ => __.Intersects(providedDescriptor)).Returns(false));
+            intersectingDescriptorMocks.ForEach(_ => _.Setup(__ => __.Intersects(providedDescriptor)).Returns(true));
+
+            this.TestInstanceMockProtected
+                .Setup<IEnumerable<IDescriptor>>("RetrieveAllDescriptors")
+                .Returns(allDescriptors)
+                .Verifiable();
+
+            var result = this.TestInstance.FindIntersectingDescriptors(providedDescriptor);
+
+            this.TestInstanceMock.Verify();
+            allDescriptorMocks.ForEach(_ => _.VerifyAll());
+            Assert.IsTrue(intersectingDescriptors.Equivalent(result));
+        }
+
+
+        [TestMethod]
+        public void RetrieveAllDescriptors__TerminalDescriptorsRetrieved()
+        {
+            var terminalDescriptorMocks = ArraysHelper.CreateWithContent(new Mock<ITerminalDescriptor>(), new Mock<ITerminalDescriptor>());
+            var terminalDescriptors = terminalDescriptorMocks.Select(_ => _.Object);
+
+            this.NonTerminalDescriptorCompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(new INonTerminalDescriptor[0]);
+            this.DataStoreMock.Setup(_ => _.RetrieveDescriptors()).Returns(terminalDescriptors).Verifiable();
+
+            var result = (IEnumerable<IDescriptor>)ReflectionHelper.Invoke(this.TestInstance, "RetrieveAllDescriptors");
+
+            this.DataStoreMock.Verify();
+            Assert.IsTrue(terminalDescriptors.Equivalent(result));
+        }
+
+        [TestMethod]
+        public void RetrieveAllDescriptors__NonTerminalDescriptorsRetrieved()
+        {
+            var nonTerminalDescriptorMocks = ArraysHelper.CreateWithContent(new Mock<INonTerminalDescriptor>(), new Mock<INonTerminalDescriptor>());
+            var nonTerminalDescriptors = nonTerminalDescriptorMocks.Select(_ => _.Object);
+
+            this.DataStoreMock.Setup(_ => _.RetrieveDescriptors()).Returns(new ITerminalDescriptor[0]);
+            this.NonTerminalDescriptorCompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(nonTerminalDescriptors).Verifiable();
+
+            var result = (IEnumerable<IDescriptor>)ReflectionHelper.Invoke(this.TestInstance, "RetrieveAllDescriptors");
+
+            this.NonTerminalDescriptorCompositionsMock.Verify();
+            Assert.IsTrue(nonTerminalDescriptors.Equivalent(result));
+        }
+
+
+        // TODO: Move to the framework.
+        private TItem[] ShuffledMerge<TItem>(TItem[] left, TItem[] right)
+        {
+            var random = new Random();
+            var result = left.Concat(right).ToArray();
+            var size = result.Length;
+
+            for (int i = 1; i < size; ++i)
+            {
+                var swapIndex = random.Next(size - 1);
+                var swappedValue = result[swapIndex];
+
+                result[swapIndex] = result[i];
+                result[i] = swappedValue;
+            }
+
+            return result;
+        }
     }
 }
