@@ -17,11 +17,11 @@ namespace DAA.StateManagement.DataManagement
         protected virtual ITerminalDescriptorsFlyweightFactory TerminalDescriptorsFlyweightFactory { get => terminalDescriptorsFlyweightFactory; }
 
 
-        public DataPool(ITerminalDescriptorsFlyweightFactory terminalDescriptorsFlyweightFactory)
+        public DataPool(ITerminalDescriptorsFlyweightFactory terminalDescriptorsFlyweightFactory, IDataManipulator<TData> dataManipulator)
         {
             this.terminalDescriptorsFlyweightFactory = terminalDescriptorsFlyweightFactory;
 
-            this.dataStore = new DataStore<TData>();
+            this.dataStore = new DataStore<TData>(dataManipulator);
             this.nonTerminalDescriptorCompositionsStore = new NonTerminalDescriptorCompositionsStore();
         }
 

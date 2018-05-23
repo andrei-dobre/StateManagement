@@ -19,6 +19,9 @@ namespace DAA.StateManagement.Tests
         private ITerminalDescriptorsFlyweightFactory TerminalDescriptorsFlyweightFactory { get => this.TerminalDescriptorsFlyweightFactoryMock.Object; }
         private Mock<ITerminalDescriptorsFlyweightFactory> TerminalDescriptorsFlyweightFactoryMock { get; set; }
 
+        private IDataManipulator<IData> DataManipulator { get => this.DataManipulatorMock.Object; }
+        private Mock<IDataManipulator<IData>> DataManipulatorMock { get; set; }
+
         private DataStore<IData> DataStore { get => this.DataStoreMock.Object; }
         private Mock<DataStore<IData>> DataStoreMock { get; set; }
 
@@ -49,7 +52,8 @@ namespace DAA.StateManagement.Tests
         public void BeforeEach()
         {
             this.TerminalDescriptorsFlyweightFactoryMock = new Mock<ITerminalDescriptorsFlyweightFactory>();
-            this.DataStoreMock = new Mock<DataStore<IData>>();
+            this.DataManipulatorMock = new Mock<IDataManipulator<IData>>();
+            this.DataStoreMock = new Mock<DataStore<IData>>(this.DataManipulator);
             this.NonTerminalDescriptorCompositionsMock = new Mock<NonTerminalDescriptorCompositionsStore>();
             this.DataMock = new Mock<IData>();
             this.DataCollectionMock = new Mock<IEnumerable<IData>>();
@@ -57,7 +61,7 @@ namespace DAA.StateManagement.Tests
             this.NonTerminalDescriptorMock = new Mock<INonTerminalDescriptor>();
             this.TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
 
-            this.TestInstanceMock = new Mock<DataPool<IData>>(this.TerminalDescriptorsFlyweightFactory);
+            this.TestInstanceMock = new Mock<DataPool<IData>>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
             this.TestInstanceMock.CallBase = true;
 
             this.TestInstanceMockProtected
@@ -72,7 +76,7 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void GetTerminalDescriptorsFlyweightFactory__ProvidedValue()
         {
-            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory);
+            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
 
             var result = ReflectionHelper.Invoke(testInstance, "TerminalDescriptorsFlyweightFactory");
 
@@ -82,7 +86,7 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void GetData__NotNull_Constant()
         {
-            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory);
+            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
 
             var resultOne = ReflectionHelper.Invoke(testInstance, "Data");
             var resultTwo = ReflectionHelper.Invoke(testInstance, "Data");
@@ -95,7 +99,7 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void GetNonTerminalDescriptorCompositions__NotNull_Constant()
         {
-            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory);
+            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
 
             var resultOne = ReflectionHelper.Invoke(testInstance, "NonTerminalDescriptorCompositions");
             var resultTwo = ReflectionHelper.Invoke(testInstance, "NonTerminalDescriptorCompositions");
@@ -103,6 +107,18 @@ namespace DAA.StateManagement.Tests
             Assert.IsNotNull(resultOne);
             Assert.IsNotNull(resultTwo);
             Assert.AreSame(resultOne, resultTwo);
+        }
+
+
+        [TestMethod]
+        public void Ctor__DataStoreCreatedWithProvidedDataManipulator()
+        {
+            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
+            var dataStore = ReflectionHelper.Invoke(testInstance, "Data") as DataStore<IData>;
+
+            var result = ReflectionHelper.Invoke(dataStore, "DataManipulator");
+
+            Assert.AreSame(this.DataManipulator, result);
         }
 
 

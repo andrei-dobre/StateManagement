@@ -15,6 +15,9 @@ namespace DAA.StateManagement.Tests
     [TestClass]
     public class UnitTest_DataStore
     {
+        private IDataManipulator<IData> DataManipulator { get => this.DataManipulatorMock.Object; }
+        private Mock<IDataManipulator<IData>> DataManipulatorMock { get; set; }
+
         private IData Data { get => this.DataMock.Object; }
         private Mock<IData> DataMock { get; set; }
 
@@ -32,12 +35,24 @@ namespace DAA.StateManagement.Tests
         [TestInitialize]
         public void BeforeEach()
         {
+            this.DataManipulatorMock = new Mock<IDataManipulator<IData>>();
             this.DataMock = new Mock<IData>();
             this.TerminalDescriptorMock = new Mock<ITerminalDescriptor>();
             this.TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
 
-            this.TestInstanceMock = new Mock<DataStore<IData>>();
+            this.TestInstanceMock = new Mock<DataStore<IData>>(this.DataManipulator);
             this.TestInstanceMock.CallBase = true;
+        }
+
+
+        [TestMethod]
+        public void GetDataManipulator__ProvidedValue()
+        {
+            var testInstance = new DataStore<IData>(this.DataManipulator);
+
+            var result = ReflectionHelper.Invoke(testInstance, "DataManipulator");
+
+            Assert.AreSame(this.DataManipulator, result);
         }
     }
 }
