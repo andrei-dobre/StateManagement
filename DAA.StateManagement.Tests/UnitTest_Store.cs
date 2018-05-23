@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+using Moq.Protected;
 
 using DAA.Helpers;
 using DAA.StateManagement.DataManagement;
@@ -15,6 +16,7 @@ namespace DAA.StateManagement.Tests
     {
         private Store<object, object> TestInstance { get => this.TestInstanceMock.Object; }
         private Mock<Store<object, object>> TestInstanceMock { get; set; }
+        private IProtectedMock<Store<object, object>> TestInstanceMockProtected { get => TestInstanceMock.Protected(); }
 
         private object Value { get; set; }
         private object Key { get; set; }
@@ -47,7 +49,7 @@ namespace DAA.StateManagement.Tests
 
 
         [TestMethod]
-        public void Save_DescriptorNotContained_Inserted()
+        public void Save_KeyNotContained_Inserted()
         {
             this.TestInstanceMock.Setup(_ => _.Insert(It.IsAny<object>(), It.IsAny<object>()));
             this.TestInstanceMock.Setup(_ => _.Update(It.IsAny<object>(), It.IsAny<object>()));
@@ -59,7 +61,7 @@ namespace DAA.StateManagement.Tests
         }
 
         [TestMethod]
-        public void Save_DescriptorNotContained_NotUpdated()
+        public void Save_KeyNotContained_NotUpdated()
         {
             this.TestInstanceMock.Setup(_ => _.Insert(It.IsAny<object>(), It.IsAny<object>()));
             this.TestInstanceMock.Setup(_ => _.Update(It.IsAny<object>(), It.IsAny<object>()));
@@ -71,7 +73,7 @@ namespace DAA.StateManagement.Tests
         }
 
         [TestMethod]
-        public void Save_DescriptorContained_Updated()
+        public void Save_KeyContained_Updated()
         {
             this.TestInstanceMock.Setup(_ => _.Insert(It.IsAny<object>(), It.IsAny<object>()));
             this.TestInstanceMock.Setup(_ => _.Update(It.IsAny<object>(), It.IsAny<object>()));
@@ -83,7 +85,7 @@ namespace DAA.StateManagement.Tests
         }
 
         [TestMethod]
-        public void Save_DescriptorContained_NotInserted()
+        public void Save_KeyContained_NotInserted()
         {
             this.TestInstanceMock.Setup(_ => _.Insert(It.IsAny<object>(), It.IsAny<object>()));
             this.TestInstanceMock.Setup(_ => _.Update(It.IsAny<object>(), It.IsAny<object>()));
@@ -96,33 +98,19 @@ namespace DAA.StateManagement.Tests
 
 
         [TestMethod]
-        public void Insert_DescriptorNotContained_CanRetrieveData()
+        public void Insert_KeyNotContained_Set()
         {
+            this.TestInstanceMockProtected
+                .Setup("Set", this.Key, this.Value)
+                .Verifiable();
+
             this.TestInstance.Insert(this.Key, this.Value);
 
-            var result = this.TestInstance.Retrieve(this.Key);
-
-            Assert.AreSame(result, this.Value);
+            this.TestInstanceMock.Verify();
         }
 
         [TestMethod]
-        public void Insert__DescriptorNotContained_OtherDescriptorContained__CanRetrieveData()
-        {
-            var terminalDescriptor = new Mock<object>().Object;
-            var data = new Mock<object>().Object;
-
-            this.TestInstance.Insert(terminalDescriptor, data);
-            this.TestInstance.Insert(this.Key, this.Value);
-
-            var resultOne = this.TestInstance.Retrieve(this.Key);
-            var resultTwo = this.TestInstance.Retrieve(terminalDescriptor);
-
-            Assert.AreSame(resultOne, this.Value);
-            Assert.AreSame(resultTwo, data);
-        }
-
-        [TestMethod]
-        public void Insert_DescriptorContained_InvalidOperationException()
+        public void Insert_KeyContained_InvalidOperationException()
         {
             this.TestInstance.Insert(this.Key, this.Value);
 
@@ -130,7 +118,7 @@ namespace DAA.StateManagement.Tests
         }
 
         [TestMethod]
-        public void Insert_NullData_ArgumentNullException()
+        public void Insert_NullValue_ArgumentNullException()
         {
             Assert.ThrowsException<ArgumentNullException>(() => this.TestInstance.Insert(this.Key, null));
         }
@@ -166,6 +154,39 @@ namespace DAA.StateManagement.Tests
                             as IEnumerable<object>;
 
             Assert.IsTrue(expectedValues.Equivalent(result));
+        }
+
+
+        [TestMethod]
+        public void Set_KeyDoesNotExist_CanRetrieveData()
+        {
+            ReflectionHelper.Invoke(this.TestInstance, "Set", this.Key, this.Value);
+
+            Assert.AreSame(this.Value, this.TestInstance.Retrieve(this.Key));
+        }
+
+        [TestMethod]
+        public void Set_KeyExists_ValueChanged()
+        {
+            ReflectionHelper.Invoke(this.TestInstance, "Set", this.Key, new object());
+            ReflectionHelper.Invoke(this.TestInstance, "Set", this.Key, this.Value);
+
+            Assert.AreSame(this.Value, this.TestInstance.Retrieve(this.Key));
+        }
+
+        [TestMethod]
+        public void Set__KeyValueAssociationsKept()
+        {
+            var keyOne = new object();
+            var keyTwo = new object();
+            var valueOne = new object();
+            var valueTwo = new object();
+
+            ReflectionHelper.Invoke(this.TestInstance, "Set", keyOne, valueOne);
+            ReflectionHelper.Invoke(this.TestInstance, "Set", keyTwo, valueTwo);
+
+            Assert.AreSame(valueOne, this.TestInstance.Retrieve(keyOne));
+            Assert.AreSame(valueTwo, this.TestInstance.Retrieve(keyTwo));
         }
     }
 }

@@ -27,23 +27,23 @@ namespace DAA.StateManagement.DataManagement
             return this.KeyToValueMap[key];
         }
         
-        public virtual void Save(TKey key, TValue data)
+        public virtual void Save(TKey key, TValue value)
         {
             if (this.Contains(key))
             {
-                this.Update(key, data);
+                this.Update(key, value);
             }
             else
             {
-                this.Insert(key, data);
+                this.Insert(key, value);
             }
         }
 
-        public virtual void Insert(TKey key, TValue data)
+        public virtual void Insert(TKey key, TValue value)
         {
-            if (null == data)
+            if (null == value)
             {
-                throw new ArgumentNullException(nameof(data));
+                throw new ArgumentNullException(nameof(value));
             }
 
             if (this.Contains(key))
@@ -51,11 +51,16 @@ namespace DAA.StateManagement.DataManagement
                 throw new InvalidOperationException();
             }
 
-            this.KeyToValueMap.Add(key, data);
+            this.Set(key, value);
         }
         
-        public abstract void Update(TKey key, TValue data);
+        public abstract void Update(TKey key, TValue value);
+        
 
+        protected virtual void Set(TKey key, TValue value)
+        {
+            this.KeyToValueMap[key] = value;
+        }
 
         protected virtual IEnumerable<TKey> RetrieveKeys()
         {
