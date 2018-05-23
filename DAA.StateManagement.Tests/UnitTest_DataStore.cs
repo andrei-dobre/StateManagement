@@ -18,14 +18,8 @@ namespace DAA.StateManagement.Tests
         private IDataManipulator<IData> DataManipulator { get => this.DataManipulatorMock.Object; }
         private Mock<IDataManipulator<IData>> DataManipulatorMock { get; set; }
 
-        private IData Data { get => this.DataMock.Object; }
-        private Mock<IData> DataMock { get; set; }
-
-        private ITerminalDescriptor TerminalDescriptor { get => this.TerminalDescriptorMock.Object; }
-        private Mock<ITerminalDescriptor> TerminalDescriptorMock { get; set; }
-        
-        private IEnumerable<ITerminalDescriptor> TerminalDescriptorsCollection { get => this.TerminalDescriptorsCollectionMock.Object; }
-        private Mock<IEnumerable<ITerminalDescriptor>> TerminalDescriptorsCollectionMock { get; set; }
+        private ITerminalDescriptor Descriptor { get => this.DescriptorMock.Object; }
+        private Mock<ITerminalDescriptor> DescriptorMock { get; set; }
 
         private DataStore<IData> TestInstance { get => this.TestInstanceMock.Object; }
         private Mock<DataStore<IData>> TestInstanceMock { get; set; }
@@ -36,9 +30,7 @@ namespace DAA.StateManagement.Tests
         public void BeforeEach()
         {
             this.DataManipulatorMock = new Mock<IDataManipulator<IData>>();
-            this.DataMock = new Mock<IData>();
-            this.TerminalDescriptorMock = new Mock<ITerminalDescriptor>();
-            this.TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
+            this.DescriptorMock = new Mock<ITerminalDescriptor>();
 
             this.TestInstanceMock = new Mock<DataStore<IData>>(this.DataManipulator);
             this.TestInstanceMock.CallBase = true;
@@ -53,6 +45,22 @@ namespace DAA.StateManagement.Tests
             var result = ReflectionHelper.Invoke(testInstance, "DataManipulator");
 
             Assert.AreSame(this.DataManipulator, result);
+        }
+
+
+        [TestMethod]
+        public void Update__InitialDataUpdatedFromSpecifiedInstance()
+        {
+            var initialData = new Mock<IData>().Object;
+            var newData = new Mock<IData>().Object;
+
+            this.TestInstanceMock
+                .Setup(_ => _.Retrieve(this.Descriptor))
+                .Returns(initialData);
+
+            this.TestInstance.Update(this.Descriptor, newData);
+
+            this.DataManipulatorMock.Verify(_ => _.Update(initialData, newData));
         }
     }
 }

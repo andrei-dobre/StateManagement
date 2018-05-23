@@ -18,7 +18,9 @@ namespace DAA.StateManagement.DataManagement
 
         public override void Update(ITerminalDescriptor descriptor, TData data)
         {
-            // TODO: Implement using the data manipulator.
+            var containedInstance = this.Retrieve(descriptor);
+
+            this.DataManipulator.Update(containedInstance, data);
         }
     }
 }
