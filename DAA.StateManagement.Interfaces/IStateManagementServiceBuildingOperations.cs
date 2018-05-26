@@ -1,6 +1,6 @@
 ﻿namespace DAA.StateManagement.Interfaces
 {
-    public interface IStateManagementServiceBuildingInterface
+    public interface IStateManagementServiceBuildingOperations
     {
         void BuildDataCollectionsManager();
 

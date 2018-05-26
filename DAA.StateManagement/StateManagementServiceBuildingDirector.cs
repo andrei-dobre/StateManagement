@@ -4,7 +4,7 @@ namespace DAA.StateManagement
 {
     public class StateManagementServiceBuildingDirector
     {
-        public void Build(IStateManagementServiceBuildingInterface builder)
+        public void Build(IStateManagementServiceBuildingOperations builder)
         {
             builder.BuildEventsAggregator();
             builder.BuildDataQualitySupervisor();

@@ -9,16 +9,16 @@ namespace DAA.StateManagement.Tests
     [TestClass]
     public class UnitTest_StateManagementServiceBuildingDirector
     {
-        private Mock<IStateManagementServiceBuildingInterface> BuildingInterfaceMock { get; set; }
+        private Mock<IStateManagementServiceBuildingOperations> BuildingInterfaceMock { get; set; }
 
-        private IStateManagementServiceBuildingInterface BuildingInterface { get => this.BuildingInterfaceMock.Object; }
+        private IStateManagementServiceBuildingOperations BuildingInterface { get => this.BuildingInterfaceMock.Object; }
         private StateManagementServiceBuildingDirector TestInstance { get; set; }
 
 
         [TestInitialize]
         public void BeforeEach()
         {
-            this.BuildingInterfaceMock = new Mock<IStateManagementServiceBuildingInterface>();
+            this.BuildingInterfaceMock = new Mock<IStateManagementServiceBuildingOperations>();
 
             this.TestInstance = new StateManagementServiceBuildingDirector();
         }

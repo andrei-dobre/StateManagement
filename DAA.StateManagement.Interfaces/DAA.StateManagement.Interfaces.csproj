@@ -36,11 +36,12 @@
     <Compile Include="IData.cs" />
     <Compile Include="IDataManipulator.cs" />
     <Compile Include="IDataPool.cs" />
+    <Compile Include="IDataRetriever.cs" />
     <Compile Include="IDescriptor.cs" />
     <Compile Include="INonTerminalDescriptor.cs" />
     <Compile Include="IStateManagementService.cs" />
     <Compile Include="IStateManagementServiceBuilder.cs" />
-    <Compile Include="IStateManagementServiceBuildingInterface.cs" />
+    <Compile Include="IStateManagementServiceBuildingOperations.cs" />
     <Compile Include="ITerminalDescriptor.cs" />
     <Compile Include="ITerminalDescriptorsFlyweightFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

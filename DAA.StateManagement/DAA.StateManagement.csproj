@@ -44,6 +44,7 @@
     <Compile Include="StateManagementService.cs" />
     <Compile Include="StateManagementServiceBuildingDirector.cs" />
     <Compile Include="TerminalDescriptorsFlyweightFactory.cs" />
+    <Compile Include="VoidTaskResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DAA.StateManagement.Interfaces\DAA.StateManagement.Interfaces.csproj">
