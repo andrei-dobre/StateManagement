@@ -134,23 +134,34 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void Save_NonTerminalDescriptor_DataSaved()
         {
-            this.TestInstanceMockProtected.Setup("DescribeAndSaveData", ItExpr.IsAny<IEnumerable<IData>>());
+            this.TestInstanceMockProtected.Setup("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>());
 
             this.TestInstance.Save(this.NonTerminalDescriptor, this.DataCollection);
 
-            this.TestInstanceMockProtected.Verify("DescribeAndSaveData", Times.Once(), this.DataCollection);
+            this.TestInstanceMockProtected.Verify("DescribeAndSave", Times.Once(), this.DataCollection);
         }
 
         [TestMethod]
         public void Save_NonTerminalDescriptor_CompositionUpdated()
         {
             this.TestInstanceMockProtected
-                .Setup<IEnumerable<ITerminalDescriptor>>("DescribeAndSaveData", ItExpr.IsAny<IEnumerable<IData>>())
+                .Setup<IEnumerable<ITerminalDescriptor>>("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>())
                 .Returns(this.TerminalDescriptorsCollection);
 
             this.TestInstance.Save(this.NonTerminalDescriptor, this.DataCollection);
 
             this.NonTerminalDescriptorCompositionsMock.Verify(_ => _.Save(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection), Times.Once());
+        }
+
+
+        [TestMethod]
+        public void Save_DataCollection_DataDescribedSaved()
+        {
+            this.TestInstanceMockProtected.Setup("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>());
+
+            this.TestInstance.Save(this.DataCollection);
+
+            this.TestInstanceMockProtected.Verify("DescribeAndSave", Times.Once(), this.DataCollection);
         }
 
 
@@ -253,7 +264,7 @@ namespace DAA.StateManagement.Tests
 
 
         [TestMethod]
-        public void DescribeAndSaveData__CreatesTerminalDescriptorsAndSavesData_TerminalDescriptorsReturned()
+        public void DescribeAndSave__CreatesTerminalDescriptorsAndSavesData_TerminalDescriptorsReturned()
         {
             var dataMocks = ArraysHelper.CreateWithContent(new Mock<IData>(), new Mock<IData>(), new Mock<IData>());
             var data = dataMocks.Select(_ => _.Object);
@@ -261,18 +272,14 @@ namespace DAA.StateManagement.Tests
 
             for (int i = 0; i < dataMocks.Length; ++i)
             {
-                var dataIdentifier = new object();
                 var dataMock = dataMocks[i];
+                var dataItem = dataMock.Object;
                 var terminalDescriptor = new Mock<ITerminalDescriptor>().Object;
 
                 terminalDescriptors[i] = terminalDescriptor;
 
-                dataMock
-                    .Setup<object>(_ => _.DataIdentifier)
-                    .Returns(dataIdentifier);
-
                 this.TerminalDescriptorsFlyweightFactoryMock
-                    .Setup<ITerminalDescriptor>(_ => _.Create(dataIdentifier))
+                    .Setup<ITerminalDescriptor>(_ => _.Create(dataItem))
                     .Returns(terminalDescriptor)
                     .Verifiable();
 
@@ -281,7 +288,7 @@ namespace DAA.StateManagement.Tests
                     .Verifiable();
             }
 
-            var result = ReflectionHelper.Invoke(this.TestInstance, "DescribeAndSaveData", data)
+            var result = ReflectionHelper.Invoke(this.TestInstance, "DescribeAndSave", data)
                             as IEnumerable<ITerminalDescriptor>;
 
             this.TerminalDescriptorsFlyweightFactoryMock.Verify();
@@ -291,7 +298,7 @@ namespace DAA.StateManagement.Tests
 
 
         [TestMethod]
-        public void UpdateDescriptorCompositionAndProvideAdditions__ProxiesNonTerminalDescriptorCompositionsStore()
+        public void UpdateCompositionAndProvideAdditions__ProxiesNonTerminalDescriptorCompositionsStore()
         {
             var additions = ArraysHelper.CreateWithContent(new Mock<ITerminalDescriptor>().Object, new Mock<ITerminalDescriptor>().Object);
 
@@ -300,7 +307,7 @@ namespace DAA.StateManagement.Tests
                 .Returns(additions)
                 .Verifiable();
 
-            var result = this.TestInstance.UpdateDescriptorCompositionAndProvideAdditions(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection);
+            var result = this.TestInstance.UpdateCompositionAndProvideAdditions(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection);
 
             this.NonTerminalDescriptorCompositionsMock.Verify();
             Assert.AreSame(additions, result);

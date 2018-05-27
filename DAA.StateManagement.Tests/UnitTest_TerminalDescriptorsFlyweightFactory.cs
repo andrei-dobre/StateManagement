@@ -14,15 +14,19 @@ namespace DAA.StateManagement.Tests
     [TestClass]
     public class UnitTest_TerminalDescriptorsFlyweightFactory : TerminalDescriptorsFlyweightFactory
     {
-        private Mock<TerminalDescriptorsFlyweightFactory> TestInstanceMock { get; set; }
-        private IProtectedMock<TerminalDescriptorsFlyweightFactory> TestInstanceMockProtected { get => this.TestInstanceMock.Protected(); }
+        private IData Data { get => this.DataMock.Object; }
+        private Mock<IData> DataMock { get; set; }
 
         private TerminalDescriptorsFlyweightFactory TestInstance { get => this.TestInstanceMock.Object; }
+        private Mock<TerminalDescriptorsFlyweightFactory> TestInstanceMock { get; set; }
+        private IProtectedMock<TerminalDescriptorsFlyweightFactory> TestInstanceMockProtected { get => this.TestInstanceMock.Protected(); }
 
 
         [TestInitialize]
         public void BeforeEach()
         {
+            this.DataMock = new Mock<IData>();
+
             this.TestInstanceMock = new Mock<TerminalDescriptorsFlyweightFactory>();
             this.TestInstanceMock.CallBase = true;
         }
@@ -72,6 +76,31 @@ namespace DAA.StateManagement.Tests
 
 
         [TestMethod]
+        public void Create_Data_CreatedUsingDataIdentifier()
+        {
+            var descriptor = new Mock<ITerminalDescriptor>().Object;
+            var dataIdentifier = new object();
+
+            this.DataMock
+                .Setup(_ => _.DataIdentifier)
+                .Returns(dataIdentifier)
+                .Verifiable();
+
+            this.TestInstanceMock
+                .Setup(_ => _.Create(dataIdentifier))
+                .Returns(descriptor)
+                .Verifiable();
+
+            var result = this.TestInstance.Create(this.Data);
+
+            this.DataMock.Verify();
+            this.TestInstanceMock.Verify();
+
+            Assert.AreSame(descriptor, result);
+        }
+
+
+        [TestMethod]
         public void Create_CollectionOfInstrinsicStates_TerminalDescriptorsCreatedForEach()
         {
             var intrinsicStates = new object[5];
@@ -92,23 +121,26 @@ namespace DAA.StateManagement.Tests
             Assert.IsTrue(terminalDescriptors.Equivalent(result));
         }
 
+
         [TestMethod]
-        public void Create__CollectionIterableMultipleTimes()
+        public void Create_CollectionOfData_TerminalDescriptorsCreatedForEach()
         {
-            var result = this.TestInstance.Create(new object[] { new object() });
-            var exceptionCaught = false;
-            
-            try
+            var dataCollection = new IData[5];
+            var terminalDescriptors = new List<ITerminalDescriptor>();
+
+            for (int i = 0; i < dataCollection.Length; ++i)
             {
-                result.ForEach(_ => { });
-                result.ForEach(_ => { });
-            }
-            catch
-            {
-                exceptionCaught = true;
+                terminalDescriptors.Add(new Mock<ITerminalDescriptor>().Object);
+                dataCollection[i] = new Mock<IData>().Object;
+
+                this.TestInstanceMock
+                    .Setup(_ => _.Create(dataCollection[i]))
+                    .Returns(terminalDescriptors[i]);
             }
 
-            Assert.IsFalse(exceptionCaught);
+            var result = this.TestInstance.Create(dataCollection);
+
+            Assert.IsTrue(terminalDescriptors.Equivalent(result));
         }
     }
 }

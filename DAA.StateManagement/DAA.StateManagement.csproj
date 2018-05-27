@@ -39,7 +39,6 @@
     <Compile Include="DataManagement\Store.cs" />
     <Compile Include="DataQualitySupervisor.cs" />
     <Compile Include="DataManagement\DataStore.cs" />
-    <Compile Include="EventsAggregator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StateManagementService.cs" />
     <Compile Include="StateManagementServiceBuildingDirector.cs" />

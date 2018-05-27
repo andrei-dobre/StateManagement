@@ -8,6 +8,7 @@ namespace DAA.StateManagement.Interfaces
     {
         Task<TData> RetrieveAsync(ITerminalDescriptor descriptor);
 
+
         Task<IEnumerable<TData>> RetrieveAsync(IEnumerable<ITerminalDescriptor> descriptors);
 
         Task<IEnumerable<TData>> RetrieveAsync(INonTerminalDescriptor descriptor);

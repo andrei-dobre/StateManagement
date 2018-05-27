@@ -14,12 +14,14 @@ namespace DAA.StateManagement.Interfaces
         IEnumerable<TData> Retrieve(INonTerminalDescriptor descriptor);
 
 
-        IEnumerable<ITerminalDescriptor> UpdateDescriptorCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition);
+        IEnumerable<ITerminalDescriptor> UpdateCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition);
 
 
         void Save(ITerminalDescriptor descriptor, TData data);
 
         void Save(INonTerminalDescriptor descriptor, IEnumerable<TData> data);
+
+        void Save(IEnumerable<TData> data);
 
 
         IEnumerable<IDescriptor> FindIntersectingDescriptors(IDescriptor descriptor);

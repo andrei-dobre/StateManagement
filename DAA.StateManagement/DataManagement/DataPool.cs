@@ -58,19 +58,23 @@ namespace DAA.StateManagement.DataManagement
 
         public void Save(INonTerminalDescriptor descriptor, IEnumerable<TData> data)
         {
-            var composition = this.DescribeAndSaveData(data);
-
+            var composition = this.DescribeAndSave(data);
             this.NonTerminalDescriptorCompositions.Save(descriptor, composition);
         }
 
-        protected virtual IEnumerable<ITerminalDescriptor> DescribeAndSaveData(IEnumerable<TData> data)
+        public void Save(IEnumerable<TData> data)
         {
-            return data.Select(this.DescribeAndSaveData).ToArray();
+            this.DescribeAndSave(data);
         }
 
-        private ITerminalDescriptor DescribeAndSaveData(TData data)
+        protected virtual IEnumerable<ITerminalDescriptor> DescribeAndSave(IEnumerable<TData> data)
         {
-            var descriptor = this.TerminalDescriptorsFlyweightFactory.Create(data.DataIdentifier);
+            return data.Select(this.DescribeAndSave).ToArray();
+        }
+
+        private ITerminalDescriptor DescribeAndSave(TData data)
+        {
+            var descriptor = this.TerminalDescriptorsFlyweightFactory.Create(data);
 
             this.Data.Save(descriptor, data);
 
@@ -92,7 +96,7 @@ namespace DAA.StateManagement.DataManagement
         }
 
 
-        public virtual IEnumerable<ITerminalDescriptor> UpdateDescriptorCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
+        public virtual IEnumerable<ITerminalDescriptor> UpdateCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
         {
             return this.NonTerminalDescriptorCompositions.UpdateAndProvideAdditions(descriptor, composition);
         }

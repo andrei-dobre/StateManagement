@@ -26,9 +26,23 @@ namespace DAA.StateManagement
             return this.IntrinsicStateToTerminalDescriptorMap[intrinsicState];
         }
 
+        public virtual ITerminalDescriptor Create(IData data)
+        {
+            var intrinsicState = data.DataIdentifier;
+            var descriptor = this.Create(intrinsicState);
+
+            return descriptor;
+        }
+
+
         public IEnumerable<ITerminalDescriptor> Create(IEnumerable<object> intrinsicStates)
         {
             return intrinsicStates.Select(_ => this.Create(_));
+        }
+
+        public IEnumerable<ITerminalDescriptor> Create(IEnumerable<IData> data)
+        {
+            return data.Select(_ => this.Create(_));
         }
 
 
