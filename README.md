@@ -1,7 +1,7 @@
 # DAA::StateManagement
 
 ## Refresh buttons are lazy
-Modern business applications should be their user's allies in tackling the complexity of day to day activities. To achieve that, they must not add overhead to already difficult processes. Asking the user to take actions in order to maintain the integrity of the presented data is unnecessary. The most up to date data should be made available without further interaction, always.
+Modern business applications should be their user's allies in tackling the complexity of day to day activities. To achieve that, they must not add overhead to already difficult processes. Asking the user to take actions in order to maintain the integrity of the presented data is unnecessary. **The most up to date data should be made available without further interaction, always.**
 
 ## State management is hard
 Making sure your application always present the most up to date data is difficult. More precisely, it's difficult to scale. One can reason about many approaches to satisfy the requirement, but in practice, the implementation can result in high amounts of duplication or weak design elements whose only purpose is to improve reusability.
