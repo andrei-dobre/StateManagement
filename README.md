@@ -7,9 +7,17 @@ Modern business applications should be their user's allies in tackling the compl
 Making sure your application always present the most up to date data is difficult. More precisely, it's difficult to scale. One can reason about many approaches to satisfy the requirement, but in practice, the implementation can result in high amounts of duplication or weak design elements whose only purpose is to improve reusability.
 
 ### The traditional approach
-In a traditional application, where state management is not necessary, things are quite straight forward. Let's assume the following design of a traditional layered application that employs the M.V.VM. pattern and data binding in the presentation layer: [Appendix 0: Traditional Application Structure](Documentation/Images/traditional-application-structure.png). In this scenario, a command triggered in the View-Model will result in Models being acquired from a Repository. The Models are then stored in the View-Model's state and data is made available to the View through data binding: [Appendix 1: Data Retrieved From Repository](Documentation/Images/traditional-data-retrieved-from-repository.png). 
+In a traditional application, where state management is not necessary, things are quite straight forward. Let's assume the following design of a traditional layered application that employs the M.V.VM. pattern and data binding in the presentation layer. 
 
-This works very well when state changes are the result of user issued commands within the scope of a single instance. When the user initiates a process that is being executed by a Service and results in changes in the application's Persistence, the View-Model retrieves the fresh data from the Repository once the process ends: [Appendix 2: Data Retrieved From Repository After Process Execution](Documentation/Images/traditional-application-data-updated-after-process.png).
+![Appendix 0: Traditional Application Structure](Documentation/Images/traditional-application-structure.png) 
+
+In this scenario, a command triggered in the View-Model will result in Models being acquired from a Repository. The Models are then stored in the View-Model's state and data is made available to the View through data binding. 
+
+![Appendix 1: Data Retrieved From Repository](Documentation/Images/traditional-data-retrieved-from-repository.png)
+
+This works very well when state changes are the result of user issued commands within the scope of a single instance. When the user initiates a process that is being executed by a Service and results in changes in the application's Persistence, the View-Model retrieves the fresh data from the Repository once the process ends. 
+
+![Appendix 2: Data Retrieved From Repository After Process Execution](Documentation/Images/traditional-application-data-updated-after-process.png)
 
 ### The reactive approach
 This traditional approach becomes challenging when the same data is presented in multiple Views and even more challenging when data is modified outside of the application's scope. 
