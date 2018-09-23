@@ -7,7 +7,7 @@ Modern business applications should be their user's allies in tackling the compl
 Making sure your application always present the most up to date data is difficult. More precisely, it's difficult to scale. One can reason about many approaches to satisfy the requirement, but in practice, the implementation can result in high amounts of duplication or weak design elements whose only purpose is to improve reusability.
 
 ### The traditional approach
-In a traditional application, where state management is not necessary, things are quite straight forward. Let's assume the following design of a traditional layered application that employs the M.V.VM. pattern and data binding in the presentation layer. 
+In a traditional application, where state management is not a big concern, things are quite straight forward. Let's assume the following structure of a traditional layered application that employs the M.V.VM. pattern and data binding in the presentation layer. 
 
 ![Appendix 0: Traditional Application Structure](Documentation/Images/traditional-application-structure.png) 
 
@@ -22,7 +22,9 @@ This works very well when state changes are the result of user issued commands w
 ### The reactive approach
 This traditional approach becomes challenging when the same data is presented in multiple Views and even more challenging when data is modified outside of the application's scope. 
 
-To tackle this, developers may choose to employ reactive programming techniques to maintain the application's state. In doing so, View-Models no longer refresh their copy of the data at the end of a given process, instead they subscribe to Events that are published whenever data is mutated: [Appendix 3: Reactive Application State Update](Documentation/Images/reactive-application-data-updates.png).
+To tackle this, developers may choose to employ reactive programming techniques to maintain the application's state. In doing so, View-Models no longer refresh their copy of the data at the end of a given process, instead they subscribe to Events that are published whenever data is mutated.
+
+![Appendix 3: Reactive Application State Update](Documentation/Images/reactive-application-data-updates.png)
 
 ### Increasing complexity
 The reactive approach works very well when building applications that satisfy the following conditions:
@@ -32,11 +34,15 @@ The reactive approach works very well when building applications that satisfy th
 
 When a type of data is changed by numerous commands, the View-Models that are interested in said data need to be aware of, and react to, a large set of events. As the number of interested View-Models increases, it becomes more and more difficult to ensure that the state is correctly maintained throughout the application. This also, inevitably, leads to increasing instances of duplication and the approach starts affecting the application's maintainability.
 
-When a type of data is composed of numerous other types, the complexity increases as interested View-Models need to handle an increasing number of events. To illustrate the problem, let's take the extreme example of a View that presents the products found in shops near you, grouped by aisle: [Appendix 4: Increased data composition](Documentation/Images/increased-data-composition.png). In this scenario, all interested View-Models need to be aware that:
+When a type of data is composed of numerous other types, the complexity increases as interested View-Models need to handle an increasing number of events. To illustrate the problem, let's take the extreme example of a View that presents the products found in shops near you, grouped by aisle. 
+
+![Appendix 4: Increased data composition](Documentation/Images/increased-data-composition.png) 
+
+In this scenario, all interested View-Models need to be aware that:
 1. A shop may change its name
 2. A shop may add, remove or re-code its aisles
 3. Products are placed on and removed from aisles
 4. The same product may be placed on multiple aisles
 5. A product's name could change, and when it does, the change likely applies to all the shops.
 
-A different approach is necessary.
+It's time to recognize that the burden of state management has become too much for the View-Models to handle. A different approach if needed.
