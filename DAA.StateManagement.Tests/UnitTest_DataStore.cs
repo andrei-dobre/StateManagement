@@ -1,50 +1,44 @@
-﻿using System.Collections.Generic;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
-using Moq.Protected;
-
 using DAA.Helpers;
 using DAA.StateManagement.DataManagement;
 using DAA.StateManagement.Interfaces;
-using System;
 
 namespace DAA.StateManagement.Tests
 {
     [TestClass]
     public class UnitTest_DataStore
     {
-        private IDataManipulator<IData> DataManipulator { get => this.DataManipulatorMock.Object; }
+        private IDataManipulator<IData> DataManipulator { get => DataManipulatorMock.Object; }
         private Mock<IDataManipulator<IData>> DataManipulatorMock { get; set; }
 
-        private ITerminalDescriptor Descriptor { get => this.DescriptorMock.Object; }
+        private ITerminalDescriptor Descriptor { get => DescriptorMock.Object; }
         private Mock<ITerminalDescriptor> DescriptorMock { get; set; }
 
-        private DataStore<IData> TestInstance { get => this.TestInstanceMock.Object; }
+        private DataStore<IData> TestInstance { get => TestInstanceMock.Object; }
         private Mock<DataStore<IData>> TestInstanceMock { get; set; }
-        private IProtectedMock<DataStore<IData>> TestInstanceMockProtected { get => this.TestInstanceMock.Protected(); }
 
 
         [TestInitialize]
         public void BeforeEach()
         {
-            this.DataManipulatorMock = new Mock<IDataManipulator<IData>>();
-            this.DescriptorMock = new Mock<ITerminalDescriptor>();
+            DataManipulatorMock = new Mock<IDataManipulator<IData>>();
+            DescriptorMock = new Mock<ITerminalDescriptor>();
 
-            this.TestInstanceMock = new Mock<DataStore<IData>>(this.DataManipulator);
-            this.TestInstanceMock.CallBase = true;
+            TestInstanceMock = new Mock<DataStore<IData>>(DataManipulator);
+            TestInstanceMock.CallBase = true;
         }
 
 
         [TestMethod]
         public void GetDataManipulator__ProvidedValue()
         {
-            var testInstance = new DataStore<IData>(this.DataManipulator);
+            var testInstance = new DataStore<IData>(DataManipulator);
 
             var result = ReflectionHelper.Invoke(testInstance, "DataManipulator");
 
-            Assert.AreSame(this.DataManipulator, result);
+            Assert.AreSame(DataManipulator, result);
         }
 
 
@@ -54,13 +48,13 @@ namespace DAA.StateManagement.Tests
             var initialData = new Mock<IData>().Object;
             var newData = new Mock<IData>().Object;
 
-            this.TestInstanceMock
-                .Setup(_ => _.Retrieve(this.Descriptor))
+            TestInstanceMock
+                .Setup(_ => _.Retrieve(Descriptor))
                 .Returns(initialData);
 
-            this.TestInstance.Update(this.Descriptor, newData);
+            TestInstance.Update(Descriptor, newData);
 
-            this.DataManipulatorMock.Verify(_ => _.Update(initialData, newData));
+            DataManipulatorMock.Verify(_ => _.Update(initialData, newData));
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -14,21 +13,21 @@ namespace DAA.StateManagement.Tests
     [TestClass]
     public class UnitTest_TerminalDescriptorsFlyweightFactory : TerminalDescriptorsFlyweightFactory
     {
-        private IData Data { get => this.DataMock.Object; }
+        private IData Data { get => DataMock.Object; }
         private Mock<IData> DataMock { get; set; }
 
-        private TerminalDescriptorsFlyweightFactory TestInstance { get => this.TestInstanceMock.Object; }
+        private TerminalDescriptorsFlyweightFactory TestInstance { get => TestInstanceMock.Object; }
         private Mock<TerminalDescriptorsFlyweightFactory> TestInstanceMock { get; set; }
-        private IProtectedMock<TerminalDescriptorsFlyweightFactory> TestInstanceMockProtected { get => this.TestInstanceMock.Protected(); }
+        private IProtectedMock<TerminalDescriptorsFlyweightFactory> TestInstanceMockProtected { get => TestInstanceMock.Protected(); }
 
 
         [TestInitialize]
         public void BeforeEach()
         {
-            this.DataMock = new Mock<IData>();
+            DataMock = new Mock<IData>();
 
-            this.TestInstanceMock = new Mock<TerminalDescriptorsFlyweightFactory>();
-            this.TestInstanceMock.CallBase = true;
+            TestInstanceMock = new Mock<TerminalDescriptorsFlyweightFactory>();
+            TestInstanceMock.CallBase = true;
         }
 
 
@@ -38,13 +37,13 @@ namespace DAA.StateManagement.Tests
             var intrinsicState = new object();
             var terminalDescriptor = new Mock<ITerminalDescriptor>().Object;
 
-            this.TestInstanceMockProtected
+            TestInstanceMockProtected
                 .Setup<ITerminalDescriptor>(nameof(Instantiate), intrinsicState)
                 .Returns(terminalDescriptor);
 
-            var result = this.TestInstance.Create(intrinsicState);
+            var result = TestInstance.Create(intrinsicState);
 
-            Assert.IsTrue(Object.ReferenceEquals(terminalDescriptor, result));
+            Assert.IsTrue(ReferenceEquals(terminalDescriptor, result));
         }
 
         [TestMethod]
@@ -52,11 +51,11 @@ namespace DAA.StateManagement.Tests
         {
             var intrinsicState = new object();
 
-            this.TestInstanceMockProtected
+            TestInstanceMockProtected
                 .Setup<ITerminalDescriptor>(nameof(Instantiate), intrinsicState)
                 .Returns(() => new Mock<ITerminalDescriptor>().Object);
 
-            Assert.IsTrue(Object.ReferenceEquals(this.TestInstance.Create(intrinsicState), this.TestInstance.Create(intrinsicState)));
+            Assert.IsTrue(ReferenceEquals(TestInstance.Create(intrinsicState), TestInstance.Create(intrinsicState)));
         }
 
         [TestMethod]
@@ -65,13 +64,13 @@ namespace DAA.StateManagement.Tests
             var intrinsicStateOne = new object();
             var intrinsicStateTwo = new object();
 
-            this.TestInstanceMockProtected
+            TestInstanceMockProtected
                 .Setup<ITerminalDescriptor>(nameof(Instantiate), ItExpr.IsAny<object>())
                 .Returns(() => new Mock<ITerminalDescriptor>().Object);
 
-            Assert.IsTrue(Object.ReferenceEquals(this.TestInstance.Create(intrinsicStateOne), this.TestInstance.Create(intrinsicStateOne)));
-            Assert.IsTrue(Object.ReferenceEquals(this.TestInstance.Create(intrinsicStateTwo), this.TestInstance.Create(intrinsicStateTwo)));
-            Assert.IsFalse(Object.ReferenceEquals(this.TestInstance.Create(intrinsicStateOne), this.TestInstance.Create(intrinsicStateTwo)));
+            Assert.IsTrue(ReferenceEquals(TestInstance.Create(intrinsicStateOne), TestInstance.Create(intrinsicStateOne)));
+            Assert.IsTrue(ReferenceEquals(TestInstance.Create(intrinsicStateTwo), TestInstance.Create(intrinsicStateTwo)));
+            Assert.IsFalse(ReferenceEquals(TestInstance.Create(intrinsicStateOne), TestInstance.Create(intrinsicStateTwo)));
         }
 
 
@@ -81,20 +80,20 @@ namespace DAA.StateManagement.Tests
             var descriptor = new Mock<ITerminalDescriptor>().Object;
             var dataIdentifier = new object();
 
-            this.DataMock
+            DataMock
                 .Setup(_ => _.DataIdentifier)
                 .Returns(dataIdentifier)
                 .Verifiable();
 
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.Create(dataIdentifier))
                 .Returns(descriptor)
                 .Verifiable();
 
-            var result = this.TestInstance.Create(this.Data);
+            var result = TestInstance.Create(Data);
 
-            this.DataMock.Verify();
-            this.TestInstanceMock.Verify();
+            DataMock.Verify();
+            TestInstanceMock.Verify();
 
             Assert.AreSame(descriptor, result);
         }
@@ -106,17 +105,17 @@ namespace DAA.StateManagement.Tests
             var intrinsicStates = new object[5];
             var terminalDescriptors = new List<ITerminalDescriptor>();
 
-            for (int i = 0; i < intrinsicStates.Length; ++i)
+            for (var i = 0; i < intrinsicStates.Length; ++i)
             {
                 terminalDescriptors.Add(new Mock<ITerminalDescriptor>().Object);
                 intrinsicStates[i] = new object();
 
-                this.TestInstanceMock
+                TestInstanceMock
                     .Setup(_ => _.Create(intrinsicStates[i]))
                     .Returns(terminalDescriptors[i]);
             }
 
-            var result = this.TestInstance.Create(intrinsicStates);
+            var result = TestInstance.Create(intrinsicStates);
 
             Assert.IsTrue(terminalDescriptors.Equivalent(result));
         }
@@ -128,17 +127,17 @@ namespace DAA.StateManagement.Tests
             var dataCollection = new IData[5];
             var terminalDescriptors = new List<ITerminalDescriptor>();
 
-            for (int i = 0; i < dataCollection.Length; ++i)
+            for (var i = 0; i < dataCollection.Length; ++i)
             {
                 terminalDescriptors.Add(new Mock<ITerminalDescriptor>().Object);
                 dataCollection[i] = new Mock<IData>().Object;
 
-                this.TestInstanceMock
+                TestInstanceMock
                     .Setup(_ => _.Create(dataCollection[i]))
                     .Returns(terminalDescriptors[i]);
             }
 
-            var result = this.TestInstance.Create(dataCollection);
+            var result = TestInstance.Create(dataCollection);
 
             Assert.IsTrue(terminalDescriptors.Equivalent(result));
         }

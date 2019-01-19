@@ -9,7 +9,7 @@ namespace DAA.StateManagement.DataManagement
     {
         public virtual IEnumerable<TDescriptor> RetrieveDescriptors()
         {
-            return this.RetrieveKeys();
+            return RetrieveKeys();
         }
     }
 }

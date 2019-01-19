@@ -14,104 +14,104 @@ namespace DAA.StateManagement.Tests
     [TestClass]
     public class UnitTest_StateManagementService
     {
-        private IDataPool<IData> DataPool { get => this.DataPoolMock.Object; }
+        private IDataPool<IData> DataPool { get => DataPoolMock.Object; }
         private Mock<IDataPool<IData>> DataPoolMock { get; set; }
 
-        private IDataRetriever<IData> DataRetriever { get => this.DataRetrieverMock.Object; }
+        private IDataRetriever<IData> DataRetriever { get => DataRetrieverMock.Object; }
         private Mock<IDataRetriever<IData>> DataRetrieverMock { get; set; }
 
-        private IData Data { get => this.DataMock.Object; }
+        private IData Data { get => DataMock.Object; }
         private Mock<IData> DataMock { get; set; }
 
-        private IDescriptor Descriptor { get => this.DescriptorMock.Object; }
+        private IDescriptor Descriptor { get => DescriptorMock.Object; }
         private Mock<IDescriptor> DescriptorMock { get; set; }
 
-        private ITerminalDescriptor TerminalDescriptor { get => this.TerminalDescriptorMock.Object; }
+        private ITerminalDescriptor TerminalDescriptor { get => TerminalDescriptorMock.Object; }
         private Mock<ITerminalDescriptor> TerminalDescriptorMock { get; set; }
 
-        private INonTerminalDescriptor NonTerminalDescriptor { get => this.NonTerminalDescriptorMock.Object; }
+        private INonTerminalDescriptor NonTerminalDescriptor { get => NonTerminalDescriptorMock.Object; }
         private Mock<INonTerminalDescriptor> NonTerminalDescriptorMock { get; set; }
 
-        private IEnumerable<IDescriptor> DescriptorsCollection { get => this.DescriptorsCollectionMock.Object; }
+        private IEnumerable<IDescriptor> DescriptorsCollection { get => DescriptorsCollectionMock.Object; }
         private Mock<IEnumerable<IDescriptor>> DescriptorsCollectionMock { get; set; }
 
-        private IEnumerable<ITerminalDescriptor> TerminalDescriptorsCollection { get => this.TerminalDescriptorsCollectionMock.Object; }
+        private IEnumerable<ITerminalDescriptor> TerminalDescriptorsCollection { get => TerminalDescriptorsCollectionMock.Object; }
         private Mock<IEnumerable<ITerminalDescriptor>> TerminalDescriptorsCollectionMock { get; set; }
 
-        private IStateEventsAggregator StateEventsAggregator { get => this.StateEventsAggregatorMock.Object; }
+        private IStateEventsAggregator StateEventsAggregator { get => StateEventsAggregatorMock.Object; }
         private Mock<IStateEventsAggregator> StateEventsAggregatorMock { get; set; }
 
-        private StateManagementService<IData> TestInstance { get => this.TestInstanceMock.Object; }
+        private StateManagementService<IData> TestInstance { get => TestInstanceMock.Object; }
         private Mock<StateManagementService<IData>> TestInstanceMock { get; set; }
-        private IProtectedMock<StateManagementService<IData>> TestInstanceMockProtected { get => this.TestInstanceMock.Protected(); }
+        private IProtectedMock<StateManagementService<IData>> TestInstanceMockProtected { get => TestInstanceMock.Protected(); }
 
 
         [TestInitialize]
         public void BeforeEach()
         {
-            this.DataPoolMock = new Mock<IDataPool<IData>>();
-            this.DataRetrieverMock = new Mock<IDataRetriever<IData>>();
-            this.DataMock = new Mock<IData>();
-            this.DescriptorMock = new Mock<IDescriptor>();
-            this.TerminalDescriptorMock = new Mock<ITerminalDescriptor>();
-            this.NonTerminalDescriptorMock = new Mock<INonTerminalDescriptor>();
-            this.DescriptorsCollectionMock = new Mock<IEnumerable<IDescriptor>>();
-            this.TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
-            this.StateEventsAggregatorMock = new Mock<IStateEventsAggregator>();
+            DataPoolMock = new Mock<IDataPool<IData>>();
+            DataRetrieverMock = new Mock<IDataRetriever<IData>>();
+            DataMock = new Mock<IData>();
+            DescriptorMock = new Mock<IDescriptor>();
+            TerminalDescriptorMock = new Mock<ITerminalDescriptor>();
+            NonTerminalDescriptorMock = new Mock<INonTerminalDescriptor>();
+            DescriptorsCollectionMock = new Mock<IEnumerable<IDescriptor>>();
+            TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
+            StateEventsAggregatorMock = new Mock<IStateEventsAggregator>();
 
-            this.TestInstanceMock = new Mock<StateManagementService<IData>>(this.DataRetriever, this.DataPool, this.StateEventsAggregator);
-            this.TestInstanceMock.CallBase = true;
+            TestInstanceMock = new Mock<StateManagementService<IData>>(DataRetriever, DataPool, StateEventsAggregator);
+            TestInstanceMock.CallBase = true;
         }
 
 
         [TestMethod]
         public void GetDataPool__ProvidedValue()
         {
-            var testInstance = new StateManagementService<IData>(this.DataRetriever, this.DataPool, this.StateEventsAggregator);
+            var testInstance = new StateManagementService<IData>(DataRetriever, DataPool, StateEventsAggregator);
 
             var result = ReflectionHelper.Invoke(testInstance, "DataPool");
 
-            Assert.AreSame(result, this.DataPool);
+            Assert.AreSame(result, DataPool);
         }
 
         [TestMethod]
         public void GetDataRetriever__ProvidedValue()
         {
-            var testInstance = new StateManagementService<IData>(this.DataRetriever, this.DataPool, this.StateEventsAggregator);
+            var testInstance = new StateManagementService<IData>(DataRetriever, DataPool, StateEventsAggregator);
 
             var result = ReflectionHelper.Invoke(testInstance, "DataRetriever");
 
-            Assert.AreSame(result, this.DataRetriever);
+            Assert.AreSame(result, DataRetriever);
         }
 
         [TestMethod]
         public void GetStateEventsAggregator__ProvidedValue()
         {
-            var testInstance = new StateManagementService<IData>(this.DataRetriever, this.DataPool, this.StateEventsAggregator);
+            var testInstance = new StateManagementService<IData>(DataRetriever, DataPool, StateEventsAggregator);
 
             var result = ReflectionHelper.Invoke(testInstance, "StateEventsAggregator");
 
-            Assert.AreSame(result, this.StateEventsAggregator);
+            Assert.AreSame(result, StateEventsAggregator);
         }
 
 
         [TestMethod]
         public async Task RefreshIntersectingDataAsync__RefreshesAllIntersectingData()
         {
-            this.DataPoolMock
-                .Setup(_ => _.FindIntersectingDescriptors(this.Descriptor))
-                .Returns(this.DescriptorsCollection)
+            DataPoolMock
+                .Setup(_ => _.FindIntersectingDescriptors(Descriptor))
+                .Returns(DescriptorsCollection)
                 .Verifiable();
 
-            this.TestInstanceMock
-                .Setup(_ => _.RefreshDataAsync(this.DescriptorsCollection))
+            TestInstanceMock
+                .Setup(_ => _.RefreshDataAsync(DescriptorsCollection))
                 .Returns(Task.FromResult(new VoidTaskResult()))
                 .Verifiable();
 
-            await this.TestInstance.RefreshIntersectingDataAsync(this.Descriptor);
+            await TestInstance.RefreshIntersectingDataAsync(Descriptor);
 
-            this.DataPoolMock.Verify();
-            this.TestInstanceMock.Verify();
+            DataPoolMock.Verify();
+            TestInstanceMock.Verify();
         }
 
         [TestMethod]
@@ -119,14 +119,14 @@ namespace DAA.StateManagement.Tests
         {
             var taskToRefreshTheData = Task.Delay(10);
 
-            this.DataPoolMock
-                .Setup(_ => _.FindIntersectingDescriptors(this.Descriptor));
+            DataPoolMock
+                .Setup(_ => _.FindIntersectingDescriptors(Descriptor));
 
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<IEnumerable<IDescriptor>>()))
                 .Returns(taskToRefreshTheData);
 
-            await this.TestInstance.RefreshIntersectingDataAsync(this.Descriptor);
+            await TestInstance.RefreshIntersectingDataAsync(Descriptor);
 
             Assert.IsTrue(taskToRefreshTheData.IsCompleted);
         }
@@ -139,15 +139,15 @@ namespace DAA.StateManagement.Tests
 
             descriptors.ForEach(descriptor =>
             {
-                this.TestInstanceMock
+                TestInstanceMock
                     .Setup(_ => _.RefreshDataAsync(descriptor))
                     .Returns(Task.FromResult(new VoidTaskResult()))
                     .Verifiable();
             });
 
-            await this.TestInstance.RefreshDataAsync(descriptors);
+            await TestInstance.RefreshDataAsync(descriptors);
 
-            this.TestInstanceMock.Verify();
+            TestInstanceMock.Verify();
         }
 
         [TestMethod]
@@ -156,19 +156,19 @@ namespace DAA.StateManagement.Tests
             var descriptors = ArraysHelper.CreateWithContent(new Mock<IDescriptor>().Object, new Mock<IDescriptor>().Object, new Mock<IDescriptor>().Object);
             var tasks = new Task[descriptors.Length];
 
-            for (int i = 0; i < descriptors.Length; ++i)
+            for (var i = 0; i < descriptors.Length; ++i)
             {
                 var task = Task.Delay(5 * (i + 1));
                 var descriptor = descriptors[i];
 
-                this.TestInstanceMock
+                TestInstanceMock
                     .Setup(_ => _.RefreshDataAsync(descriptor))
                     .Returns(task);
 
                 tasks[i] = task;
             }
 
-            await this.TestInstance.RefreshDataAsync(descriptors);
+            await TestInstance.RefreshDataAsync(descriptors);
 
             tasks.ForEach(_ => Assert.IsTrue(_.IsCompleted));
         }
@@ -177,35 +177,35 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public async Task RefreshDataAsync_TerminalDescriptorThroughGeneralHandler_DataRefreshedForTerminalDescriptor()
         {
-            var descriptor = this.TerminalDescriptor as IDescriptor;
+            var descriptor = TerminalDescriptor as IDescriptor;
 
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()))
                 .Returns(Task.FromResult(new VoidTaskResult()));
-            this.TestInstanceMock
-                .Setup(_ => _.RefreshDataAsync(this.TerminalDescriptor))
+            TestInstanceMock
+                .Setup(_ => _.RefreshDataAsync(TerminalDescriptor))
                 .Returns(Task.FromResult(new VoidTaskResult()))
                 .Verifiable();
 
-            await this.TestInstance.RefreshDataAsync(descriptor);
+            await TestInstance.RefreshDataAsync(descriptor);
 
-            this.TestInstanceMock.Verify();
+            TestInstanceMock.Verify();
         }
 
         [TestMethod]
         public async Task RefreshDataAsync_TerminalDescriptorThroughGeneralHandler_TerminalDescriptorDataRefreshAwaited()
         {
             var taskToRefreshTheData = Task.Delay(10);
-            var descriptor = this.TerminalDescriptor as IDescriptor;
+            var descriptor = TerminalDescriptor as IDescriptor;
 
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()))
                 .Returns(Task.FromResult(new VoidTaskResult()));
-            this.TestInstanceMock
-                .Setup(_ => _.RefreshDataAsync(this.TerminalDescriptor))
+            TestInstanceMock
+                .Setup(_ => _.RefreshDataAsync(TerminalDescriptor))
                 .Returns(taskToRefreshTheData);
 
-            await this.TestInstance.RefreshDataAsync(descriptor);
+            await TestInstance.RefreshDataAsync(descriptor);
 
             Assert.IsTrue(taskToRefreshTheData.IsCompleted);
         }
@@ -213,35 +213,35 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public async Task RefreshDataAsync_NonTerminalDescriptorThroughGeneralHandler_DataRefreshedForNonTerminalDescriptor()
         {
-            var descriptor = this.NonTerminalDescriptor as IDescriptor;
+            var descriptor = NonTerminalDescriptor as IDescriptor;
 
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()))
                 .Returns(Task.FromResult(new VoidTaskResult()));
-            this.TestInstanceMock
-                .Setup(_ => _.RefreshDataAsync(this.NonTerminalDescriptor))
+            TestInstanceMock
+                .Setup(_ => _.RefreshDataAsync(NonTerminalDescriptor))
                 .Returns(Task.FromResult(new VoidTaskResult()))
                 .Verifiable();
 
-            await this.TestInstance.RefreshDataAsync(descriptor);
+            await TestInstance.RefreshDataAsync(descriptor);
 
-            this.TestInstanceMock.Verify();
+            TestInstanceMock.Verify();
         }
 
         [TestMethod]
         public async Task RefreshDataAsync_NonTerminalDescriptorThroughGeneralHandler_NonTerminalDescriptorDataRefreshAwaited()
         {
             var taskToRefreshTheData = Task.Delay(10);
-            var descriptor = this.NonTerminalDescriptor as IDescriptor;
+            var descriptor = NonTerminalDescriptor as IDescriptor;
 
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()))
                 .Returns(Task.FromResult(new VoidTaskResult()));
-            this.TestInstanceMock
-                .Setup(_ => _.RefreshDataAsync(this.NonTerminalDescriptor))
+            TestInstanceMock
+                .Setup(_ => _.RefreshDataAsync(NonTerminalDescriptor))
                 .Returns(taskToRefreshTheData);
 
-            await this.TestInstance.RefreshDataAsync(descriptor);
+            await TestInstance.RefreshDataAsync(descriptor);
 
             Assert.IsTrue(taskToRefreshTheData.IsCompleted);
         }
@@ -249,57 +249,57 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public async Task RefreshDataAsync_NonTerminalDescriptorThroughGeneralHandler_TerminalDescriptorDataRefreshNotAttempted()
         {
-            var descriptor = this.NonTerminalDescriptor as IDescriptor;
+            var descriptor = NonTerminalDescriptor as IDescriptor;
 
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()))
                 .Returns(Task.FromResult(new VoidTaskResult()));
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()))
                 .Returns(Task.FromResult(new VoidTaskResult()));
 
-            await this.TestInstance.RefreshDataAsync(descriptor);
+            await TestInstance.RefreshDataAsync(descriptor);
 
-            this.TestInstanceMock.Verify(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()), Times.Never());
+            TestInstanceMock.Verify(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()), Times.Never());
         }
 
         [TestMethod]
         public async Task RefreshDataAsync_TerminalDescriptorThroughGeneralHandler_NonTerminalDescriptorDataRefreshNotAttempted()
         {
-            var descriptor = this.TerminalDescriptor as IDescriptor;
+            var descriptor = TerminalDescriptor as IDescriptor;
 
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()))
                 .Returns(Task.FromResult(new VoidTaskResult()));
-            this.TestInstanceMock
+            TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()))
                 .Returns(Task.FromResult(new VoidTaskResult()));
 
-            await this.TestInstance.RefreshDataAsync(descriptor);
+            await TestInstance.RefreshDataAsync(descriptor);
 
-            this.TestInstanceMock.Verify(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()), Times.Never());
+            TestInstanceMock.Verify(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()), Times.Never());
         }
 
 
         [TestMethod]
         public async Task RefreshDataAsync_TerminalDescriptor_DataRetrievedAndSaved()
         {
-            this.StateEventsAggregatorMock
+            StateEventsAggregatorMock
                 .Setup(_ => _.PublishDataChangedEvent(It.IsAny<IDescriptor>(), It.IsAny<object>()));
 
-            this.DataRetrieverMock
-                .Setup(_ => _.RetrieveAsync(this.TerminalDescriptor))
-                .Returns(Task.FromResult(this.Data))
+            DataRetrieverMock
+                .Setup(_ => _.RetrieveAsync(TerminalDescriptor))
+                .Returns(Task.FromResult(Data))
                 .Verifiable();
 
-            this.DataPoolMock
-                .Setup(_ => _.Save(this.TerminalDescriptor, this.Data))
+            DataPoolMock
+                .Setup(_ => _.Save(TerminalDescriptor, Data))
                 .Verifiable();
 
-            await this.TestInstance.RefreshDataAsync(this.TerminalDescriptor);
+            await TestInstance.RefreshDataAsync(TerminalDescriptor);
 
-            this.DataRetrieverMock.Verify();
-            this.DataPoolMock.Verify();
+            DataRetrieverMock.Verify();
+            DataPoolMock.Verify();
         }
 
         [TestMethod]
@@ -309,22 +309,22 @@ namespace DAA.StateManagement.Tests
             var saveDataCallNumber = 0;
             var publishEventCallNumber = 0;
 
-            this.DataRetrieverMock
+            DataRetrieverMock
                 .Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
-                .Returns(Task.FromResult(this.Data));
+                .Returns(Task.FromResult(Data));
 
-            this.DataPoolMock
+            DataPoolMock
                 .Setup(_ => _.Save(It.IsAny<ITerminalDescriptor>(), It.IsAny<IData>()))
                 .Callback(() => saveDataCallNumber = ++callCounter);
 
-            this.StateEventsAggregatorMock
-                .Setup(_ => _.PublishDataChangedEvent(this.TerminalDescriptor, this.TestInstance))
+            StateEventsAggregatorMock
+                .Setup(_ => _.PublishDataChangedEvent(TerminalDescriptor, TestInstance))
                 .Callback(() => publishEventCallNumber = ++callCounter)
                 .Verifiable();
 
-            await this.TestInstance.RefreshDataAsync(this.TerminalDescriptor);
+            await TestInstance.RefreshDataAsync(TerminalDescriptor);
 
-            this.StateEventsAggregatorMock.Verify();
+            StateEventsAggregatorMock.Verify();
             Assert.IsTrue(publishEventCallNumber >= saveDataCallNumber);
         }
 
@@ -332,20 +332,20 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public async Task RefreshDataAsync_NonTerminalDescriptor_CompositionRetrievedAndUpdated()
         {
-            this.DataRetrieverMock
-                .Setup(_ => _.RetrieveCompositionAsync(this.NonTerminalDescriptor))
-                .Returns(Task.FromResult(this.TerminalDescriptorsCollection))
+            DataRetrieverMock
+                .Setup(_ => _.RetrieveCompositionAsync(NonTerminalDescriptor))
+                .Returns(Task.FromResult(TerminalDescriptorsCollection))
                 .Verifiable();
 
-            this.TestInstanceMockProtected
-                .Setup<Task>("UpdateCompositionAndAcquireAdditionsAsync", this.NonTerminalDescriptor, this.TerminalDescriptorsCollection)
+            TestInstanceMockProtected
+                .Setup<Task>("UpdateCompositionAndAcquireAdditionsAsync", NonTerminalDescriptor, TerminalDescriptorsCollection)
                 .Returns(Task.FromResult(new VoidTaskResult()))
                 .Verifiable();
 
-            await this.TestInstance.RefreshDataAsync(this.NonTerminalDescriptor);
+            await TestInstance.RefreshDataAsync(NonTerminalDescriptor);
 
-            this.DataRetrieverMock.Verify();
-            this.TestInstanceMock.Verify();
+            DataRetrieverMock.Verify();
+            TestInstanceMock.Verify();
         }
 
         [TestMethod]
@@ -353,15 +353,15 @@ namespace DAA.StateManagement.Tests
         {
             var task = Task.Delay(10);
 
-            this.DataRetrieverMock
+            DataRetrieverMock
                 .Setup(_ => _.RetrieveCompositionAsync(It.IsAny<INonTerminalDescriptor>()))
-                .Returns(Task.FromResult(this.TerminalDescriptorsCollection));
+                .Returns(Task.FromResult(TerminalDescriptorsCollection));
 
-            this.TestInstanceMockProtected
+            TestInstanceMockProtected
                 .Setup<Task>("UpdateCompositionAndAcquireAdditionsAsync", ItExpr.IsAny<INonTerminalDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>())
                 .Returns(task);
 
-            await this.TestInstance.RefreshDataAsync(this.NonTerminalDescriptor);
+            await TestInstance.RefreshDataAsync(NonTerminalDescriptor);
 
             Assert.IsTrue(task.IsCompleted);
         }
@@ -373,23 +373,23 @@ namespace DAA.StateManagement.Tests
             var compositionUpdateCallNumber = 0;
             var publishEventCallNumber = 0;
 
-            this.DataRetrieverMock
+            DataRetrieverMock
                 .Setup(_ => _.RetrieveCompositionAsync(It.IsAny<INonTerminalDescriptor>()))
-                .Returns(Task.FromResult(this.TerminalDescriptorsCollection));
+                .Returns(Task.FromResult(TerminalDescriptorsCollection));
 
-            this.TestInstanceMockProtected
+            TestInstanceMockProtected
                 .Setup<Task>("UpdateCompositionAndAcquireAdditionsAsync", ItExpr.IsAny<INonTerminalDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>())
                 .Callback(() => compositionUpdateCallNumber = ++callCounter)
                 .Returns(Task.FromResult(new VoidTaskResult()));
             
-            this.StateEventsAggregatorMock
-                .Setup(_ => _.PublishDataChangedEvent(this.NonTerminalDescriptor, this.TestInstance))
+            StateEventsAggregatorMock
+                .Setup(_ => _.PublishDataChangedEvent(NonTerminalDescriptor, TestInstance))
                 .Callback(() => publishEventCallNumber = ++callCounter)
                 .Verifiable();
 
-            await this.TestInstance.RefreshDataAsync(this.NonTerminalDescriptor);
+            await TestInstance.RefreshDataAsync(NonTerminalDescriptor);
 
-            this.StateEventsAggregatorMock.Verify();
+            StateEventsAggregatorMock.Verify();
             Assert.IsTrue(publishEventCallNumber >= compositionUpdateCallNumber);
         }
 
@@ -400,20 +400,20 @@ namespace DAA.StateManagement.Tests
             var additions = new Mock<IEnumerable<ITerminalDescriptor>>().Object;
             var dataCollection = new Mock<IEnumerable<IData>>().Object;
 
-            this.DataPoolMock
-                .Setup(_ => _.UpdateCompositionAndProvideAdditions(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection))
+            DataPoolMock
+                .Setup(_ => _.UpdateCompositionAndProvideAdditions(NonTerminalDescriptor, TerminalDescriptorsCollection))
                 .Returns(additions)
                 .Verifiable();
 
-            this.DataRetrieverMock
+            DataRetrieverMock
                 .Setup(_ => _.RetrieveAsync(additions))
                 .Returns(Task.FromResult(dataCollection))
                 .Verifiable();
 
-            await (ReflectionHelper.Invoke(this.TestInstance, "UpdateCompositionAndAcquireAdditionsAsync", this.NonTerminalDescriptor, this.TerminalDescriptorsCollection) as Task);
+            await (ReflectionHelper.Invoke(TestInstance, "UpdateCompositionAndAcquireAdditionsAsync", NonTerminalDescriptor, TerminalDescriptorsCollection) as Task);
 
-            this.DataPoolMock.Verify();
-            this.DataRetrieverMock.Verify();
+            DataPoolMock.Verify();
+            DataRetrieverMock.Verify();
         }
 
         [TestMethod]
@@ -421,21 +421,21 @@ namespace DAA.StateManagement.Tests
         {
             var dataCollection = new Mock<IEnumerable<IData>>().Object;
 
-            this.DataPoolMock
+            DataPoolMock
                 .Setup(_ => _.UpdateCompositionAndProvideAdditions(It.IsAny<INonTerminalDescriptor>(), It.IsAny<IEnumerable<ITerminalDescriptor>>()))
                 .Returns(new Mock<IEnumerable<ITerminalDescriptor>>().Object);
 
-            this.DataRetrieverMock
+            DataRetrieverMock
                 .Setup(_ => _.RetrieveAsync(It.IsAny<IEnumerable<ITerminalDescriptor>>()))
                 .Returns(Task.FromResult(dataCollection));
 
-            this.DataPoolMock
+            DataPoolMock
                 .Setup(_ => _.Save(dataCollection))
                 .Verifiable();
 
-            await (ReflectionHelper.Invoke(this.TestInstance, "UpdateCompositionAndAcquireAdditionsAsync", this.NonTerminalDescriptor, this.TerminalDescriptorsCollection) as Task);
+            await (ReflectionHelper.Invoke(TestInstance, "UpdateCompositionAndAcquireAdditionsAsync", NonTerminalDescriptor, TerminalDescriptorsCollection) as Task);
 
-            this.DataPoolMock.Verify();
+            DataPoolMock.Verify();
         }
     }
 }

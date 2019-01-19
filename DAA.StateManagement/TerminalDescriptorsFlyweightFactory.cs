@@ -5,31 +5,31 @@ using DAA.StateManagement.Interfaces;
 
 namespace DAA.StateManagement
 {
-    public class TerminalDescriptorsFlyweightFactory : ITerminalDescriptorsFlyweightFactory
+    public class TerminalDescriptorsFlyweightFactory : ITerminalDescriptorsFactory
     {
         private IDictionary<object, ITerminalDescriptor> IntrinsicStateToTerminalDescriptorMap { get; set; }
 
 
         public TerminalDescriptorsFlyweightFactory()
         {
-            this.IntrinsicStateToTerminalDescriptorMap = new Dictionary<object, ITerminalDescriptor>();
+            IntrinsicStateToTerminalDescriptorMap = new Dictionary<object, ITerminalDescriptor>();
         }
 
 
         public virtual ITerminalDescriptor Create(object intrinsicState)
         {
-            if (!this.IntrinsicStateToTerminalDescriptorMap.ContainsKey(intrinsicState))
+            if (!IntrinsicStateToTerminalDescriptorMap.ContainsKey(intrinsicState))
             {
-                this.IntrinsicStateToTerminalDescriptorMap.Add(intrinsicState, this.Instantiate(intrinsicState));
+                IntrinsicStateToTerminalDescriptorMap.Add(intrinsicState, Instantiate(intrinsicState));
             }
 
-            return this.IntrinsicStateToTerminalDescriptorMap[intrinsicState];
+            return IntrinsicStateToTerminalDescriptorMap[intrinsicState];
         }
 
         public virtual ITerminalDescriptor Create(IData data)
         {
             var intrinsicState = data.DataIdentifier;
-            var descriptor = this.Create(intrinsicState);
+            var descriptor = Create(intrinsicState);
 
             return descriptor;
         }
@@ -37,12 +37,12 @@ namespace DAA.StateManagement
 
         public IEnumerable<ITerminalDescriptor> Create(IEnumerable<object> intrinsicStates)
         {
-            return intrinsicStates.Select(_ => this.Create(_));
+            return intrinsicStates.Select(_ => Create(_));
         }
 
         public IEnumerable<ITerminalDescriptor> Create(IEnumerable<IData> data)
         {
-            return data.Select(_ => this.Create(_));
+            return data.Select(_ => Create(_));
         }
 
 

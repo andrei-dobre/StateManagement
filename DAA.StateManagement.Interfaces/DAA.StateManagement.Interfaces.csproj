@@ -44,7 +44,7 @@
     <Compile Include="IStateManagementServiceBuilder.cs" />
     <Compile Include="IStateManagementServiceBuildingOperations.cs" />
     <Compile Include="ITerminalDescriptor.cs" />
-    <Compile Include="ITerminalDescriptorsFlyweightFactory.cs" />
+    <Compile Include="ITerminalDescriptorsFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

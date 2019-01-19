@@ -9,14 +9,14 @@ namespace DAA.StateManagement.DataManagement
     {
         public override void Update(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
         {
-            this.Set(descriptor, composition);
+            Set(descriptor, composition);
         }
 
         public virtual IEnumerable<ITerminalDescriptor> UpdateAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> newComposition)
         {
-            var additions = this.CompareToInitialCompositionAndFindAdditions(descriptor, newComposition);
+            var additions = CompareToInitialCompositionAndFindAdditions(descriptor, newComposition);
 
-            this.Update(descriptor, newComposition);
+            Update(descriptor, newComposition);
 
             return additions;
         }
@@ -24,8 +24,8 @@ namespace DAA.StateManagement.DataManagement
 
         protected virtual IEnumerable<ITerminalDescriptor> CompareToInitialCompositionAndFindAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> newComposition)
         {
-            var initialComposition = this.Retrieve(descriptor);
-            var additions = this.FindDistinctAdditions(initialComposition, newComposition);
+            var initialComposition = Retrieve(descriptor);
+            var additions = FindDistinctAdditions(initialComposition, newComposition);
 
             return additions;
         }

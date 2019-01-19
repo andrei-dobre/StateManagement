@@ -3,8 +3,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
-using Moq.Protected;
-
 using DAA.StateManagement.Interfaces;
 using DAA.StateManagement.DataManagement;
 
@@ -13,34 +11,33 @@ namespace DAA.StateManagement.Tests
     [TestClass]
     public class UnitTest_DataInformationStore
     {
-        private IEnumerable<ITerminalDescriptor> TerminalDescriptorsCollection { get => this.TerminalDescriptorsCollectionMock.Object; }
+        private IEnumerable<ITerminalDescriptor> TerminalDescriptorsCollection { get => TerminalDescriptorsCollectionMock.Object; }
         private Mock<IEnumerable<ITerminalDescriptor>> TerminalDescriptorsCollectionMock { get; set; }
 
-        private DataInformationStore<IDescriptor, object> TestInstance { get => this.TestInstanceMock.Object; }
+        private DataInformationStore<IDescriptor, object> TestInstance { get => TestInstanceMock.Object; }
         private Mock<DataInformationStore<IDescriptor, object>> TestInstanceMock { get; set; }
-        private IProtectedMock<DataInformationStore<IDescriptor, object>> TestInstanceMockProtected { get => this.TestInstanceMock.Protected(); }
 
 
         [TestInitialize]
         public void BeforeEach()
         {
-            this.TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
+            TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
 
-            this.TestInstanceMock = new Mock<DataInformationStore<IDescriptor, object>>();
-            this.TestInstanceMock.CallBase = true;
+            TestInstanceMock = new Mock<DataInformationStore<IDescriptor, object>>();
+            TestInstanceMock.CallBase = true;
         }
 
 
         [TestMethod]
         public void RetrieveDescriptors__ProxiesRetrieveKeys()
         {
-            this.TestInstanceMockProtected
-                .Setup<IEnumerable<IDescriptor>>("RetrieveKeys")
-                .Returns(this.TerminalDescriptorsCollection);
+            TestInstanceMock
+                .Setup<IEnumerable<IDescriptor>>(_ => _.RetrieveKeys())
+                .Returns(TerminalDescriptorsCollection);
 
-            var result = this.TestInstance.RetrieveDescriptors();
+            var result = TestInstance.RetrieveDescriptors();
 
-            Assert.AreSame(this.TerminalDescriptorsCollection, result);
+            Assert.AreSame(TerminalDescriptorsCollection, result);
         }
     }
 }

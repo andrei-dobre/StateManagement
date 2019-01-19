@@ -63,13 +63,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UnitTest_DataInformationStore.cs" />
+    <Compile Include="UnitTest_DataPool.cs" />
+    <Compile Include="UnitTest_DataStore.cs" />
+    <Compile Include="UnitTest_Store.cs" />
     <Compile Include="UnitTest_StateManagementService.cs" />
     <Compile Include="UnitTest_NonTerminalDescriptorCompositionsStore.cs" />
-    <Compile Include="UnitTest_DataInformationStore.cs" />
-    <Compile Include="UnitTest_Store.cs" />
-    <Compile Include="UnitTest_DataStore.cs" />
     <Compile Include="UnitTest_TerminalDescriptorsFlyweightFactory.cs" />
-    <Compile Include="UnitTest_DataPool.cs" />
     <Compile Include="UnitTest_StateManagementServiceBuildingDirector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

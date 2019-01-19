@@ -14,6 +14,6 @@
 
         void BuildEventsAggregator();
 
-        void BuildTerminalDescriptorsFlyweightFactory();
+        void BuildTerminalDescriptorsFactory();
     }
 }

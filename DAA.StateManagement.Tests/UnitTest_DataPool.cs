@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,77 +15,77 @@ namespace DAA.StateManagement.Tests
     [TestClass]
     public class UnitTest_DataPool
     {
-        private ITerminalDescriptorsFlyweightFactory TerminalDescriptorsFlyweightFactory { get => this.TerminalDescriptorsFlyweightFactoryMock.Object; }
-        private Mock<ITerminalDescriptorsFlyweightFactory> TerminalDescriptorsFlyweightFactoryMock { get; set; }
+        private ITerminalDescriptorsFactory TerminalDescriptorsFactory => TerminalDescriptorsFactoryMock.Object;
+        private Mock<ITerminalDescriptorsFactory> TerminalDescriptorsFactoryMock { get; set; }
 
-        private IDataManipulator<IData> DataManipulator { get => this.DataManipulatorMock.Object; }
+        private IDataManipulator<IData> DataManipulator => DataManipulatorMock.Object;
         private Mock<IDataManipulator<IData>> DataManipulatorMock { get; set; }
 
-        private DataStore<IData> DataStore { get => this.DataStoreMock.Object; }
+        private DataStore<IData> DataStore => DataStoreMock.Object;
         private Mock<DataStore<IData>> DataStoreMock { get; set; }
 
-        private NonTerminalDescriptorCompositionsStore NonTerminalDescriptorCompositions { get => this.NonTerminalDescriptorCompositionsMock.Object; }
+        private NonTerminalDescriptorCompositionsStore NonTerminalDescriptorCompositions => NonTerminalDescriptorCompositionsMock.Object;
         private Mock<NonTerminalDescriptorCompositionsStore> NonTerminalDescriptorCompositionsMock { get; set; }
 
-        private IData Data { get => this.DataMock.Object; }
+        private IData Data => DataMock.Object;
         private Mock<IData> DataMock { get; set; }
 
-        private IEnumerable<IData> DataCollection { get => this.DataCollectionMock.Object; }
+        private IEnumerable<IData> DataCollection => DataCollectionMock.Object;
         private Mock<IEnumerable<IData>> DataCollectionMock { get; set; }
 
-        private ITerminalDescriptor TerminalDescriptor { get => this.TerminalDescriptorMock.Object; }
+        private ITerminalDescriptor TerminalDescriptor => TerminalDescriptorMock.Object;
         private Mock<ITerminalDescriptor> TerminalDescriptorMock { get; set; }
 
-        private INonTerminalDescriptor NonTerminalDescriptor { get => this.NonTerminalDescriptorMock.Object; }
+        private INonTerminalDescriptor NonTerminalDescriptor => NonTerminalDescriptorMock.Object;
         private Mock<INonTerminalDescriptor> NonTerminalDescriptorMock { get; set; }
 
-        private IEnumerable<ITerminalDescriptor> TerminalDescriptorsCollection { get => this.TerminalDescriptorsCollectionMock.Object; }
+        private IEnumerable<ITerminalDescriptor> TerminalDescriptorsCollection => TerminalDescriptorsCollectionMock.Object;
         private Mock<IEnumerable<ITerminalDescriptor>> TerminalDescriptorsCollectionMock { get; set; }
 
-        private DataPool<IData> TestInstance { get => this.TestInstanceMock.Object; }
+        private DataPool<IData> TestInstance => TestInstanceMock.Object;
         private Mock<DataPool<IData>> TestInstanceMock { get; set; }
-        private IProtectedMock<DataPool<IData>> TestInstanceMockProtected { get => this.TestInstanceMock.Protected(); }
+        private IProtectedMock<DataPool<IData>> TestInstanceMockProtected => TestInstanceMock.Protected();
 
 
         [TestInitialize]
         public void BeforeEach()
         {
-            this.TerminalDescriptorsFlyweightFactoryMock = new Mock<ITerminalDescriptorsFlyweightFactory>();
-            this.DataManipulatorMock = new Mock<IDataManipulator<IData>>();
-            this.DataStoreMock = new Mock<DataStore<IData>>(this.DataManipulator);
-            this.NonTerminalDescriptorCompositionsMock = new Mock<NonTerminalDescriptorCompositionsStore>();
-            this.DataMock = new Mock<IData>();
-            this.DataCollectionMock = new Mock<IEnumerable<IData>>();
-            this.TerminalDescriptorMock = new Mock<ITerminalDescriptor>();
-            this.NonTerminalDescriptorMock = new Mock<INonTerminalDescriptor>();
-            this.TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
+            TerminalDescriptorsFactoryMock = new Mock<ITerminalDescriptorsFactory>();
+            DataManipulatorMock = new Mock<IDataManipulator<IData>>();
+            DataStoreMock = new Mock<DataStore<IData>>(DataManipulator);
+            NonTerminalDescriptorCompositionsMock = new Mock<NonTerminalDescriptorCompositionsStore>();
+            DataMock = new Mock<IData>();
+            DataCollectionMock = new Mock<IEnumerable<IData>>();
+            TerminalDescriptorMock = new Mock<ITerminalDescriptor>();
+            NonTerminalDescriptorMock = new Mock<INonTerminalDescriptor>();
+            TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
 
-            this.TestInstanceMock = new Mock<DataPool<IData>>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
-            this.TestInstanceMock.CallBase = true;
+            TestInstanceMock = new Mock<DataPool<IData>>(TerminalDescriptorsFactory, DataManipulator);
+            TestInstanceMock.CallBase = true;
 
-            this.TestInstanceMockProtected
+            TestInstanceMockProtected
                 .SetupGet<DataStore<IData>>("Data")
-                .Returns(this.DataStore);
-            this.TestInstanceMockProtected
+                .Returns(DataStore);
+            TestInstanceMockProtected
                 .SetupGet<NonTerminalDescriptorCompositionsStore>("NonTerminalDescriptorCompositions")
-                .Returns(this.NonTerminalDescriptorCompositions);
+                .Returns(NonTerminalDescriptorCompositions);
         }
 
 
         [TestMethod]
-        public void GetTerminalDescriptorsFlyweightFactory__ProvidedValue()
+        public void GetTerminalDescriptorsFactory__ProvidedValue()
         {
-            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
+            var testInstance = new DataPool<IData>(TerminalDescriptorsFactory, DataManipulator);
 
-            var result = ReflectionHelper.Invoke(testInstance, "TerminalDescriptorsFlyweightFactory");
+            var result = ReflectionHelper.Invoke(testInstance, "TerminalDescriptorsFactory");
 
-            Assert.AreSame(this.TerminalDescriptorsFlyweightFactory, result);
+            Assert.AreSame(TerminalDescriptorsFactory, result);
         }
 
         [TestMethod]
         public void GetData__NotNull_Constant()
         {
-            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
+            var testInstance = new DataPool<IData>(TerminalDescriptorsFactory, DataManipulator);
 
             var resultOne = ReflectionHelper.Invoke(testInstance, "Data");
             var resultTwo = ReflectionHelper.Invoke(testInstance, "Data");
@@ -99,7 +98,7 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void GetNonTerminalDescriptorCompositions__NotNull_Constant()
         {
-            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
+            var testInstance = new DataPool<IData>(TerminalDescriptorsFactory, DataManipulator);
 
             var resultOne = ReflectionHelper.Invoke(testInstance, "NonTerminalDescriptorCompositions");
             var resultTwo = ReflectionHelper.Invoke(testInstance, "NonTerminalDescriptorCompositions");
@@ -113,66 +112,66 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void Ctor__DataStoreCreatedWithProvidedDataManipulator()
         {
-            var testInstance = new DataPool<IData>(this.TerminalDescriptorsFlyweightFactory, this.DataManipulator);
+            var testInstance = new DataPool<IData>(TerminalDescriptorsFactory, DataManipulator);
             var dataStore = ReflectionHelper.Invoke(testInstance, "Data") as DataStore<IData>;
 
             var result = ReflectionHelper.Invoke(dataStore, "DataManipulator");
 
-            Assert.AreSame(this.DataManipulator, result);
+            Assert.AreSame(DataManipulator, result);
         }
 
 
         [TestMethod]
         public void Save_TerminalDescriptor_DataSaved()
         {
-            this.TestInstance.Save(this.TerminalDescriptor, this.Data);
+            TestInstance.Save(TerminalDescriptor, Data);
 
-            this.DataStoreMock.Verify(_ => _.Save(this.TerminalDescriptor, this.Data));
+            DataStoreMock.Verify(_ => _.Save(TerminalDescriptor, Data));
         }
 
 
         [TestMethod]
         public void Save_NonTerminalDescriptor_DataSaved()
         {
-            this.TestInstanceMockProtected.Setup("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>());
+            TestInstanceMockProtected.Setup("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>());
 
-            this.TestInstance.Save(this.NonTerminalDescriptor, this.DataCollection);
+            TestInstance.Save(NonTerminalDescriptor, DataCollection);
 
-            this.TestInstanceMockProtected.Verify("DescribeAndSave", Times.Once(), this.DataCollection);
+            TestInstanceMockProtected.Verify("DescribeAndSave", Times.Once(), DataCollection);
         }
 
         [TestMethod]
         public void Save_NonTerminalDescriptor_CompositionUpdated()
         {
-            this.TestInstanceMockProtected
+            TestInstanceMockProtected
                 .Setup<IEnumerable<ITerminalDescriptor>>("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>())
-                .Returns(this.TerminalDescriptorsCollection);
+                .Returns(TerminalDescriptorsCollection);
 
-            this.TestInstance.Save(this.NonTerminalDescriptor, this.DataCollection);
+            TestInstance.Save(NonTerminalDescriptor, DataCollection);
 
-            this.NonTerminalDescriptorCompositionsMock.Verify(_ => _.Save(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection), Times.Once());
+            NonTerminalDescriptorCompositionsMock.Verify(_ => _.Save(NonTerminalDescriptor, TerminalDescriptorsCollection), Times.Once());
         }
 
 
         [TestMethod]
         public void Save_DataCollection_DataDescribedSaved()
         {
-            this.TestInstanceMockProtected.Setup("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>());
+            TestInstanceMockProtected.Setup("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>());
 
-            this.TestInstance.Save(this.DataCollection);
+            TestInstance.Save(DataCollection);
 
-            this.TestInstanceMockProtected.Verify("DescribeAndSave", Times.Once(), this.DataCollection);
+            TestInstanceMockProtected.Verify("DescribeAndSave", Times.Once(), DataCollection);
         }
 
 
         [TestMethod]
         public void Contains_NonTerminalContained_True()
         {
-            this.NonTerminalDescriptorCompositionsMock
-                .Setup(_ => _.Contains(this.NonTerminalDescriptor))
+            NonTerminalDescriptorCompositionsMock
+                .Setup(_ => _.Contains(NonTerminalDescriptor))
                 .Returns(true);
 
-            var result = this.TestInstance.Contains(this.NonTerminalDescriptor);
+            var result = TestInstance.Contains(NonTerminalDescriptor);
 
             Assert.IsTrue(result);
         }
@@ -180,11 +179,11 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void Contains_NonTerminalNotContained_False()
         {
-            this.NonTerminalDescriptorCompositionsMock
-                .Setup(_ => _.Contains(this.NonTerminalDescriptor))
+            NonTerminalDescriptorCompositionsMock
+                .Setup(_ => _.Contains(NonTerminalDescriptor))
                 .Returns(false);
 
-            var result = this.TestInstance.Contains(this.NonTerminalDescriptor);
+            var result = TestInstance.Contains(NonTerminalDescriptor);
 
             Assert.IsFalse(result);
         }
@@ -193,11 +192,11 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void Contains_TerminalContained_True()
         {
-            this.DataStoreMock
-                .Setup(_ => _.Contains(this.TerminalDescriptor))
+            DataStoreMock
+                .Setup(_ => _.Contains(TerminalDescriptor))
                 .Returns(true);
 
-            var result = this.TestInstance.Contains(this.TerminalDescriptor);
+            var result = TestInstance.Contains(TerminalDescriptor);
 
             Assert.IsTrue(result);
         }
@@ -205,11 +204,11 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void Contains_TerminalNotContained_False()
         {
-            this.DataStoreMock
-                .Setup(_ => _.Contains(this.TerminalDescriptor))
+            DataStoreMock
+                .Setup(_ => _.Contains(TerminalDescriptor))
                 .Returns(false);
 
-            var result = this.TestInstance.Contains(this.TerminalDescriptor);
+            var result = TestInstance.Contains(TerminalDescriptor);
 
             Assert.IsFalse(result);
         }
@@ -218,15 +217,15 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void Retrieve_TerminalDescriptor_ProxyDataStore()
         {
-            this.DataStoreMock
-                .Setup(_ => _.Retrieve(this.TerminalDescriptor))
-                .Returns(this.Data)
+            DataStoreMock
+                .Setup(_ => _.Retrieve(TerminalDescriptor))
+                .Returns(Data)
                 .Verifiable();
 
-            var result = this.TestInstance.Retrieve(this.TerminalDescriptor);
+            var result = TestInstance.Retrieve(TerminalDescriptor);
 
-            this.DataStoreMock.Verify();
-            Assert.AreSame(this.Data, result);
+            DataStoreMock.Verify();
+            Assert.AreSame(Data, result);
         }
 
 
@@ -241,23 +240,23 @@ namespace DAA.StateManagement.Tests
                 );
             var data = new IData[terminalDescriptors.Length];
 
-            for (int i = 0; i < terminalDescriptors.Length; ++i)
+            for (var i = 0; i < terminalDescriptors.Length; ++i)
             {
                 var terminalDescriptor = terminalDescriptors[i];
                 var dataItem = new Mock<IData>().Object;
                 
-                this.TestInstanceMock
+                TestInstanceMock
                     .Setup<IData>(_ => _.Retrieve(terminalDescriptor))
                     .Returns(dataItem);
 
                 data[i] = dataItem;
             }
 
-            this.NonTerminalDescriptorCompositionsMock
-                .Setup(_ => _.Retrieve(this.NonTerminalDescriptor))
+            NonTerminalDescriptorCompositionsMock
+                .Setup(_ => _.Retrieve(NonTerminalDescriptor))
                 .Returns(() => terminalDescriptors);
 
-            var result = this.TestInstance.Retrieve(this.NonTerminalDescriptor);
+            var result = TestInstance.Retrieve(NonTerminalDescriptor);
 
             Assert.IsTrue(data.Equivalent(result));
         }
@@ -270,7 +269,7 @@ namespace DAA.StateManagement.Tests
             var data = dataMocks.Select(_ => _.Object);
             var terminalDescriptors = new ITerminalDescriptor[dataMocks.Length];
 
-            for (int i = 0; i < dataMocks.Length; ++i)
+            for (var i = 0; i < dataMocks.Length; ++i)
             {
                 var dataMock = dataMocks[i];
                 var dataItem = dataMock.Object;
@@ -278,21 +277,21 @@ namespace DAA.StateManagement.Tests
 
                 terminalDescriptors[i] = terminalDescriptor;
 
-                this.TerminalDescriptorsFlyweightFactoryMock
+                TerminalDescriptorsFactoryMock
                     .Setup<ITerminalDescriptor>(_ => _.Create(dataItem))
                     .Returns(terminalDescriptor)
                     .Verifiable();
 
-                this.DataStoreMock
+                DataStoreMock
                     .Setup(_ => _.Save(terminalDescriptor, dataMock.Object))
                     .Verifiable();
             }
 
-            var result = ReflectionHelper.Invoke(this.TestInstance, "DescribeAndSave", data)
+            var result = ReflectionHelper.Invoke(TestInstance, "DescribeAndSave", data)
                             as IEnumerable<ITerminalDescriptor>;
 
-            this.TerminalDescriptorsFlyweightFactoryMock.Verify();
-            this.DataStoreMock.Verify();
+            TerminalDescriptorsFactoryMock.Verify();
+            DataStoreMock.Verify();
             Assert.IsTrue(terminalDescriptors.Equivalent(result));
         }
 
@@ -302,14 +301,14 @@ namespace DAA.StateManagement.Tests
         {
             var additions = ArraysHelper.CreateWithContent(new Mock<ITerminalDescriptor>().Object, new Mock<ITerminalDescriptor>().Object);
 
-            this.NonTerminalDescriptorCompositionsMock
-                .Setup(_ => _.UpdateAndProvideAdditions(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection))
+            NonTerminalDescriptorCompositionsMock
+                .Setup(_ => _.UpdateAndProvideAdditions(NonTerminalDescriptor, TerminalDescriptorsCollection))
                 .Returns(additions)
                 .Verifiable();
 
-            var result = this.TestInstance.UpdateCompositionAndProvideAdditions(this.NonTerminalDescriptor, this.TerminalDescriptorsCollection);
+            var result = TestInstance.UpdateCompositionAndProvideAdditions(NonTerminalDescriptor, TerminalDescriptorsCollection);
 
-            this.NonTerminalDescriptorCompositionsMock.Verify();
+            NonTerminalDescriptorCompositionsMock.Verify();
             Assert.AreSame(additions, result);
         }
 
@@ -320,7 +319,7 @@ namespace DAA.StateManagement.Tests
             var providedDescriptor = new Mock<IDescriptor>().Object;
             var disjunctDescriptorMocks = ArraysHelper.CreateWithContent(new Mock<IDescriptor>(), new Mock<IDescriptor>());
             var intersectingDescriptorMocks = ArraysHelper.CreateWithContent(new Mock<IDescriptor>(), new Mock<IDescriptor>());
-            var allDescriptorMocks = this.ShuffledMerge(intersectingDescriptorMocks, disjunctDescriptorMocks);
+            var allDescriptorMocks = intersectingDescriptorMocks.ShuffledMerge(disjunctDescriptorMocks);
 
             var intersectingDescriptors = intersectingDescriptorMocks.Select(_ => _.Object);
             var allDescriptors = allDescriptorMocks.Select(_ => _.Object);
@@ -328,14 +327,14 @@ namespace DAA.StateManagement.Tests
             disjunctDescriptorMocks.ForEach(_ => _.Setup(__ => __.Intersects(providedDescriptor)).Returns(false));
             intersectingDescriptorMocks.ForEach(_ => _.Setup(__ => __.Intersects(providedDescriptor)).Returns(true));
 
-            this.TestInstanceMockProtected
+            TestInstanceMockProtected
                 .Setup<IEnumerable<IDescriptor>>("RetrieveAllDescriptors")
                 .Returns(allDescriptors)
                 .Verifiable();
 
-            var result = this.TestInstance.FindIntersectingDescriptors(providedDescriptor);
+            var result = TestInstance.FindIntersectingDescriptors(providedDescriptor);
 
-            this.TestInstanceMock.Verify();
+            TestInstanceMock.Verify();
             allDescriptorMocks.ForEach(_ => _.VerifyAll());
             Assert.IsTrue(intersectingDescriptors.Equivalent(result));
         }
@@ -347,12 +346,12 @@ namespace DAA.StateManagement.Tests
             var terminalDescriptorMocks = ArraysHelper.CreateWithContent(new Mock<ITerminalDescriptor>(), new Mock<ITerminalDescriptor>());
             var terminalDescriptors = terminalDescriptorMocks.Select(_ => _.Object);
 
-            this.NonTerminalDescriptorCompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(new INonTerminalDescriptor[0]);
-            this.DataStoreMock.Setup(_ => _.RetrieveDescriptors()).Returns(terminalDescriptors).Verifiable();
+            NonTerminalDescriptorCompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(new INonTerminalDescriptor[0]);
+            DataStoreMock.Setup(_ => _.RetrieveDescriptors()).Returns(terminalDescriptors).Verifiable();
 
-            var result = (IEnumerable<IDescriptor>)ReflectionHelper.Invoke(this.TestInstance, "RetrieveAllDescriptors");
+            var result = (IEnumerable<IDescriptor>)ReflectionHelper.Invoke(TestInstance, "RetrieveAllDescriptors");
 
-            this.DataStoreMock.Verify();
+            DataStoreMock.Verify();
             Assert.IsTrue(terminalDescriptors.Equivalent(result));
         }
 
@@ -362,33 +361,13 @@ namespace DAA.StateManagement.Tests
             var nonTerminalDescriptorMocks = ArraysHelper.CreateWithContent(new Mock<INonTerminalDescriptor>(), new Mock<INonTerminalDescriptor>());
             var nonTerminalDescriptors = nonTerminalDescriptorMocks.Select(_ => _.Object);
 
-            this.DataStoreMock.Setup(_ => _.RetrieveDescriptors()).Returns(new ITerminalDescriptor[0]);
-            this.NonTerminalDescriptorCompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(nonTerminalDescriptors).Verifiable();
+            DataStoreMock.Setup(_ => _.RetrieveDescriptors()).Returns(new ITerminalDescriptor[0]);
+            NonTerminalDescriptorCompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(nonTerminalDescriptors).Verifiable();
 
-            var result = (IEnumerable<IDescriptor>)ReflectionHelper.Invoke(this.TestInstance, "RetrieveAllDescriptors");
+            var result = (IEnumerable<IDescriptor>)ReflectionHelper.Invoke(TestInstance, "RetrieveAllDescriptors");
 
-            this.NonTerminalDescriptorCompositionsMock.Verify();
+            NonTerminalDescriptorCompositionsMock.Verify();
             Assert.IsTrue(nonTerminalDescriptors.Equivalent(result));
-        }
-
-
-        // TODO: Move to the framework.
-        private TItem[] ShuffledMerge<TItem>(TItem[] left, TItem[] right)
-        {
-            var random = new Random();
-            var result = left.Concat(right).ToArray();
-            var size = result.Length;
-
-            for (int i = 1; i < size; ++i)
-            {
-                var swapIndex = random.Next(size - 1);
-                var swappedValue = result[swapIndex];
-
-                result[swapIndex] = result[i];
-                result[i] = swappedValue;
-            }
-
-            return result;
         }
     }
 }
