@@ -105,7 +105,7 @@ namespace DAA.StateManagement.Tests
 
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(DescriptorsCollection))
-                .Returns(Task.FromResult(new VoidTaskResult()))
+                .Returns(Task.Delay(0))
                 .Verifiable();
 
             await TestInstance.RefreshIntersectingDataAsync(Descriptor);
@@ -141,7 +141,7 @@ namespace DAA.StateManagement.Tests
             {
                 TestInstanceMock
                     .Setup(_ => _.RefreshDataAsync(descriptor))
-                    .Returns(Task.FromResult(new VoidTaskResult()))
+                    .Returns(Task.Delay(0))
                     .Verifiable();
             });
 
@@ -181,10 +181,10 @@ namespace DAA.StateManagement.Tests
 
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()))
-                .Returns(Task.FromResult(new VoidTaskResult()));
+                .Returns(Task.Delay(0));
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(TerminalDescriptor))
-                .Returns(Task.FromResult(new VoidTaskResult()))
+                .Returns(Task.Delay(0))
                 .Verifiable();
 
             await TestInstance.RefreshDataAsync(descriptor);
@@ -200,7 +200,7 @@ namespace DAA.StateManagement.Tests
 
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()))
-                .Returns(Task.FromResult(new VoidTaskResult()));
+                .Returns(Task.Delay(0));
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(TerminalDescriptor))
                 .Returns(taskToRefreshTheData);
@@ -217,10 +217,10 @@ namespace DAA.StateManagement.Tests
 
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()))
-                .Returns(Task.FromResult(new VoidTaskResult()));
+                .Returns(Task.Delay(0));
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(NonTerminalDescriptor))
-                .Returns(Task.FromResult(new VoidTaskResult()))
+                .Returns(Task.Delay(0))
                 .Verifiable();
 
             await TestInstance.RefreshDataAsync(descriptor);
@@ -236,7 +236,7 @@ namespace DAA.StateManagement.Tests
 
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()))
-                .Returns(Task.FromResult(new VoidTaskResult()));
+                .Returns(Task.Delay(0));
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(NonTerminalDescriptor))
                 .Returns(taskToRefreshTheData);
@@ -253,10 +253,10 @@ namespace DAA.StateManagement.Tests
 
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()))
-                .Returns(Task.FromResult(new VoidTaskResult()));
+                .Returns(Task.Delay(0));
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()))
-                .Returns(Task.FromResult(new VoidTaskResult()));
+                .Returns(Task.Delay(0));
 
             await TestInstance.RefreshDataAsync(descriptor);
 
@@ -270,10 +270,10 @@ namespace DAA.StateManagement.Tests
 
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<ITerminalDescriptor>()))
-                .Returns(Task.FromResult(new VoidTaskResult()));
+                .Returns(Task.Delay(0));
             TestInstanceMock
                 .Setup(_ => _.RefreshDataAsync(It.IsAny<INonTerminalDescriptor>()))
-                .Returns(Task.FromResult(new VoidTaskResult()));
+                .Returns(Task.Delay(0));
 
             await TestInstance.RefreshDataAsync(descriptor);
 
@@ -339,7 +339,7 @@ namespace DAA.StateManagement.Tests
 
             TestInstanceMockProtected
                 .Setup<Task>("UpdateCompositionAndAcquireAdditionsAsync", NonTerminalDescriptor, TerminalDescriptorsCollection)
-                .Returns(Task.FromResult(new VoidTaskResult()))
+                .Returns(Task.Delay(0))
                 .Verifiable();
 
             await TestInstance.RefreshDataAsync(NonTerminalDescriptor);
@@ -380,7 +380,7 @@ namespace DAA.StateManagement.Tests
             TestInstanceMockProtected
                 .Setup<Task>("UpdateCompositionAndAcquireAdditionsAsync", ItExpr.IsAny<INonTerminalDescriptor>(), ItExpr.IsAny<IEnumerable<ITerminalDescriptor>>())
                 .Callback(() => compositionUpdateCallNumber = ++callCounter)
-                .Returns(Task.FromResult(new VoidTaskResult()));
+                .Returns(Task.Delay(0));
             
             StateEventsAggregatorMock
                 .Setup(_ => _.PublishDataChangedEvent(NonTerminalDescriptor, TestInstance))
