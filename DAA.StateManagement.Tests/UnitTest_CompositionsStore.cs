@@ -7,22 +7,22 @@ using Moq;
 using Moq.Protected;
 
 using DAA.Helpers;
-using DAA.StateManagement.DataManagement;
 using DAA.StateManagement.Interfaces;
+using DAA.StateManagement.Stores;
 
 namespace DAA.StateManagement.Tests
 {
     [TestClass]
-    public class UnitTest_NonTerminalDescriptorCompositionsStore
+    public class UnitTest_CompositionsStore
     {
-        private NonTerminalDescriptorCompositionsStore TestInstance { get => TestInstanceMock.Object; }
-        private Mock<NonTerminalDescriptorCompositionsStore> TestInstanceMock { get; set; }
-        private IProtectedMock<NonTerminalDescriptorCompositionsStore> TestInstanceMockProtected { get => TestInstanceMock.Protected(); }
+        private CompositionsStore TestInstance => TestInstanceMock.Object;
+        private Mock<CompositionsStore> TestInstanceMock { get; set; }
+        private IProtectedMock<CompositionsStore> TestInstanceMockProtected => TestInstanceMock.Protected();
 
-        private INonTerminalDescriptor Descriptor { get => DescriptorMock.Object; }
+        private INonTerminalDescriptor Descriptor => DescriptorMock.Object;
         private Mock<INonTerminalDescriptor> DescriptorMock { get; set; }
 
-        private IEnumerable<ITerminalDescriptor> Composition { get => CompositionMock.Object; }
+        private IEnumerable<ITerminalDescriptor> Composition => CompositionMock.Object;
         private Mock<IEnumerable<ITerminalDescriptor>> CompositionMock { get; set; }
 
 
@@ -32,7 +32,7 @@ namespace DAA.StateManagement.Tests
             DescriptorMock = new Mock<INonTerminalDescriptor>();
             CompositionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
 
-            TestInstanceMock = new Mock<NonTerminalDescriptorCompositionsStore>();
+            TestInstanceMock = new Mock<CompositionsStore>();
             TestInstanceMock.CallBase = true;
         }
 

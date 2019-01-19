@@ -33,12 +33,12 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataManagement\DataInformationStore.cs" />
-    <Compile Include="DataManagement\DataPool.cs" />
-    <Compile Include="DataManagement\NonTerminalDescriptorCompositionsStore.cs" />
-    <Compile Include="DataManagement\Store.cs" />
+    <Compile Include="Stores\StateManagementStore.cs" />
+    <Compile Include="DataPool.cs" />
+    <Compile Include="Stores\CompositionsStore.cs" />
+    <Compile Include="Stores\Store.cs" />
     <Compile Include="DataQualitySupervisor.cs" />
-    <Compile Include="DataManagement\DataStore.cs" />
+    <Compile Include="Stores\DataStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StateManagementService.cs" />
     <Compile Include="StateManagementServiceBuildingDirector.cs" />

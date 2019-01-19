@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
 using DAA.StateManagement.Interfaces;
+using DAA.StateManagement.Stores;
 
-namespace DAA.StateManagement.DataManagement
+namespace DAA.StateManagement
 {
     public class DataPool<TData> : IDataPool<TData>
         where TData : IData
     {
         protected virtual DataStore<TData> Data { get;  }
-        protected virtual NonTerminalDescriptorCompositionsStore NonTerminalDescriptorCompositions { get; }
+        protected virtual CompositionsStore Compositions { get; }
         protected virtual ITerminalDescriptorsFactory TerminalDescriptorsFactory { get; }
 
 
@@ -18,7 +18,7 @@ namespace DAA.StateManagement.DataManagement
             TerminalDescriptorsFactory = terminalDescriptorsFactory;
 
             Data = new DataStore<TData>(dataManipulator);
-            NonTerminalDescriptorCompositions = new NonTerminalDescriptorCompositionsStore();
+            Compositions = new CompositionsStore();
         }
 
 
@@ -29,9 +29,8 @@ namespace DAA.StateManagement.DataManagement
 
         public bool Contains(INonTerminalDescriptor descriptor)
         {
-            return NonTerminalDescriptorCompositions.Contains(descriptor);
+            return Compositions.Contains(descriptor);
         }
-
 
         public virtual TData Retrieve(ITerminalDescriptor descriptor)
         {
@@ -40,11 +39,8 @@ namespace DAA.StateManagement.DataManagement
 
         public virtual IEnumerable<TData> Retrieve(INonTerminalDescriptor descriptor)
         {
-            return NonTerminalDescriptorCompositions
-                .Retrieve(descriptor)
-                .Select(Retrieve);
+            return Compositions.Retrieve(descriptor).Select(Retrieve);
         }
-
 
         public void Save(ITerminalDescriptor descriptor, TData data)
         {
@@ -54,7 +50,8 @@ namespace DAA.StateManagement.DataManagement
         public void Save(INonTerminalDescriptor descriptor, IEnumerable<TData> data)
         {
             var composition = DescribeAndSave(data);
-            NonTerminalDescriptorCompositions.Save(descriptor, composition);
+
+            Compositions.Save(descriptor, composition);
         }
 
         public void Save(IEnumerable<TData> data)
@@ -62,9 +59,14 @@ namespace DAA.StateManagement.DataManagement
             DescribeAndSave(data);
         }
 
-        protected virtual IEnumerable<ITerminalDescriptor> DescribeAndSave(IEnumerable<TData> data)
+        public IEnumerable<IDescriptor> FindIntersectingDescriptors(IDescriptor descriptor)
         {
-            return data.Select(DescribeAndSave).ToArray();
+            return RetrieveAllDescriptors().Where(_ => _.Intersects(descriptor)).ToArray();
+        }
+
+        public virtual IEnumerable<ITerminalDescriptor> UpdateCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
+        {
+            return Compositions.UpdateAndProvideAdditions(descriptor, composition);
         }
 
         private ITerminalDescriptor DescribeAndSave(TData data)
@@ -76,24 +78,17 @@ namespace DAA.StateManagement.DataManagement
             return descriptor;
         }
 
-
-        public IEnumerable<IDescriptor> FindIntersectingDescriptors(IDescriptor descriptor)
+        protected virtual IEnumerable<ITerminalDescriptor> DescribeAndSave(IEnumerable<TData> data)
         {
-            return RetrieveAllDescriptors().Where(_ => _.Intersects(descriptor)).ToArray();
+            return data.Select(DescribeAndSave).ToArray();
         }
 
         protected virtual IEnumerable<IDescriptor> RetrieveAllDescriptors()
         {
             var terminalDescriptors = Data.RetrieveDescriptors().Cast<IDescriptor>();
-            var nonTerminalDescriptors = NonTerminalDescriptorCompositions.RetrieveDescriptors().Cast<IDescriptor>();
+            var nonTerminalDescriptors = Compositions.RetrieveDescriptors().Cast<IDescriptor>();
 
             return terminalDescriptors.Concat(nonTerminalDescriptors);
-        }
-
-
-        public virtual IEnumerable<ITerminalDescriptor> UpdateCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
-        {
-            return NonTerminalDescriptorCompositions.UpdateAndProvideAdditions(descriptor, composition);
         }
     }
 }

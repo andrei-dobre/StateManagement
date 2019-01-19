@@ -1,18 +1,16 @@
 ﻿using DAA.StateManagement.Interfaces;
 
-namespace DAA.StateManagement.DataManagement
+namespace DAA.StateManagement.Stores
 {
-    public class DataStore<TData> : DataInformationStore<ITerminalDescriptor, TData>
+    public class DataStore<TData> : StateManagementStore<ITerminalDescriptor, TData>
         where TData : IData
     {
-        private IDataManipulator<TData> dataManipulator;
-
-        protected IDataManipulator<TData> DataManipulator { get => dataManipulator; }
+        protected IDataManipulator<TData> DataManipulator { get; }
 
 
         public DataStore(IDataManipulator<TData> dataManipulator)
         {
-            this.dataManipulator = dataManipulator;
+            DataManipulator = dataManipulator;
         }
 
 

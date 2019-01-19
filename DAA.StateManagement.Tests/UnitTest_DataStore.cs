@@ -2,8 +2,8 @@
 
 using Moq;
 using DAA.Helpers;
-using DAA.StateManagement.DataManagement;
 using DAA.StateManagement.Interfaces;
+using DAA.StateManagement.Stores;
 
 namespace DAA.StateManagement.Tests
 {

@@ -11,7 +11,7 @@ using DAA.StateManagement.Interfaces;
 namespace DAA.StateManagement.Tests
 {
     [TestClass]
-    public class UnitTest_TerminalDescriptorsFlyweightFactory : TerminalDescriptorsFlyweightFactory
+    public class UnitTest_TerminalDescriptorsFlyweightFactory
     {
         private IData Data { get => DataMock.Object; }
         private Mock<IData> DataMock { get; set; }
@@ -38,12 +38,12 @@ namespace DAA.StateManagement.Tests
             var terminalDescriptor = new Mock<ITerminalDescriptor>().Object;
 
             TestInstanceMockProtected
-                .Setup<ITerminalDescriptor>(nameof(Instantiate), intrinsicState)
+                .Setup<ITerminalDescriptor>("Instantiate", intrinsicState)
                 .Returns(terminalDescriptor);
 
             var result = TestInstance.Create(intrinsicState);
 
-            Assert.IsTrue(ReferenceEquals(terminalDescriptor, result));
+            Assert.AreSame(terminalDescriptor, result);
         }
 
         [TestMethod]
@@ -52,10 +52,10 @@ namespace DAA.StateManagement.Tests
             var intrinsicState = new object();
 
             TestInstanceMockProtected
-                .Setup<ITerminalDescriptor>(nameof(Instantiate), intrinsicState)
+                .Setup<ITerminalDescriptor>("Instantiate", intrinsicState)
                 .Returns(() => new Mock<ITerminalDescriptor>().Object);
 
-            Assert.IsTrue(ReferenceEquals(TestInstance.Create(intrinsicState), TestInstance.Create(intrinsicState)));
+            Assert.AreSame(TestInstance.Create(intrinsicState), TestInstance.Create(intrinsicState));
         }
 
         [TestMethod]
@@ -65,12 +65,24 @@ namespace DAA.StateManagement.Tests
             var intrinsicStateTwo = new object();
 
             TestInstanceMockProtected
-                .Setup<ITerminalDescriptor>(nameof(Instantiate), ItExpr.IsAny<object>())
+                .Setup<ITerminalDescriptor>("Instantiate", ItExpr.IsAny<object>())
                 .Returns(() => new Mock<ITerminalDescriptor>().Object);
 
-            Assert.IsTrue(ReferenceEquals(TestInstance.Create(intrinsicStateOne), TestInstance.Create(intrinsicStateOne)));
-            Assert.IsTrue(ReferenceEquals(TestInstance.Create(intrinsicStateTwo), TestInstance.Create(intrinsicStateTwo)));
+            Assert.AreSame(TestInstance.Create(intrinsicStateOne), TestInstance.Create(intrinsicStateOne));
+            Assert.AreSame(TestInstance.Create(intrinsicStateTwo), TestInstance.Create(intrinsicStateTwo));
             Assert.IsFalse(ReferenceEquals(TestInstance.Create(intrinsicStateOne), TestInstance.Create(intrinsicStateTwo)));
+        }
+
+        [TestMethod]
+        public void Create_IntrinsicStatesAutoBoxed_SameInstanceForEqualState()
+        {
+            var intrinsicState = RandomizationHelper.Instance.GetInt();
+
+            TestInstanceMockProtected
+                .Setup<ITerminalDescriptor>("Instantiate", intrinsicState)
+                .Returns(() => new Mock<ITerminalDescriptor>().Object);
+
+            Assert.AreSame(TestInstance.Create(intrinsicState), TestInstance.Create(intrinsicState));
         }
 
 
@@ -100,7 +112,7 @@ namespace DAA.StateManagement.Tests
 
 
         [TestMethod]
-        public void Create_CollectionOfInstrinsicStates_TerminalDescriptorsCreatedForEach()
+        public void Create_CollectionOfIntrinsicStates_TerminalDescriptorsCreatedForEach()
         {
             var intrinsicStates = new object[5];
             var terminalDescriptors = new List<ITerminalDescriptor>();

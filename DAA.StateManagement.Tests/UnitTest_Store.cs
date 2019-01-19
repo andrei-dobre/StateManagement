@@ -7,7 +7,7 @@ using Moq;
 using Moq.Protected;
 
 using DAA.Helpers;
-using DAA.StateManagement.DataManagement;
+using DAA.StateManagement.Stores;
 
 namespace DAA.StateManagement.Tests
 {

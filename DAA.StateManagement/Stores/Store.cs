@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DAA.StateManagement.DataManagement
+namespace DAA.StateManagement.Stores
 {
     public abstract class Store<TKey, TValue>
     {

@@ -7,8 +7,8 @@ using Moq;
 using Moq.Protected;
 
 using DAA.Helpers;
-using DAA.StateManagement.DataManagement;
 using DAA.StateManagement.Interfaces;
+using DAA.StateManagement.Stores;
 
 namespace DAA.StateManagement.Tests
 {
@@ -24,8 +24,8 @@ namespace DAA.StateManagement.Tests
         private DataStore<IData> DataStore => DataStoreMock.Object;
         private Mock<DataStore<IData>> DataStoreMock { get; set; }
 
-        private NonTerminalDescriptorCompositionsStore NonTerminalDescriptorCompositions => NonTerminalDescriptorCompositionsMock.Object;
-        private Mock<NonTerminalDescriptorCompositionsStore> NonTerminalDescriptorCompositionsMock { get; set; }
+        private CompositionsStore Compositions => CompositionsMock.Object;
+        private Mock<CompositionsStore> CompositionsMock { get; set; } 
 
         private IData Data => DataMock.Object;
         private Mock<IData> DataMock { get; set; }
@@ -53,7 +53,7 @@ namespace DAA.StateManagement.Tests
             TerminalDescriptorsFactoryMock = new Mock<ITerminalDescriptorsFactory>();
             DataManipulatorMock = new Mock<IDataManipulator<IData>>();
             DataStoreMock = new Mock<DataStore<IData>>(DataManipulator);
-            NonTerminalDescriptorCompositionsMock = new Mock<NonTerminalDescriptorCompositionsStore>();
+            CompositionsMock = new Mock<CompositionsStore>();
             DataMock = new Mock<IData>();
             DataCollectionMock = new Mock<IEnumerable<IData>>();
             TerminalDescriptorMock = new Mock<ITerminalDescriptor>();
@@ -67,8 +67,8 @@ namespace DAA.StateManagement.Tests
                 .SetupGet<DataStore<IData>>("Data")
                 .Returns(DataStore);
             TestInstanceMockProtected
-                .SetupGet<NonTerminalDescriptorCompositionsStore>("NonTerminalDescriptorCompositions")
-                .Returns(NonTerminalDescriptorCompositions);
+                .SetupGet<CompositionsStore>("Compositions")
+                .Returns(Compositions);
         }
 
 
@@ -100,8 +100,8 @@ namespace DAA.StateManagement.Tests
         {
             var testInstance = new DataPool<IData>(TerminalDescriptorsFactory, DataManipulator);
 
-            var resultOne = ReflectionHelper.Invoke(testInstance, "NonTerminalDescriptorCompositions");
-            var resultTwo = ReflectionHelper.Invoke(testInstance, "NonTerminalDescriptorCompositions");
+            var resultOne = ReflectionHelper.Invoke(testInstance, "Compositions");
+            var resultTwo = ReflectionHelper.Invoke(testInstance, "Compositions");
 
             Assert.IsNotNull(resultOne);
             Assert.IsNotNull(resultTwo);
@@ -149,7 +149,7 @@ namespace DAA.StateManagement.Tests
 
             TestInstance.Save(NonTerminalDescriptor, DataCollection);
 
-            NonTerminalDescriptorCompositionsMock.Verify(_ => _.Save(NonTerminalDescriptor, TerminalDescriptorsCollection), Times.Once());
+            CompositionsMock.Verify(_ => _.Save(NonTerminalDescriptor, TerminalDescriptorsCollection), Times.Once());
         }
 
 
@@ -167,7 +167,7 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void Contains_NonTerminalContained_True()
         {
-            NonTerminalDescriptorCompositionsMock
+            CompositionsMock
                 .Setup(_ => _.Contains(NonTerminalDescriptor))
                 .Returns(true);
 
@@ -179,7 +179,7 @@ namespace DAA.StateManagement.Tests
         [TestMethod]
         public void Contains_NonTerminalNotContained_False()
         {
-            NonTerminalDescriptorCompositionsMock
+            CompositionsMock
                 .Setup(_ => _.Contains(NonTerminalDescriptor))
                 .Returns(false);
 
@@ -252,7 +252,7 @@ namespace DAA.StateManagement.Tests
                 data[i] = dataItem;
             }
 
-            NonTerminalDescriptorCompositionsMock
+            CompositionsMock
                 .Setup(_ => _.Retrieve(NonTerminalDescriptor))
                 .Returns(() => terminalDescriptors);
 
@@ -301,14 +301,14 @@ namespace DAA.StateManagement.Tests
         {
             var additions = ArraysHelper.CreateWithContent(new Mock<ITerminalDescriptor>().Object, new Mock<ITerminalDescriptor>().Object);
 
-            NonTerminalDescriptorCompositionsMock
+            CompositionsMock
                 .Setup(_ => _.UpdateAndProvideAdditions(NonTerminalDescriptor, TerminalDescriptorsCollection))
                 .Returns(additions)
                 .Verifiable();
 
             var result = TestInstance.UpdateCompositionAndProvideAdditions(NonTerminalDescriptor, TerminalDescriptorsCollection);
 
-            NonTerminalDescriptorCompositionsMock.Verify();
+            CompositionsMock.Verify();
             Assert.AreSame(additions, result);
         }
 
@@ -346,7 +346,7 @@ namespace DAA.StateManagement.Tests
             var terminalDescriptorMocks = ArraysHelper.CreateWithContent(new Mock<ITerminalDescriptor>(), new Mock<ITerminalDescriptor>());
             var terminalDescriptors = terminalDescriptorMocks.Select(_ => _.Object);
 
-            NonTerminalDescriptorCompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(new INonTerminalDescriptor[0]);
+            CompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(new INonTerminalDescriptor[0]);
             DataStoreMock.Setup(_ => _.RetrieveDescriptors()).Returns(terminalDescriptors).Verifiable();
 
             var result = (IEnumerable<IDescriptor>)ReflectionHelper.Invoke(TestInstance, "RetrieveAllDescriptors");
@@ -362,11 +362,11 @@ namespace DAA.StateManagement.Tests
             var nonTerminalDescriptors = nonTerminalDescriptorMocks.Select(_ => _.Object);
 
             DataStoreMock.Setup(_ => _.RetrieveDescriptors()).Returns(new ITerminalDescriptor[0]);
-            NonTerminalDescriptorCompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(nonTerminalDescriptors).Verifiable();
+            CompositionsMock.Setup(_ => _.RetrieveDescriptors()).Returns(nonTerminalDescriptors).Verifiable();
 
             var result = (IEnumerable<IDescriptor>)ReflectionHelper.Invoke(TestInstance, "RetrieveAllDescriptors");
 
-            NonTerminalDescriptorCompositionsMock.Verify();
+            CompositionsMock.Verify();
             Assert.IsTrue(nonTerminalDescriptors.Equivalent(result));
         }
     }

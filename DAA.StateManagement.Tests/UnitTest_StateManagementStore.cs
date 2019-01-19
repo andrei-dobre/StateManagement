@@ -4,18 +4,18 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 using DAA.StateManagement.Interfaces;
-using DAA.StateManagement.DataManagement;
+using DAA.StateManagement.Stores;
 
 namespace DAA.StateManagement.Tests
 {
     [TestClass]
-    public class UnitTest_DataInformationStore
+    public class UnitTest_StateManagementStore
     {
         private IEnumerable<ITerminalDescriptor> TerminalDescriptorsCollection { get => TerminalDescriptorsCollectionMock.Object; }
         private Mock<IEnumerable<ITerminalDescriptor>> TerminalDescriptorsCollectionMock { get; set; }
 
-        private DataInformationStore<IDescriptor, object> TestInstance { get => TestInstanceMock.Object; }
-        private Mock<DataInformationStore<IDescriptor, object>> TestInstanceMock { get; set; }
+        private StateManagementStore<IDescriptor, object> TestInstance { get => TestInstanceMock.Object; }
+        private Mock<StateManagementStore<IDescriptor, object>> TestInstanceMock { get; set; }
 
 
         [TestInitialize]
@@ -23,7 +23,7 @@ namespace DAA.StateManagement.Tests
         {
             TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
 
-            TestInstanceMock = new Mock<DataInformationStore<IDescriptor, object>>();
+            TestInstanceMock = new Mock<StateManagementStore<IDescriptor, object>>();
             TestInstanceMock.CallBase = true;
         }
 
