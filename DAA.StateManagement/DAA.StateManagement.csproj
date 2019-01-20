@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CollectionsManager.cs" />
+    <Compile Include="DataRepository.cs" />
     <Compile Include="StateEventsAggregator.cs" />
     <Compile Include="Stores\StateManagementStore.cs" />
     <Compile Include="DataPool.cs" />

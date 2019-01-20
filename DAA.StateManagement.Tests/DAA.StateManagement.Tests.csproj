@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Stores\UnitTest_StateManagementStore.cs" />
+    <Compile Include="UnitTest_DataRepository.cs" />
     <Compile Include="UnitTest_CollectionsManager.cs" />
     <Compile Include="UnitTest_StateEventsAggregator.cs" />
     <Compile Include="UnitTest_DataPool.cs" />

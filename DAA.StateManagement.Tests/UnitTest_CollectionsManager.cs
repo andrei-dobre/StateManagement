@@ -85,7 +85,7 @@ namespace DAA.StateManagement
         [TestMethod]
         public void DropCollection_CollectionRegistered_CollectionCleared()
         {
-            MockedTestInstance.Setup(_ => _.CollectionIsRegistered(It.IsAny<ICollection<IData>>())).Returns(true);
+            MockedTestInstance.Setup(_ => _.IsCollectionRegistered(It.IsAny<ICollection<IData>>())).Returns(true);
             MockedTestInstance.Setup(_ => _.ClearCollection(It.IsAny<ICollection<IData>>()));
             MockedTestInstance.Setup(_ =>
                 _.DropCollection(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()));
@@ -99,7 +99,7 @@ namespace DAA.StateManagement
         [TestMethod]
         public void DropCollection_CollectionRegistered_CollectionDroppedCorrectly()
         {
-            MockedTestInstance.Setup(_ => _.CollectionIsRegistered(It.IsAny<ICollection<IData>>())).Returns(true);
+            MockedTestInstance.Setup(_ => _.IsCollectionRegistered(It.IsAny<ICollection<IData>>())).Returns(true);
             MockedTestInstance.Setup(_ => _.ClearCollection(It.IsAny<ICollection<IData>>()));
             MockedTestInstance.Setup(_ =>
                 _.DropCollection(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()));
@@ -114,7 +114,7 @@ namespace DAA.StateManagement
         [TestMethod]
         public void DropCollection_CollectionNotRegistered_CollectionNotCleared()
         {
-            MockedTestInstance.Setup(_ => _.CollectionIsRegistered(It.IsAny<ICollection<IData>>())).Returns(false);
+            MockedTestInstance.Setup(_ => _.IsCollectionRegistered(It.IsAny<ICollection<IData>>())).Returns(false);
             MockedTestInstance.Setup(_ => _.ClearCollection(It.IsAny<ICollection<IData>>()));
             MockedTestInstance.Setup(_ =>
                 _.DropCollection(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()));
@@ -128,7 +128,7 @@ namespace DAA.StateManagement
         [TestMethod]
         public void DropCollection_CollectionNotRegistered_DoesNotAttemptToDropCollection()
         {
-            MockedTestInstance.Setup(_ => _.CollectionIsRegistered(It.IsAny<ICollection<IData>>())).Returns(false);
+            MockedTestInstance.Setup(_ => _.IsCollectionRegistered(It.IsAny<ICollection<IData>>())).Returns(false);
             MockedTestInstance.Setup(_ => _.ClearCollection(It.IsAny<ICollection<IData>>()));
             MockedTestInstance.Setup(_ =>
                 _.DropCollection(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()));
@@ -160,6 +160,49 @@ namespace DAA.StateManagement
             {
                 MockedTestInstance.Verify(_ => _.UpdateCollection(collection));
             }
+        }
+
+        [TestMethod]
+        public void IsCollectionRegistered_RegisteredCollection_True()
+        {
+            TestInstance.RegisterCollection(Collection, Descriptor);
+
+            Assert.IsTrue(TestInstance.IsCollectionRegistered(Collection));
+        }
+
+        [TestMethod]
+        public void IsCollectionRegistered_CollectionRegisteredAndDropped_False()
+        {
+            TestInstance.RegisterCollection(Collection, Descriptor);
+            TestInstance.DropCollection(Collection);
+
+            Assert.IsFalse(TestInstance.IsCollectionRegistered(Collection));
+        }
+
+        [TestMethod]
+        public void IsCollectionRegistered_CollectionNeverRegistered_False()
+        {
+            Assert.IsFalse(TestInstance.IsCollectionRegistered(Collection));
+        }
+
+        [TestMethod]
+        public void GetDescriptor_RegisteredCollection_CorrectDescriptor()
+        {
+            TestInstance.RegisterCollection(Collection, Descriptor);
+
+            Assert.AreSame(Descriptor, TestInstance.GetDescriptor(Collection));
+        }
+
+        [TestMethod]
+        public void GetDescriptor_CollectionRegisteredTwice_CorrectDescriptor()
+        {
+            var descriptorOne = new Mock<INonTerminalDescriptor>().Object;
+            var descriptorTwo = new Mock<INonTerminalDescriptor>().Object;
+
+            TestInstance.RegisterCollection(Collection, descriptorOne);
+            TestInstance.RegisterCollection(Collection, descriptorTwo);
+
+            Assert.AreSame(descriptorTwo, TestInstance.GetDescriptor(Collection));
         }
     }
 }

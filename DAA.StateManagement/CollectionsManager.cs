@@ -36,11 +36,16 @@ namespace DAA.StateManagement
 
         public virtual void DropCollection(ICollection<TData> collection)
         {
-            if (CollectionIsRegistered(collection))
+            if (IsCollectionRegistered(collection))
             {
                 ClearCollection(collection);
                 DropCollection(collection, GetDescriptor(collection));
             }
+        }
+
+        public virtual bool IsCollectionRegistered(ICollection<TData> collection)
+        {
+            return DescriptorByCollection.ContainsKey(collection);
         }
 
         public virtual void WhenCompositionChanged(object sender, INonTerminalDescriptor descriptor)
@@ -94,11 +99,6 @@ namespace DAA.StateManagement
         public virtual INonTerminalDescriptor GetDescriptor(ICollection<TData> collection)
         {
             return DescriptorByCollection[collection];
-        }
-
-        public virtual bool CollectionIsRegistered(ICollection<TData> collection)
-        {
-            return DescriptorByCollection.ContainsKey(collection);
         }
 
         public virtual ICollection<ICollection<TData>> GetCollectionsForDescriptor(INonTerminalDescriptor descriptor)
