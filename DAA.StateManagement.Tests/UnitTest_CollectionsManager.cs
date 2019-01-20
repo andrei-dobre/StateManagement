@@ -9,8 +9,8 @@ namespace DAA.StateManagement
     [TestClass]
     public class UnitTest_CollectionsManager
     {
-        private IStateEventsAggregator<IData> StateEventsAggregator => MockedStateEventsAggregator.Object;
-        private Mock<IStateEventsAggregator<IData>> MockedStateEventsAggregator { get; set; }
+        private IStateManagementEventsAggregator<IData> EventsAggregator => MockedEventsAggregator.Object;
+        private Mock<IStateManagementEventsAggregator<IData>> MockedEventsAggregator { get; set; }
 
         private IDataPool<IData> DataPool => MockedDataPool.Object;
         private Mock<IDataPool<IData>> MockedDataPool { get; set; }
@@ -28,13 +28,13 @@ namespace DAA.StateManagement
         [TestInitialize]
         public void BeforeEach()
         {
-            MockedStateEventsAggregator = new Mock<IStateEventsAggregator<IData>>();
+            MockedEventsAggregator = new Mock<IStateManagementEventsAggregator<IData>>();
             MockedDataPool = new Mock<IDataPool<IData>>();
 
             MockedDescriptor = new Mock<INonTerminalDescriptor>();
             MockedCollection = new Mock<ICollection<IData>>();
 
-            MockedTestInstance = new Mock<CollectionsManager<IData>>(DataPool, StateEventsAggregator);
+            MockedTestInstance = new Mock<CollectionsManager<IData>>(DataPool, EventsAggregator);
             MockedTestInstance.CallBase = true;
         }
 

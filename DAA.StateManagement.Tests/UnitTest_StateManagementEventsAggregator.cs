@@ -5,7 +5,7 @@ using Moq;
 namespace DAA.StateManagement
 {
     [TestClass]
-    public class UnitTest_StateEventsAggregator
+    public class UnitTest_StateManagementEventsAggregator
     {
         private IDescriptor Descriptor => MockedDescriptor.Object;
         private Mock<IDescriptor> MockedDescriptor { get; set; }
@@ -13,8 +13,8 @@ namespace DAA.StateManagement
         private INonTerminalDescriptor NonTerminalDescriptor => MockedNonTerminalDescriptor.Object;
         private Mock<INonTerminalDescriptor> MockedNonTerminalDescriptor { get; set; }
 
-        private StateEventsAggregator<IData> TestInstance => MockedTestInstance.Object;
-        private Mock<StateEventsAggregator<IData>> MockedTestInstance { get; set; }
+        private StateManagementEventsAggregator<IData> TestInstance => MockedTestInstance.Object;
+        private Mock<StateManagementEventsAggregator<IData>> MockedTestInstance { get; set; }
 
 
         [TestInitialize]
@@ -23,7 +23,7 @@ namespace DAA.StateManagement
             MockedNonTerminalDescriptor = new Mock<INonTerminalDescriptor>();
             MockedDescriptor = new Mock<IDescriptor>();
 
-            MockedTestInstance = new Mock<StateEventsAggregator<IData>>();
+            MockedTestInstance = new Mock<StateManagementEventsAggregator<IData>>();
             MockedTestInstance.CallBase = true;
         }
 

@@ -9,14 +9,14 @@ namespace DAA.StateManagement
     public class DataRefresher<TData> : IDataRefresher<TData>
         where TData: IData
     {
-        protected virtual IStateEventsAggregator<TData> StateEventsAggregator { get; }
+        protected virtual IStateManagementEventsAggregator<TData> EventsAggregator { get; }
         protected virtual IDataRetriever<TData> DataRetriever { get; }
         protected virtual IDataPool<TData> DataPool { get; }
 
 
-        public DataRefresher(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, IStateEventsAggregator<TData> stateEventsAggregator)
+        public DataRefresher(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, IStateManagementEventsAggregator<TData> eventsAggregator)
         {
-            StateEventsAggregator = stateEventsAggregator;
+            EventsAggregator = eventsAggregator;
             DataRetriever = dataRetriever;
             DataPool = dataPool;
         }
@@ -47,7 +47,7 @@ namespace DAA.StateManagement
 
             DataPool.Save(descriptor, freshData);
 
-            StateEventsAggregator.PublishDataChangedEvent(descriptor);
+            EventsAggregator.PublishDataChangedEvent(descriptor);
         }
 
         public virtual async Task RefreshDataAsync(INonTerminalDescriptor descriptor)
@@ -56,8 +56,8 @@ namespace DAA.StateManagement
 
             await UpdateCompositionAndAcquireAdditionsAsync(descriptor, freshComposition);
 
-            StateEventsAggregator.PublishDataChangedEvent(descriptor);
-            StateEventsAggregator.PublishCompositionChangedEvent(descriptor);
+            EventsAggregator.PublishDataChangedEvent(descriptor);
+            EventsAggregator.PublishCompositionChangedEvent(descriptor);
         }
 
         public virtual async Task RefreshDataAsync(IEnumerable<IDescriptor> descriptors)

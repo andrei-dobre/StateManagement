@@ -3,7 +3,7 @@ using DAA.StateManagement.Interfaces;
 
 namespace DAA.StateManagement
 {
-    public class StateEventsAggregator<TData> : IStateEventsAggregator<TData>
+    public class StateManagementEventsAggregator<TData> : IStateManagementEventsAggregator<TData>
         where TData : IData
     {
         public event EventHandler<IDescriptor> DataChangedEvent;

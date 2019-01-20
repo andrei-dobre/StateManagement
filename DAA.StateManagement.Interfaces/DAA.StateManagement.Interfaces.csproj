@@ -42,7 +42,7 @@
     <Compile Include="IDataRetriever.cs" />
     <Compile Include="IDescriptor.cs" />
     <Compile Include="INonTerminalDescriptor.cs" />
-    <Compile Include="IStateEventsAggregator.cs" />
+    <Compile Include="IStateManagementEventsAggregator.cs" />
     <Compile Include="IDataRefresher.cs" />
     <Compile Include="IStateManagementSystemBuilder.cs" />
     <Compile Include="IStateManagementSystemBuildingOperations.cs" />

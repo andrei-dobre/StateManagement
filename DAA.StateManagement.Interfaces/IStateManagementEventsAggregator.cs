@@ -2,7 +2,7 @@
 
 namespace DAA.StateManagement.Interfaces
 {
-    public interface IStateEventsAggregator<TData>
+    public interface IStateManagementEventsAggregator<TData>
         where TData : IData
     {
         event EventHandler<IDescriptor> DataChangedEvent;

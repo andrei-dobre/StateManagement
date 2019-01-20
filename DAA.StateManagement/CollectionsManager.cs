@@ -10,28 +10,30 @@ namespace DAA.StateManagement
         where TData : IData
     {
         private IDataPool<TData> DataPool { get; }
-        private IStateEventsAggregator<TData> StateEventsAggregator { get; }
+        private IStateManagementEventsAggregator<TData> EventsAggregator { get; }
 
         private IDictionary<INonTerminalDescriptor, ICollection<ICollection<TData>>> CollectionsByDescriptor { get; }
         private IDictionary<ICollection<TData>, INonTerminalDescriptor> DescriptorByCollection { get; }
 
 
-        public CollectionsManager(IDataPool<TData> dataPool, IStateEventsAggregator<TData> stateEventsAggregator)
+        public CollectionsManager(IDataPool<TData> dataPool, IStateManagementEventsAggregator<TData> eventsAggregator)
         {
             DataPool = dataPool;
-            StateEventsAggregator = stateEventsAggregator;
+            EventsAggregator = eventsAggregator;
 
             CollectionsByDescriptor = new Dictionary<INonTerminalDescriptor, ICollection<ICollection<TData>>>();
             DescriptorByCollection = new Dictionary<ICollection<TData>, INonTerminalDescriptor>();
 
-            StateEventsAggregator.CompositionChangedEvent += WhenCompositionChanged;
+            EventsAggregator.CompositionChangedEvent += WhenCompositionChanged;
         }
 
 
-        public async Task FillCollectionAsync(ICollection<TData> collection, INonTerminalDescriptor descriptor)
+        public Task FillCollectionAsync(ICollection<TData> collection, INonTerminalDescriptor descriptor)
         {
             RegisterCollection(collection, descriptor);
             FillCollectionWithData(collection, descriptor);
+
+            return Task.FromResult(0);
         }
 
         public virtual void DropCollection(ICollection<TData> collection)
