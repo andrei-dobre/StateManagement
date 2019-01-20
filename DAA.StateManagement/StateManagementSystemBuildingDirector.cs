@@ -4,7 +4,7 @@ namespace DAA.StateManagement
 {
     public class StateManagementSystemBuildingDirector
     {
-        public void Build(IStateManagementSystemBuildingOperations builder)
+        public virtual void Build(IStateManagementSystemBuildingOperations builder)
         {
             builder.BuildEventsAggregator();
             builder.BuildTerminalDescriptorsFactory();
