@@ -34,13 +34,7 @@ namespace DAA.StateManagement
             FillCollectionWithData(collection, descriptor);
         }
 
-        private void FillCollectionWithData(ICollection<TData> collection, INonTerminalDescriptor descriptor)
-        {
-            ClearCollection(collection);
-            DataPool.Retrieve(descriptor).ForEach(collection.Add);
-        }
-
-        public void DropCollection(ICollection<TData> collection)
+        public virtual void DropCollection(ICollection<TData> collection)
         {
             if (CollectionIsRegistered(collection))
             {
@@ -54,21 +48,18 @@ namespace DAA.StateManagement
             FindAffectedCollections(descriptor).ForEach(UpdateCollection);
         }
 
-        public virtual void UpdateCollection(ICollection<TData> collection)
-        {
-            var descriptor = GetDescriptor(collection);
-            var data = DataPool.Retrieve(descriptor);
-
-            collection.Update(data);
-        }
-
         public virtual void RegisterCollection(ICollection<TData> collection, INonTerminalDescriptor descriptor)
         {
-            if (!CollectionIsRegistered(collection))
-            {
-                GetCollectionsForDescriptor(descriptor).Add(collection);
-                DescriptorByCollection.Add(collection, descriptor);
-            }
+            DropCollection(collection);
+
+            GetCollectionsForDescriptor(descriptor).Add(collection);
+            DescriptorByCollection.Add(collection, descriptor);
+        }
+
+        public virtual void FillCollectionWithData(ICollection<TData> collection, INonTerminalDescriptor descriptor)
+        {
+            ClearCollection(collection);
+            DataPool.Retrieve(descriptor).ForEach(collection.Add);
         }
 
         public virtual IEnumerable<ICollection<TData>> FindAffectedCollections(INonTerminalDescriptor changedDescriptor)
@@ -81,9 +72,12 @@ namespace DAA.StateManagement
             return CollectionsByDescriptor.Keys.Where(_ => _.Intersects(changedDescriptor));
         }
 
-        public virtual INonTerminalDescriptor GetDescriptor(ICollection<TData> collection)
+        public virtual void UpdateCollection(ICollection<TData> collection)
         {
-            return DescriptorByCollection[collection];
+            var descriptor = GetDescriptor(collection);
+            var data = DataPool.Retrieve(descriptor);
+
+            collection.Update(data);
         }
 
         public virtual void DropCollection(ICollection<TData> collection, INonTerminalDescriptor descriptor)
@@ -92,14 +86,19 @@ namespace DAA.StateManagement
             CollectionsByDescriptor[descriptor].Remove(collection);
         }
 
-        public virtual bool CollectionIsRegistered(ICollection<TData> collection)
-        {
-            return DescriptorByCollection.ContainsKey(collection);
-        }
-
         public virtual void ClearCollection(ICollection<TData> collection)
         {
             collection.RemoveClear();
+        }
+
+        public virtual INonTerminalDescriptor GetDescriptor(ICollection<TData> collection)
+        {
+            return DescriptorByCollection[collection];
+        }
+
+        public virtual bool CollectionIsRegistered(ICollection<TData> collection)
+        {
+            return DescriptorByCollection.ContainsKey(collection);
         }
 
         public virtual ICollection<ICollection<TData>> GetCollectionsForDescriptor(INonTerminalDescriptor descriptor)
