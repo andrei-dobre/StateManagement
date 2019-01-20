@@ -3,6 +3,6 @@
     public interface IStateManagementServiceBuilder<TData> : IStateManagementServiceBuildingOperations
         where TData: IData
     {
-        IStateManagementService<TData> ExtractResult();
+        IDataRefresher<TData> ExtractResult();
     }
 }

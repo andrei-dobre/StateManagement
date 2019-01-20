@@ -6,7 +6,7 @@ using DAA.StateManagement.Interfaces;
 
 namespace DAA.StateManagement
 {
-    public class StateManagementService<TData> : IStateManagementService<TData>
+    public class DataRefresher<TData> : IDataRefresher<TData>
         where TData: IData
     {
         protected virtual IStateEventsAggregator StateEventsAggregator { get; }
@@ -14,7 +14,7 @@ namespace DAA.StateManagement
         protected virtual IDataPool<TData> DataPool { get; }
 
 
-        public StateManagementService(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, IStateEventsAggregator stateEventsAggregator)
+        public DataRefresher(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, IStateEventsAggregator stateEventsAggregator)
         {
             StateEventsAggregator = stateEventsAggregator;
             DataRetriever = dataRetriever;
@@ -22,18 +22,11 @@ namespace DAA.StateManagement
         }
 
 
-        public virtual async Task RefreshIntersectingDataAsync(IDescriptor descriptor)
+        public virtual async Task RefreshAsync(IDescriptor descriptor)
         {
             var intersectingDescriptors = DataPool.FindIntersectingDescriptors(descriptor);
+
             await RefreshDataAsync(intersectingDescriptors);
-        }
-
-        public virtual async Task RefreshDataAsync(IEnumerable<IDescriptor> descriptors)
-        {
-            var tasksToRefreshIndividuallyDescribedData = descriptors.Select(RefreshDataAsync).ToArray();
-            var taskToRefreshAllDescribedData = Task.WhenAll(tasksToRefreshIndividuallyDescribedData);
-
-            await taskToRefreshAllDescribedData;
         }
 
         public virtual async Task RefreshDataAsync(IDescriptor descriptor)
@@ -53,7 +46,8 @@ namespace DAA.StateManagement
             var freshData = await DataRetriever.RetrieveAsync(descriptor);
 
             DataPool.Save(descriptor, freshData);
-            PublishDataChangedEvent(descriptor);
+
+            StateEventsAggregator.PublishDataChangedEvent(descriptor);
         }
 
         public virtual async Task RefreshDataAsync(INonTerminalDescriptor descriptor)
@@ -61,20 +55,24 @@ namespace DAA.StateManagement
             var freshComposition = await DataRetriever.RetrieveCompositionAsync(descriptor);
 
             await UpdateCompositionAndAcquireAdditionsAsync(descriptor, freshComposition);
-            PublishDataChangedEvent(descriptor);
+
+            StateEventsAggregator.PublishDataChangedEvent(descriptor);
+            StateEventsAggregator.PublishCompositionChangedEvent(descriptor);
+        }
+
+        public virtual async Task RefreshDataAsync(IEnumerable<IDescriptor> descriptors)
+        {
+            var tasksToRefreshDescriptors = descriptors.Select(RefreshDataAsync).ToArray();
+
+            await Task.WhenAll(tasksToRefreshDescriptors);
         }
 
         protected virtual async Task UpdateCompositionAndAcquireAdditionsAsync(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> freshComposition)
         {
             var additionsDescriptors = DataPool.UpdateCompositionAndProvideAdditions(descriptor, freshComposition);
             var additions = await DataRetriever.RetrieveAsync(additionsDescriptors);
+
             DataPool.Save(additions);
-        }
-
-
-        private void PublishDataChangedEvent(IDescriptor descriptor)
-        {
-            StateEventsAggregator.PublishDataChangedEvent(descriptor, this);
         }
     }
 }
