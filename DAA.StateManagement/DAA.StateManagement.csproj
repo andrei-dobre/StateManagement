@@ -33,6 +33,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="StateEventsAggregator.cs" />
     <Compile Include="Stores\StateManagementStore.cs" />
     <Compile Include="DataPool.cs" />
     <Compile Include="Stores\CompositionsStore.cs" />
