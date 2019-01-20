@@ -10,12 +10,12 @@ namespace DAA.StateManagement
     [TestClass]
     public class UnitTest_TerminalDescriptorsFlyweightFactory
     {
-        private IData Data { get => DataMock.Object; }
+        private IData Data => DataMock.Object;
         private Mock<IData> DataMock { get; set; }
 
-        private TerminalDescriptorsFlyweightFactory TestInstance { get => TestInstanceMock.Object; }
-        private Mock<TerminalDescriptorsFlyweightFactory> TestInstanceMock { get; set; }
-        private IProtectedMock<TerminalDescriptorsFlyweightFactory> TestInstanceMockProtected { get => TestInstanceMock.Protected(); }
+        private TerminalDescriptorsFlyweightFactory<IData> TestInstance => TestInstanceMock.Object;
+        private Mock<TerminalDescriptorsFlyweightFactory<IData>> TestInstanceMock { get; set; }
+        private IProtectedMock<TerminalDescriptorsFlyweightFactory<IData>> TestInstanceMockProtected => TestInstanceMock.Protected();
 
 
         [TestInitialize]
@@ -23,7 +23,7 @@ namespace DAA.StateManagement
         {
             DataMock = new Mock<IData>();
 
-            TestInstanceMock = new Mock<TerminalDescriptorsFlyweightFactory>();
+            TestInstanceMock = new Mock<TerminalDescriptorsFlyweightFactory<IData>>();
             TestInstanceMock.CallBase = true;
         }
 

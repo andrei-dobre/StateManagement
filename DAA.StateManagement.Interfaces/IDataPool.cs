@@ -2,7 +2,8 @@
 
 namespace DAA.StateManagement.Interfaces
 {
-    public interface IDataPool<TData> where TData : IData
+    public interface IDataPool<TData> 
+        where TData : IData
     {
         bool Contains(ITerminalDescriptor descriptor);
 

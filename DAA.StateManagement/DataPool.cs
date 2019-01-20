@@ -10,10 +10,10 @@ namespace DAA.StateManagement
     {
         protected virtual DataStore<TData> Data { get;  }
         protected virtual CompositionsStore Compositions { get; }
-        protected virtual ITerminalDescriptorsFactory TerminalDescriptorsFactory { get; }
+        protected virtual ITerminalDescriptorsFactory<TData> TerminalDescriptorsFactory { get; }
 
 
-        public DataPool(ITerminalDescriptorsFactory terminalDescriptorsFactory, IDataManipulator<TData> dataManipulator)
+        public DataPool(ITerminalDescriptorsFactory<TData> terminalDescriptorsFactory, IDataManipulator<TData> dataManipulator)
         {
             TerminalDescriptorsFactory = terminalDescriptorsFactory;
 

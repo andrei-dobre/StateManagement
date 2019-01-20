@@ -5,7 +5,8 @@ using DAA.StateManagement.Interfaces;
 
 namespace DAA.StateManagement
 {
-    public abstract class TerminalDescriptorsFlyweightFactory : ITerminalDescriptorsFactory
+    public abstract class TerminalDescriptorsFlyweightFactory<TData> : ITerminalDescriptorsFactory<TData>
+        where TData : IData
     {
         private IDictionary<object, ITerminalDescriptor> IntrinsicStateToTerminalDescriptorMap { get; }
 
@@ -16,7 +17,7 @@ namespace DAA.StateManagement
         }
 
 
-        public virtual ITerminalDescriptor Create(IData data)
+        public virtual ITerminalDescriptor Create(TData data)
         {
             var intrinsicState = data.DataIdentifier;
             var descriptor = Create(intrinsicState);
@@ -24,7 +25,7 @@ namespace DAA.StateManagement
             return descriptor;
         }
 
-        public IEnumerable<ITerminalDescriptor> Create(IEnumerable<IData> data)
+        public IEnumerable<ITerminalDescriptor> Create(IEnumerable<TData> data)
         {
             return data.Select(Create);
         }

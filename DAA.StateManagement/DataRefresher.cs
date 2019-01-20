@@ -9,12 +9,12 @@ namespace DAA.StateManagement
     public class DataRefresher<TData> : IDataRefresher<TData>
         where TData: IData
     {
-        protected virtual IStateEventsAggregator StateEventsAggregator { get; }
+        protected virtual IStateEventsAggregator<TData> StateEventsAggregator { get; }
         protected virtual IDataRetriever<TData> DataRetriever { get; }
         protected virtual IDataPool<TData> DataPool { get; }
 
 
-        public DataRefresher(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, IStateEventsAggregator stateEventsAggregator)
+        public DataRefresher(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, IStateEventsAggregator<TData> stateEventsAggregator)
         {
             StateEventsAggregator = stateEventsAggregator;
             DataRetriever = dataRetriever;

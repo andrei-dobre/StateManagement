@@ -12,8 +12,8 @@ namespace DAA.StateManagement
     [TestClass]
     public class UnitTest_DataPool
     {
-        private ITerminalDescriptorsFactory TerminalDescriptorsFactory => TerminalDescriptorsFactoryMock.Object;
-        private Mock<ITerminalDescriptorsFactory> TerminalDescriptorsFactoryMock { get; set; }
+        private ITerminalDescriptorsFactory<IData> TerminalDescriptorsFactory => TerminalDescriptorsFactoryMock.Object;
+        private Mock<ITerminalDescriptorsFactory<IData>> TerminalDescriptorsFactoryMock { get; set; }
 
         private IDataManipulator<IData> DataManipulator => DataManipulatorMock.Object;
         private Mock<IDataManipulator<IData>> DataManipulatorMock { get; set; }
@@ -47,7 +47,7 @@ namespace DAA.StateManagement
         [TestInitialize]
         public void BeforeEach()
         {
-            TerminalDescriptorsFactoryMock = new Mock<ITerminalDescriptorsFactory>();
+            TerminalDescriptorsFactoryMock = new Mock<ITerminalDescriptorsFactory<IData>>();
             DataManipulatorMock = new Mock<IDataManipulator<IData>>();
             DataStoreMock = new Mock<DataStore<IData>>(DataManipulator);
             CompositionsMock = new Mock<CompositionsStore>();

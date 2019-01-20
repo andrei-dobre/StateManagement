@@ -35,8 +35,8 @@ namespace DAA.StateManagement
         private IEnumerable<ITerminalDescriptor> TerminalDescriptorsCollection => TerminalDescriptorsCollectionMock.Object;
         private Mock<IEnumerable<ITerminalDescriptor>> TerminalDescriptorsCollectionMock { get; set; }
 
-        private IStateEventsAggregator StateEventsAggregator => StateEventsAggregatorMock.Object;
-        private Mock<IStateEventsAggregator> StateEventsAggregatorMock { get; set; }
+        private IStateEventsAggregator<IData> StateEventsAggregator => StateEventsAggregatorMock.Object;
+        private Mock<IStateEventsAggregator<IData>> StateEventsAggregatorMock { get; set; }
 
         private DataRefresher<IData> TestInstance => TestInstanceMock.Object;
         private Mock<DataRefresher<IData>> TestInstanceMock { get; set; }
@@ -54,7 +54,7 @@ namespace DAA.StateManagement
             NonTerminalDescriptorMock = new Mock<INonTerminalDescriptor>();
             DescriptorsCollectionMock = new Mock<IEnumerable<IDescriptor>>();
             TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
-            StateEventsAggregatorMock = new Mock<IStateEventsAggregator>();
+            StateEventsAggregatorMock = new Mock<IStateEventsAggregator<IData>>();
 
             TestInstanceMock = new Mock<DataRefresher<IData>>(DataRetriever, DataPool, StateEventsAggregator);
             TestInstanceMock.CallBase = true;

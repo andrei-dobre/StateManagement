@@ -2,10 +2,11 @@
 
 namespace DAA.StateManagement.Interfaces
 {
-    public interface ITerminalDescriptorsFactory
+    public interface ITerminalDescriptorsFactory<TData>
+        where TData : IData
     {
-        ITerminalDescriptor Create(IData data);
+        ITerminalDescriptor Create(TData data);
 
-        IEnumerable<ITerminalDescriptor> Create(IEnumerable<IData> data);
+        IEnumerable<ITerminalDescriptor> Create(IEnumerable<TData> data);
     }
 }
