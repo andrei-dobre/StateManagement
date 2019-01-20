@@ -37,6 +37,7 @@
     <Compile Include="IData.cs" />
     <Compile Include="IDataManipulator.cs" />
     <Compile Include="IDataPool.cs" />
+    <Compile Include="IDataQualitySupervisor.cs" />
     <Compile Include="IDataRepository.cs" />
     <Compile Include="IDataRetriever.cs" />
     <Compile Include="IDescriptor.cs" />
