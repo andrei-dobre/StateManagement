@@ -86,7 +86,7 @@ namespace DAA.StateManagement
         {
             var testInstance = new DataRefresher<IData>(DataRetriever, DataPool, EventsAggregator);
 
-            var result = ReflectionHelper.Invoke(testInstance, "StateEventsAggregator");
+            var result = ReflectionHelper.Invoke(testInstance, "EventsAggregator");
 
             Assert.AreSame(result, EventsAggregator);
         }

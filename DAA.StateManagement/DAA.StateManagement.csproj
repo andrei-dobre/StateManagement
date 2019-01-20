@@ -39,8 +39,10 @@
     <Compile Include="CollectionsManager.cs" />
     <Compile Include="DataQualitySupervisor.cs" />
     <Compile Include="DataRepository.cs" />
+    <Compile Include="StateManagement.cs" />
     <Compile Include="StateManagementEventsAggregator.cs" />
     <Compile Include="StateManagementSystem.cs" />
+    <Compile Include="StateManagementSystemsCatalog.cs" />
     <Compile Include="Stores\StateManagementStore.cs" />
     <Compile Include="DataPool.cs" />
     <Compile Include="Stores\CompositionsStore.cs" />

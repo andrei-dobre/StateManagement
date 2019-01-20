@@ -42,11 +42,13 @@
     <Compile Include="IDataRetriever.cs" />
     <Compile Include="IDescriptor.cs" />
     <Compile Include="INonTerminalDescriptor.cs" />
+    <Compile Include="IStateManagement.cs" />
     <Compile Include="IStateManagementEventsAggregator.cs" />
     <Compile Include="IDataRefresher.cs" />
     <Compile Include="IStateManagementSystem.cs" />
     <Compile Include="IStateManagementSystemBuilder.cs" />
     <Compile Include="IStateManagementSystemBuildingOperations.cs" />
+    <Compile Include="IStateManagementSystemsCatalog.cs" />
     <Compile Include="ITerminalDescriptor.cs" />
     <Compile Include="ITerminalDescriptorsFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
