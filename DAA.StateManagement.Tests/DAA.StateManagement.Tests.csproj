@@ -7,7 +7,7 @@
     <ProjectGuid>{A7CFF468-8152-4E3C-8EF7-C3797E3FCD5D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DAA.StateManagement.Tests</RootNamespace>
+    <RootNamespace>DAA.StateManagement</RootNamespace>
     <AssemblyName>DAA.StateManagement.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -63,12 +63,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnitTest_StateManagementStore.cs" />
+    <Compile Include="Stores\UnitTest_StateManagementStore.cs" />
     <Compile Include="UnitTest_DataPool.cs" />
-    <Compile Include="UnitTest_DataStore.cs" />
-    <Compile Include="UnitTest_Store.cs" />
+    <Compile Include="Stores\UnitTest_DataStore.cs" />
+    <Compile Include="Stores\UnitTest_Store.cs" />
     <Compile Include="UnitTest_DataRefresher.cs" />
-    <Compile Include="UnitTest_CompositionsStore.cs" />
+    <Compile Include="Stores\UnitTest_CompositionsStore.cs" />
     <Compile Include="UnitTest_TerminalDescriptorsFlyweightFactory.cs" />
     <Compile Include="UnitTest_StateManagementServiceBuildingDirector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

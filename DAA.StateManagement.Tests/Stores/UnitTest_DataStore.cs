@@ -1,11 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Moq;
-using DAA.Helpers;
+﻿using DAA.Helpers;
 using DAA.StateManagement.Interfaces;
-using DAA.StateManagement.Stores;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
-namespace DAA.StateManagement.Tests
+namespace DAA.StateManagement.Stores
 {
     [TestClass]
     public class UnitTest_DataStore

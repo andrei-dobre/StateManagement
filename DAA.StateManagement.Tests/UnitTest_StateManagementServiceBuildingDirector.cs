@@ -1,10 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+﻿using DAA.StateManagement.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-using DAA.StateManagement.Interfaces;
-
-namespace DAA.StateManagement.Tests
+namespace DAA.StateManagement
 {
     [TestClass]
     public class UnitTest_StateManagementServiceBuildingDirector

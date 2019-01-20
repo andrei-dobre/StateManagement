@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using DAA.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
 using Moq.Protected;
 
-using DAA.Helpers;
-using DAA.StateManagement.Stores;
-
-namespace DAA.StateManagement.Tests
+namespace DAA.StateManagement.Stores
 {
     [TestClass]
     public class UnitTest_Store

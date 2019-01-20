@@ -1,16 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Moq;
-using Moq.Protected;
-
 using DAA.Helpers;
 using DAA.StateManagement.Interfaces;
 using DAA.StateManagement.Stores;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Moq.Protected;
 
-namespace DAA.StateManagement.Tests
+namespace DAA.StateManagement
 {
     [TestClass]
     public class UnitTest_DataPool
