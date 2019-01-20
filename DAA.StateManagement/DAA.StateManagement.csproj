@@ -30,9 +30,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DAA.Helpers">
+      <HintPath>..\..\soundservice5\Libraries\DAA.Helpers.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CollectionsManager.cs" />
     <Compile Include="StateEventsAggregator.cs" />
     <Compile Include="Stores\StateManagementStore.cs" />
     <Compile Include="DataPool.cs" />

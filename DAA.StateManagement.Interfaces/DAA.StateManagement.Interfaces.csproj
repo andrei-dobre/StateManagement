@@ -33,6 +33,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ICollectionsManager.cs" />
     <Compile Include="IData.cs" />
     <Compile Include="IDataManipulator.cs" />
     <Compile Include="IDataPool.cs" />
