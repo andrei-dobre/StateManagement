@@ -70,7 +70,7 @@
     <Compile Include="UnitTest_DataRefresher.cs" />
     <Compile Include="Stores\UnitTest_CompositionsStore.cs" />
     <Compile Include="UnitTest_TerminalDescriptorsFlyweightFactory.cs" />
-    <Compile Include="UnitTest_StateManagementServiceBuildingDirector.cs" />
+    <Compile Include="UnitTest_StateManagementSystemBuildingDirector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

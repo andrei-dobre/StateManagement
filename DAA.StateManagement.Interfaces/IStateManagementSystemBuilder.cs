@@ -1,6 +1,6 @@
 ﻿namespace DAA.StateManagement.Interfaces
 {
-    public interface IStateManagementServiceBuilder<TData> : IStateManagementServiceBuildingOperations
+    public interface IStateManagementSystemBuilder<TData> : IStateManagementSystemBuildingOperations
         where TData: IData
     {
         IDataRefresher<TData> ExtractResult();

@@ -41,8 +41,8 @@
     <Compile Include="INonTerminalDescriptor.cs" />
     <Compile Include="IStateEventsAggregator.cs" />
     <Compile Include="IDataRefresher.cs" />
-    <Compile Include="IStateManagementServiceBuilder.cs" />
-    <Compile Include="IStateManagementServiceBuildingOperations.cs" />
+    <Compile Include="IStateManagementSystemBuilder.cs" />
+    <Compile Include="IStateManagementSystemBuildingOperations.cs" />
     <Compile Include="ITerminalDescriptor.cs" />
     <Compile Include="ITerminalDescriptorsFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

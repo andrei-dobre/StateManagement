@@ -1,6 +1,6 @@
 ﻿namespace DAA.StateManagement.Interfaces
 {
-    public interface IStateManagementServiceBuildingOperations
+    public interface IStateManagementSystemBuildingOperations
     {
         void BuildDataCollectionsManager();
 
@@ -15,5 +15,9 @@
         void BuildEventsAggregator();
 
         void BuildTerminalDescriptorsFactory();
+
+        void BuildDataRefresher();
+
+        void BuildDataRepository();
     }
 }

@@ -37,11 +37,10 @@
     <Compile Include="DataPool.cs" />
     <Compile Include="Stores\CompositionsStore.cs" />
     <Compile Include="Stores\Store.cs" />
-    <Compile Include="DataQualitySupervisor.cs" />
     <Compile Include="Stores\DataStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataRefresher.cs" />
-    <Compile Include="StateManagementServiceBuildingDirector.cs" />
+    <Compile Include="StateManagementSystemBuildingDirector.cs" />
     <Compile Include="TerminalDescriptorsFlyweightFactory.cs" />
   </ItemGroup>
   <ItemGroup>
