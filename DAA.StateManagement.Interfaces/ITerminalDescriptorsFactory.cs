@@ -8,5 +8,6 @@ namespace DAA.StateManagement.Interfaces
         ITerminalDescriptor Create(TData data);
 
         IEnumerable<ITerminalDescriptor> Create(IEnumerable<TData> data);
+        IEnumerable<ITerminalDescriptor> Create(IEnumerable<object> identity);
     }
 }
