@@ -50,6 +50,12 @@ namespace DAA.StateManagement
             return DescriptorByCollection.ContainsKey(collection);
         }
 
+        public virtual bool IsCollectionRegisteredWithDescriptor(ICollection<TData> collection, INonTerminalDescriptor descriptor)
+        {
+            return CollectionsByDescriptor.ContainsKey(descriptor) 
+                   && CollectionsByDescriptor[descriptor].Contains(collection);
+        }
+
         public virtual void WhenCompositionChanged(object sender, INonTerminalDescriptor descriptor)
         {
             FindAffectedCollections(descriptor).ForEach(UpdateCollection);

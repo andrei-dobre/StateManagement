@@ -113,6 +113,22 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
+        public void IsCollectionRegisteredWithDescriptor__DelegatedToCollectionsManager()
+        {
+            var expectedResult = RandomizationHelper.Instance.GetBool();
+
+            MockedCollectionsManager.Setup(_ =>
+                    _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
+                        It.IsAny<INonTerminalDescriptor>()))
+                .Returns(expectedResult);
+
+            var result = TestInstance.IsCollectionRegisteredWithDescriptor(Collection, Descriptor);
+
+            Assert.AreEqual(expectedResult, result);
+            MockedCollectionsManager.Verify(_ => _.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
+        }
+
+        [TestMethod]
         public void DropCollection__DelegatesToCollectionsManager()
         {
             TestInstance.DropCollection(Collection);

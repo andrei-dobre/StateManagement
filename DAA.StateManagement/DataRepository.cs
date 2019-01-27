@@ -31,6 +31,11 @@ namespace DAA.StateManagement
             return CollectionsManager.IsCollectionRegistered(collection);
         }
 
+        public bool IsCollectionRegisteredWithDescriptor(ICollection<TData> collection, INonTerminalDescriptor descriptor)
+        {
+            return CollectionsManager.IsCollectionRegisteredWithDescriptor(collection, descriptor);
+        }
+
         public void DropCollection(ICollection<TData> collection)
         {
             CollectionsManager.DropCollection(collection);

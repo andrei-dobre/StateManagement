@@ -7,6 +7,7 @@ namespace DAA.StateManagement.Interfaces
     {
         Task FillCollectionAsync<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor) where TData : IData;
         bool IsCollectionRegistered<TData>(ICollection<TData> collection) where TData : IData;
+        bool IsCollectionRegisteredWithDescriptor<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor) where TData : IData;
         void DropCollection<TData>(ICollection<TData> collection) where TData : IData;
     }
 }

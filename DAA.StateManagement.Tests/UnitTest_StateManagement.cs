@@ -126,6 +126,23 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
+        public void IsCollectionRegisteredWithDescriptor__DelegatedToRepository()
+        {
+            var expectedResult = RandomizationHelper.Instance.GetBool();
+
+            MockedTestInstance.Setup(_ => _.GetRepository<IData>()).Returns(DataRepository);
+            MockedDataRepository.Setup(_ =>
+                    _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
+                        It.IsAny<INonTerminalDescriptor>()))
+                .Returns(expectedResult);
+
+            var result = TestInstance.IsCollectionRegisteredWithDescriptor(Collection, Descriptor);
+
+            Assert.AreEqual(expectedResult, result);
+            MockedDataRepository.Verify(_ => _.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
+        }
+
+        [TestMethod]
         public async Task FillCollectionAsync__DelegatedToRepository()
         {
             var awaited = false;

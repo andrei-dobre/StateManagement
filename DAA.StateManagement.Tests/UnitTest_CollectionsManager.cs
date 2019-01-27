@@ -186,6 +186,42 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
+        public void IsCollectionRegisteredWithDescriptor_CollectionRegisteredWithDescriptor_True()
+        {
+            TestInstance.RegisterCollection(Collection, Descriptor);
+
+            Assert.IsTrue(TestInstance.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
+        }
+
+        [TestMethod]
+        public void IsCollectionRegisteredWithDescriptor_CollectionRegisteredWithOther_False()
+        {
+            var otherDescriptor = new Mock<INonTerminalDescriptor>().Object;
+
+            TestInstance.RegisterCollection(Collection, Descriptor);
+
+            Assert.IsFalse(TestInstance.IsCollectionRegisteredWithDescriptor(Collection, otherDescriptor));
+        }
+
+        [TestMethod]
+        public void IsCollectionRegisteredWithDescriptor_CollectionNotRegistered_False()
+        {
+            Assert.IsFalse(TestInstance.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
+        }
+
+        [TestMethod]
+        public void IsCollectionRegisteredWithDescriptor_CollectionReRegisteredWithOtherDescriptor_TrueForOtherDescriptor()
+        {
+            var otherDescriptor = new Mock<INonTerminalDescriptor>().Object;
+
+            TestInstance.RegisterCollection(Collection, Descriptor);
+            TestInstance.RegisterCollection(Collection, otherDescriptor);
+
+            Assert.IsFalse(TestInstance.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
+            Assert.IsTrue(TestInstance.IsCollectionRegisteredWithDescriptor(Collection, otherDescriptor));
+        }
+
+        [TestMethod]
         public void GetDescriptor_RegisteredCollection_CorrectDescriptor()
         {
             TestInstance.RegisterCollection(Collection, Descriptor);
