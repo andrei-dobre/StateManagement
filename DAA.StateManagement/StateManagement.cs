@@ -21,7 +21,10 @@ namespace DAA.StateManagement
         public async Task FillCollectionAsync<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor) 
             where TData : IData
         {
-            await GetRepository<TData>().FillCollectionAsync(collection, descriptor);
+            if (!IsCollectionRegisteredWithDescriptor(collection, descriptor))
+            {
+                await GetRepository<TData>().FillCollectionAsync(collection, descriptor);
+            }
         }
 
         public bool IsCollectionRegistered<TData>(ICollection<TData> collection) 
@@ -30,7 +33,7 @@ namespace DAA.StateManagement
             return GetRepository<TData>().IsCollectionRegistered(collection);
         }
 
-        public bool IsCollectionRegisteredWithDescriptor<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor)
+        public virtual bool IsCollectionRegisteredWithDescriptor<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor)
             where TData : IData
         {
             return GetRepository<TData>().IsCollectionRegisteredWithDescriptor(collection, descriptor);

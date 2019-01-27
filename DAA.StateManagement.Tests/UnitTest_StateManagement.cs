@@ -143,11 +143,13 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
-        public async Task FillCollectionAsync__DelegatedToRepository()
+        public async Task FillCollectionAsync_NotAlreadyRegisteredWithDescriptor_DelegatedToRepository()
         {
             var awaited = false;
 
-
+            MockedTestInstance.Setup(_ =>
+                _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
+                    It.IsAny<INonTerminalDescriptor>())).Returns(false);
             MockedDataRepository.Setup(_ =>
                     _.FillCollectionAsync(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()))
                 .Returns(Task.Delay(10).ContinueWith(_ => awaited = true));
@@ -156,6 +158,22 @@ namespace DAA.StateManagement
 
             MockedDataRepository.Verify(_ => _.FillCollectionAsync(Collection, Descriptor));
             Assert.IsTrue(awaited);
+            MockedTestInstance.Verify(_ => _.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
+        }
+
+        [TestMethod]
+        public async Task FillCollectionAsync_AlreadyRegisteredWithDescriptor_NotDelegatedToRepository()
+        {
+            MockedTestInstance.Setup(_ =>
+                _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
+                    It.IsAny<INonTerminalDescriptor>())).Returns(true);
+            MockedDataRepository.Setup(_ =>
+                    _.FillCollectionAsync(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()))
+                .Returns(Task.FromResult(0));
+
+            await TestInstance.FillCollectionAsync(Collection, Descriptor);
+
+            MockedDataRepository.Verify(_ => _.FillCollectionAsync(Collection, Descriptor), Times.Never);
         }
     }
 }
