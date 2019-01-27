@@ -39,6 +39,7 @@
     <Compile Include="CollectionsManager.cs" />
     <Compile Include="DataQualitySupervisor.cs" />
     <Compile Include="DataRepository.cs" />
+    <Compile Include="DataRetriever.cs" />
     <Compile Include="StateManagement.cs" />
     <Compile Include="StateManagementEventsAggregator.cs" />
     <Compile Include="StateManagementSystem.cs" />
