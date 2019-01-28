@@ -23,7 +23,20 @@ namespace DAA.StateManagement
         {
             if (!IsCollectionRegisteredWithDescriptor(collection, descriptor))
             {
-                await GetRepository<TData>().FillCollectionAsync(collection, descriptor);
+                await GetRepository<TData>().FillCollectionAsync(new FillCollectionArgs<TData>(collection, descriptor));
+            }
+        }
+
+        public async Task FillCollectionAsync<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor, IDataBuilder<TData> builder)
+            where TData : IData
+        {
+            if (!IsCollectionRegisteredWithDescriptor(collection, descriptor))
+            {
+                await GetRepository<TData>().FillCollectionAsync(new FillCollectionArgs<TData>(collection, descriptor, builder));
+            }
+            else
+            {
+                await GetRepository<TData>().ChangeBuilderAsync(collection, builder);
             }
         }
 

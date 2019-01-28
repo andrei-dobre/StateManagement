@@ -20,10 +20,15 @@ namespace DAA.StateManagement
         }
 
 
-        public async Task FillCollectionAsync(ICollection<TData> collection, INonTerminalDescriptor descriptor)
+        public async Task FillCollectionAsync(IFillCollectionArgs<TData> args)
         {
-            await AcquireMissingData(descriptor);
-            await CollectionsManager.FillCollectionAsync(collection, descriptor);
+            await AcquireMissingData(args.Descriptor);
+            await CollectionsManager.FillCollectionAsync(args);
+        }
+
+        public async Task ChangeBuilderAsync(ICollection<TData> collection, IDataBuilder<TData> builder)
+        {
+            await CollectionsManager.ChangeBuilderAsync(collection, builder);
         }
 
         public bool IsCollectionRegistered(ICollection<TData> collection)

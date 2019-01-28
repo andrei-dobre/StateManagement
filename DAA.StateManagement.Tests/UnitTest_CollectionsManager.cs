@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using DAA.StateManagement.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,6 +23,9 @@ namespace DAA.StateManagement
         private ICollection<IData> Collection => MockedCollection.Object;
         private Mock<ICollection<IData>> MockedCollection { get; set; }
 
+        private IDataBuilder<IData> DataBuilder => MockedDataBuilder.Object;
+        private Mock<IDataBuilder<IData>> MockedDataBuilder { get; set; }
+
         private CollectionsManager<IData> TestInstance => MockedTestInstance.Object;
         private Mock<CollectionsManager<IData>> MockedTestInstance { get; set; }
 
@@ -33,6 +38,7 @@ namespace DAA.StateManagement
 
             MockedDescriptor = new Mock<INonTerminalDescriptor>();
             MockedCollection = new Mock<ICollection<IData>>();
+            MockedDataBuilder = new Mock<IDataBuilder<IData>>();
 
             MockedTestInstance = new Mock<CollectionsManager<IData>>(DataPool, EventsAggregator);
             MockedTestInstance.CallBase = true;
@@ -43,24 +49,28 @@ namespace DAA.StateManagement
         public async Task FillCollectionAsync__CollectionRegistered()
         {
             MockedTestInstance.Setup(_ => _.RegisterCollection(It.IsAny<ICollection<IData>>(),
-                It.IsAny<INonTerminalDescriptor>()));
+                It.IsAny<INonTerminalDescriptor>(), It.IsAny<IDataBuilder<IData>>()));
             MockedTestInstance.Setup(_ => _.FillCollectionWithData(It.IsAny<ICollection<IData>>(),
                 It.IsAny<INonTerminalDescriptor>()));
+            MockedTestInstance.Setup(_ => _.BuildCollectionAsync(It.IsAny<ICollection<IData>>()))
+                .Returns(Task.FromResult(0));
 
-            await TestInstance.FillCollectionAsync(Collection, Descriptor);
+            await TestInstance.FillCollectionAsync(new FillCollectionArgs<IData>(Collection, Descriptor, DataBuilder));
 
-            MockedTestInstance.Verify(_ => _.RegisterCollection(Collection, Descriptor));
+            MockedTestInstance.Verify(_ => _.RegisterCollection(Collection, Descriptor, DataBuilder));
         }
 
         [TestMethod]
         public async Task FillCollectionAsync__CollectionFilledWithData()
         {
             MockedTestInstance.Setup(_ => _.RegisterCollection(It.IsAny<ICollection<IData>>(),
-                It.IsAny<INonTerminalDescriptor>()));
+                It.IsAny<INonTerminalDescriptor>(), It.IsAny<IDataBuilder<IData>>()));
             MockedTestInstance.Setup(_ => _.FillCollectionWithData(It.IsAny<ICollection<IData>>(),
                 It.IsAny<INonTerminalDescriptor>()));
+            MockedTestInstance.Setup(_ => _.BuildCollectionAsync(It.IsAny<ICollection<IData>>()))
+                .Returns(Task.FromResult(0));
 
-            await TestInstance.FillCollectionAsync(Collection, Descriptor);
+            await TestInstance.FillCollectionAsync(new FillCollectionArgs<IData>(Collection, Descriptor));
 
             MockedTestInstance.Verify(_ => _.FillCollectionWithData(Collection, Descriptor));
         }
@@ -72,14 +82,55 @@ namespace DAA.StateManagement
             var registrationCallNumber = 0;
             var fillCollectionCallNumber = 0;
 
-            MockedTestInstance.Setup(_ => _.RegisterCollection(It.IsAny<ICollection<IData>>(),
-                It.IsAny<INonTerminalDescriptor>())).Callback(() => registrationCallNumber = ++callCounter);
+            MockedTestInstance.Setup(_ => _.RegisterCollection(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>(), 
+                    It.IsAny<IDataBuilder<IData>>()))
+                .Callback(() => registrationCallNumber = ++callCounter);
             MockedTestInstance.Setup(_ => _.FillCollectionWithData(It.IsAny<ICollection<IData>>(),
                 It.IsAny<INonTerminalDescriptor>())).Callback(() => fillCollectionCallNumber = ++callCounter);
+            MockedTestInstance.Setup(_ => _.BuildCollectionAsync(It.IsAny<ICollection<IData>>()))
+                .Returns(Task.FromResult(0));
 
-            await TestInstance.FillCollectionAsync(Collection, Descriptor);
+            await TestInstance.FillCollectionAsync(new FillCollectionArgs<IData>(Collection, Descriptor));
 
             Assert.IsTrue(fillCollectionCallNumber > registrationCallNumber);
+        }
+
+        [TestMethod]
+        public async Task FillCollectionAsync__CollectionBuilt()
+        {
+            var awaited = false;
+
+            MockedTestInstance.Setup(_ => _.RegisterCollection(It.IsAny<ICollection<IData>>(),
+                It.IsAny<INonTerminalDescriptor>(), It.IsAny<IDataBuilder<IData>>()));
+            MockedTestInstance.Setup(_ => _.FillCollectionWithData(It.IsAny<ICollection<IData>>(),
+                It.IsAny<INonTerminalDescriptor>()));
+            MockedTestInstance.Setup(_ => _.BuildCollectionAsync(It.IsAny<ICollection<IData>>()))
+                .Returns(Task.Delay(10).ContinueWith(_ => awaited = true));
+
+            await TestInstance.FillCollectionAsync(new FillCollectionArgs<IData>(Collection, Descriptor));
+
+            MockedTestInstance.Verify(_ => _.BuildCollectionAsync(Collection));
+            Assert.IsTrue(awaited);
+        }
+
+        [TestMethod]
+        public async Task FillCollectionAsync__CollectionBuiltAfterFilledWithData()
+        {
+            var callCounter = 0;
+            var buildCallNumber = 0;
+            var fillCollectionCallNumber = 0;
+
+            MockedTestInstance.Setup(_ => _.RegisterCollection(It.IsAny<ICollection<IData>>(),
+                It.IsAny<INonTerminalDescriptor>(), It.IsAny<IDataBuilder<IData>>()));
+            MockedTestInstance.Setup(_ => _.FillCollectionWithData(It.IsAny<ICollection<IData>>(),
+                It.IsAny<INonTerminalDescriptor>())).Callback(() => fillCollectionCallNumber = ++callCounter);
+            MockedTestInstance.Setup(_ => _.BuildCollectionAsync(It.IsAny<ICollection<IData>>()))
+                .Callback(() => buildCallNumber = ++callCounter)
+                .Returns(Task.FromResult(0));
+
+            await TestInstance.FillCollectionAsync(new FillCollectionArgs<IData>(Collection, Descriptor));
+
+            Assert.IsTrue(buildCallNumber > fillCollectionCallNumber);
         }
 
         [TestMethod]
@@ -150,7 +201,7 @@ namespace DAA.StateManagement
 
             MockedTestInstance.Setup(_ => _.FindAffectedCollections(It.IsAny<INonTerminalDescriptor>()))
                 .Returns(collections);
-            MockedTestInstance.Setup(_ => _.UpdateCollection(It.IsAny<ICollection<IData>>()));
+            MockedTestInstance.Setup(_ => _.UpdateCollectionAsync(It.IsAny<ICollection<IData>>()));
 
             TestInstance.WhenCompositionChanged(new object(), Descriptor);
 
@@ -158,14 +209,14 @@ namespace DAA.StateManagement
             
             foreach (var collection in collections)
             {
-                MockedTestInstance.Verify(_ => _.UpdateCollection(collection));
+                MockedTestInstance.Verify(_ => _.UpdateCollectionAsync(collection));
             }
         }
 
         [TestMethod]
         public void IsCollectionRegistered_RegisteredCollection_True()
         {
-            TestInstance.RegisterCollection(Collection, Descriptor);
+            TestInstance.RegisterCollection(Collection, Descriptor, DataBuilder);
 
             Assert.IsTrue(TestInstance.IsCollectionRegistered(Collection));
         }
@@ -173,7 +224,7 @@ namespace DAA.StateManagement
         [TestMethod]
         public void IsCollectionRegistered_CollectionRegisteredAndDropped_False()
         {
-            TestInstance.RegisterCollection(Collection, Descriptor);
+            TestInstance.RegisterCollection(Collection, Descriptor, DataBuilder);
             TestInstance.DropCollection(Collection);
 
             Assert.IsFalse(TestInstance.IsCollectionRegistered(Collection));
@@ -188,7 +239,7 @@ namespace DAA.StateManagement
         [TestMethod]
         public void IsCollectionRegisteredWithDescriptor_CollectionRegisteredWithDescriptor_True()
         {
-            TestInstance.RegisterCollection(Collection, Descriptor);
+            TestInstance.RegisterCollection(Collection, Descriptor, DataBuilder);
 
             Assert.IsTrue(TestInstance.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
         }
@@ -198,7 +249,7 @@ namespace DAA.StateManagement
         {
             var otherDescriptor = new Mock<INonTerminalDescriptor>().Object;
 
-            TestInstance.RegisterCollection(Collection, Descriptor);
+            TestInstance.RegisterCollection(Collection, Descriptor, DataBuilder);
 
             Assert.IsFalse(TestInstance.IsCollectionRegisteredWithDescriptor(Collection, otherDescriptor));
         }
@@ -214,8 +265,8 @@ namespace DAA.StateManagement
         {
             var otherDescriptor = new Mock<INonTerminalDescriptor>().Object;
 
-            TestInstance.RegisterCollection(Collection, Descriptor);
-            TestInstance.RegisterCollection(Collection, otherDescriptor);
+            TestInstance.RegisterCollection(Collection, Descriptor, DataBuilder);
+            TestInstance.RegisterCollection(Collection, otherDescriptor, DataBuilder);
 
             Assert.IsFalse(TestInstance.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
             Assert.IsTrue(TestInstance.IsCollectionRegisteredWithDescriptor(Collection, otherDescriptor));
@@ -224,7 +275,7 @@ namespace DAA.StateManagement
         [TestMethod]
         public void GetDescriptor_RegisteredCollection_CorrectDescriptor()
         {
-            TestInstance.RegisterCollection(Collection, Descriptor);
+            TestInstance.RegisterCollection(Collection, Descriptor, DataBuilder);
 
             Assert.AreSame(Descriptor, TestInstance.GetDescriptor(Collection));
         }
@@ -235,10 +286,61 @@ namespace DAA.StateManagement
             var descriptorOne = new Mock<INonTerminalDescriptor>().Object;
             var descriptorTwo = new Mock<INonTerminalDescriptor>().Object;
 
-            TestInstance.RegisterCollection(Collection, descriptorOne);
-            TestInstance.RegisterCollection(Collection, descriptorTwo);
+            TestInstance.RegisterCollection(Collection, descriptorOne, DataBuilder);
+            TestInstance.RegisterCollection(Collection, descriptorTwo, DataBuilder);
 
             Assert.AreSame(descriptorTwo, TestInstance.GetDescriptor(Collection));
+        }
+
+        [TestMethod]
+        public async Task BuildCollectionAsync__ItemsBuildUsingRegisteredBuilder()
+        {
+            var collection = new List<IData>() {new Mock<IData>().Object, new Mock<IData>().Object};
+
+            TestInstance.RegisterCollection(collection, Descriptor, DataBuilder);
+
+            await TestInstance.BuildCollectionAsync(collection);
+
+            foreach (var item in collection)
+            {
+                MockedDataBuilder.Verify(_ => _.DoWorkAsync(item));
+            }
+        }
+
+        [TestMethod]
+        public async Task ChangeBuilderAsync__ItemsBuildUsingChangedBuilder()
+        {
+            var collection = new List<IData>() { new Mock<IData>().Object, new Mock<IData>().Object };
+            var mockedDataBuilder = new Mock<IDataBuilder<IData>>();
+            var dataBuilder = mockedDataBuilder.Object;
+
+            TestInstance.RegisterCollection(collection, Descriptor, DataBuilder);
+            await TestInstance.ChangeBuilderAsync(collection, dataBuilder);
+            
+            foreach (var item in collection)
+            {
+                mockedDataBuilder.Verify(_ => _.DoWorkAsync(item));
+            }
+        }
+
+        [TestMethod]
+        public async Task ChangeBuilderAsync_CollectionNotRegistered_InvalidOperationException()
+        {
+            var caught = false;
+
+            MockedTestInstance.Setup(_ => _.BuildCollectionAsync(It.IsAny<ICollection<IData>>()))
+                .Returns(Task.FromResult(0));
+
+            try
+            {
+                await TestInstance.ChangeBuilderAsync(Collection, DataBuilder);
+            }
+            catch (InvalidOperationException)
+            {
+                caught = true;
+            }
+
+            Assert.IsTrue(caught);
         }
     }
 }

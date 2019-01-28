@@ -34,6 +34,9 @@ namespace DAA.StateManagement
         private INonTerminalDescriptor Descriptor => MockedDescriptor.Object;
         private Mock<INonTerminalDescriptor> MockedDescriptor { get; set; }
 
+        private IDataBuilder<IData> DataBuilder => MockedDataBuilder.Object;
+        private Mock<IDataBuilder<IData>> MockedDataBuilder { get; set; }
+
         private StateManagement TestInstance => MockedTestInstance.Object;
         private Mock<StateManagement> MockedTestInstance { get; set; }
 
@@ -48,6 +51,7 @@ namespace DAA.StateManagement
             MockedSystemBuildingDirector = new Mock<StateManagementSystemBuildingDirector>();
             MockedStateManagementSystemsCatalog = new Mock<IStateManagementSystemsCatalog>();
             MockedCollection = new Mock<ICollection<IData>>();
+            MockedDataBuilder = new Mock<IDataBuilder<IData>>();
 
             MockedStateManagementSystemsCatalog.Setup(_ => _.Retrieve<IData>()).Returns(StateManagementSystem);
             MockedStateManagementSystem.Setup(_ => _.Repository).Returns(DataRepository);
@@ -143,7 +147,7 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
-        public async Task FillCollectionAsync_NotAlreadyRegisteredWithDescriptor_DelegatedToRepository()
+        public async Task FillCollectionAsync__NoBuilder_NotAlreadyRegisteredWithDescriptor__DelegatedToRepository()
         {
             var awaited = false;
 
@@ -151,29 +155,95 @@ namespace DAA.StateManagement
                 _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
                     It.IsAny<INonTerminalDescriptor>())).Returns(false);
             MockedDataRepository.Setup(_ =>
-                    _.FillCollectionAsync(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()))
+                    _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()))
                 .Returns(Task.Delay(10).ContinueWith(_ => awaited = true));
 
             await TestInstance.FillCollectionAsync(Collection, Descriptor);
 
-            MockedDataRepository.Verify(_ => _.FillCollectionAsync(Collection, Descriptor));
+            MockedDataRepository.Verify(_ =>
+                _.FillCollectionAsync(It.Is<IFillCollectionArgs<IData>>(args =>
+                    Equals(args.Collection, Collection) && args.Descriptor == Descriptor)));
             Assert.IsTrue(awaited);
             MockedTestInstance.Verify(_ => _.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
         }
 
         [TestMethod]
-        public async Task FillCollectionAsync_AlreadyRegisteredWithDescriptor_NotDelegatedToRepository()
+        public async Task FillCollectionAsync__NoBuilder_AlreadyRegisteredWithDescriptor__NotDelegatedToRepository()
         {
             MockedTestInstance.Setup(_ =>
                 _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
                     It.IsAny<INonTerminalDescriptor>())).Returns(true);
-            MockedDataRepository.Setup(_ =>
-                    _.FillCollectionAsync(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()))
+            MockedDataRepository.Setup(_ => _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()))
                 .Returns(Task.FromResult(0));
 
             await TestInstance.FillCollectionAsync(Collection, Descriptor);
 
-            MockedDataRepository.Verify(_ => _.FillCollectionAsync(Collection, Descriptor), Times.Never);
+            MockedDataRepository.Verify(_ => _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task FillCollectionAsync__Builder_NotAlreadyRegisteredWithDescriptor__FillDelegatedToRepository()
+        {
+            var awaited = false;
+
+            MockedTestInstance.Setup(_ =>
+                _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
+                    It.IsAny<INonTerminalDescriptor>())).Returns(false);
+            MockedDataRepository.Setup(_ =>
+                    _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()))
+                .Returns(Task.Delay(10).ContinueWith(_ => awaited = true));
+
+            await TestInstance.FillCollectionAsync(Collection, Descriptor, DataBuilder);
+
+            MockedDataRepository.Verify(_ =>
+                _.FillCollectionAsync(It.Is<IFillCollectionArgs<IData>>(args =>
+                    Equals(args.Collection, Collection) && args.Descriptor == Descriptor && args.Builder == DataBuilder)));
+            Assert.IsTrue(awaited);
+            MockedTestInstance.Verify(_ => _.IsCollectionRegisteredWithDescriptor(Collection, Descriptor));
+        }
+
+        [TestMethod]
+        public async Task FillCollectionAsync__Builder_AlreadyRegisteredWithDescriptor__FillNotDelegatedToRepository()
+        {
+            MockedTestInstance.Setup(_ =>
+                _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
+                    It.IsAny<INonTerminalDescriptor>())).Returns(true);
+            MockedDataRepository.Setup(_ => _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()))
+                .Returns(Task.FromResult(0));
+
+            await TestInstance.FillCollectionAsync(Collection, Descriptor, DataBuilder);
+
+            MockedDataRepository.Verify(_ => _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task FillCollectionAsync__Builder_AlreadyRegisteredWithDescriptor__ChangeBuilderDelegatedToRepository()
+        {
+            MockedTestInstance.Setup(_ =>
+                _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
+                    It.IsAny<INonTerminalDescriptor>())).Returns(true);
+            MockedDataRepository.Setup(_ => _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()))
+                .Returns(Task.FromResult(0));
+
+            await TestInstance.FillCollectionAsync(Collection, Descriptor, DataBuilder);
+
+            MockedDataRepository.Verify(_ => _.ChangeBuilderAsync(Collection, DataBuilder), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task FillCollectionAsync__Builder_NotAlreadyRegisteredWithDescriptor__ChangeBuilderNotDelegatedToRepository()
+        {
+            MockedTestInstance.Setup(_ =>
+                _.IsCollectionRegisteredWithDescriptor(It.IsAny<ICollection<IData>>(),
+                    It.IsAny<INonTerminalDescriptor>())).Returns(false);
+            MockedDataRepository.Setup(_ => _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()))
+                .Returns(Task.FromResult(0));
+
+            await TestInstance.FillCollectionAsync(Collection, Descriptor, DataBuilder);
+
+            MockedDataRepository.Verify(
+                _ => _.ChangeBuilderAsync(It.IsAny<ICollection<IData>>(), It.IsAny<IDataBuilder<IData>>()),
+                Times.Never);
         }
     }
 }

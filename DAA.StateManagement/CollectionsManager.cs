@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DAA.Helpers;
@@ -14,6 +15,7 @@ namespace DAA.StateManagement
 
         private IDictionary<INonTerminalDescriptor, ICollection<ICollection<TData>>> CollectionsByDescriptor { get; }
         private IDictionary<ICollection<TData>, INonTerminalDescriptor> DescriptorByCollection { get; }
+        private IDictionary<ICollection<TData>, IDataBuilder<TData>> BuilderByCollection { get; }
 
 
         public CollectionsManager(IDataPool<TData> dataPool, IStateManagementEventsAggregator<TData> eventsAggregator)
@@ -23,17 +25,29 @@ namespace DAA.StateManagement
 
             CollectionsByDescriptor = new Dictionary<INonTerminalDescriptor, ICollection<ICollection<TData>>>();
             DescriptorByCollection = new Dictionary<ICollection<TData>, INonTerminalDescriptor>();
+            BuilderByCollection = new Dictionary<ICollection<TData>, IDataBuilder<TData>>();
 
             EventsAggregator.CompositionChangedEvent += WhenCompositionChanged;
         }
 
 
-        public Task FillCollectionAsync(ICollection<TData> collection, INonTerminalDescriptor descriptor)
+        public async Task FillCollectionAsync(IFillCollectionArgs<TData> args)
         {
-            RegisterCollection(collection, descriptor);
-            FillCollectionWithData(collection, descriptor);
+            RegisterCollection(args.Collection, args.Descriptor, args.Builder);
+            FillCollectionWithData(args.Collection, args.Descriptor);
 
-            return Task.FromResult(0);
+            await BuildCollectionAsync(args.Collection);
+        }
+
+        public async Task ChangeBuilderAsync(ICollection<TData> collection, IDataBuilder<TData> builder)
+        {
+            if (!IsCollectionRegistered(collection))
+            {
+                throw new InvalidOperationException("Cannot change the builder associated with a collection that has not been registered");
+            }
+
+            BuilderByCollection[collection] = builder;
+            await BuildCollectionAsync(collection);
         }
 
         public virtual void DropCollection(ICollection<TData> collection)
@@ -56,17 +70,18 @@ namespace DAA.StateManagement
                    && CollectionsByDescriptor[descriptor].Contains(collection);
         }
 
-        public virtual void WhenCompositionChanged(object sender, INonTerminalDescriptor descriptor)
+        public virtual async void WhenCompositionChanged(object sender, INonTerminalDescriptor descriptor)
         {
-            FindAffectedCollections(descriptor).ForEach(UpdateCollection);
+            await Task.WhenAll(FindAffectedCollections(descriptor).Select(UpdateCollectionAsync).ToArray());
         }
 
-        public virtual void RegisterCollection(ICollection<TData> collection, INonTerminalDescriptor descriptor)
+        public virtual void RegisterCollection(ICollection<TData> collection, INonTerminalDescriptor descriptor, IDataBuilder<TData> builder)
         {
             DropCollection(collection);
 
             GetCollectionsForDescriptor(descriptor).Add(collection);
             DescriptorByCollection.Add(collection, descriptor);
+            BuilderByCollection.Add(collection, builder);
         }
 
         public virtual void FillCollectionWithData(ICollection<TData> collection, INonTerminalDescriptor descriptor)
@@ -85,23 +100,34 @@ namespace DAA.StateManagement
             return CollectionsByDescriptor.Keys.Where(_ => _.Intersects(changedDescriptor));
         }
 
-        public virtual void UpdateCollection(ICollection<TData> collection)
+        public virtual async Task UpdateCollectionAsync(ICollection<TData> collection)
         {
             var descriptor = GetDescriptor(collection);
             var data = DataPool.Retrieve(descriptor);
 
             collection.Update(data);
+
+            await BuildCollectionAsync(collection);
         }
 
         public virtual void DropCollection(ICollection<TData> collection, INonTerminalDescriptor descriptor)
         {
             DescriptorByCollection.Remove(collection);
             CollectionsByDescriptor[descriptor].Remove(collection);
+            BuilderByCollection.Remove(collection);
         }
 
         public virtual void ClearCollection(ICollection<TData> collection)
         {
             collection.RemoveClear();
+        }
+
+        public virtual async Task BuildCollectionAsync(ICollection<TData> collection)
+        {
+            var builder = BuilderByCollection[collection];
+            var tasksToBuildItems = collection.Select(builder.DoWorkAsync);
+
+            await Task.WhenAll(tasksToBuildItems);
         }
 
         public virtual INonTerminalDescriptor GetDescriptor(ICollection<TData> collection)

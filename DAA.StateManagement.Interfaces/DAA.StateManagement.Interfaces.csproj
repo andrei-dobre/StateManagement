@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="ICollectionsManager.cs" />
     <Compile Include="IData.cs" />
+    <Compile Include="IDataBuilder.cs" />
     <Compile Include="IDataManipulator.cs" />
     <Compile Include="IDataPool.cs" />
     <Compile Include="IDataQualitySupervisor.cs" />
@@ -42,6 +43,7 @@
     <Compile Include="IDataRetriever.cs" />
     <Compile Include="IDescriptor.cs" />
     <Compile Include="INonTerminalDescriptor.cs" />
+    <Compile Include="IFillCollectionArgs.cs" />
     <Compile Include="IStateManagement.cs" />
     <Compile Include="IStateManagementEventsAggregator.cs" />
     <Compile Include="IDataRefresher.cs" />

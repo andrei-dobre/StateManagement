@@ -25,6 +25,12 @@ namespace DAA.StateManagement
         private INonTerminalDescriptor Descriptor => MockedDescriptor.Object;
         private Mock<INonTerminalDescriptor> MockedDescriptor { get; set; }
 
+        private IFillCollectionArgs<IData> FillCollectionArgs => MockedFillCollectionArgs.Object;
+        private Mock<IFillCollectionArgs<IData>> MockedFillCollectionArgs { get; set; }
+
+        private IDataBuilder<IData> DataBuilder => MockedDataBuilder.Object;
+        private Mock<IDataBuilder<IData>> MockedDataBuilder { get; set; }
+
         private DataRepository<IData> TestInstance => MockedTestInstance.Object;
         private Mock<DataRepository<IData>> MockedTestInstance { get; set; }
 
@@ -38,6 +44,12 @@ namespace DAA.StateManagement
 
             MockedCollection = new Mock<ICollection<IData>>();
             MockedDescriptor = new Mock<INonTerminalDescriptor>();
+            MockedDataBuilder = new Mock<IDataBuilder<IData>>();
+
+            MockedFillCollectionArgs = new Mock<IFillCollectionArgs<IData>>();
+
+            MockedFillCollectionArgs.Setup(_ => _.Descriptor).Returns(Descriptor);
+            MockedFillCollectionArgs.Setup(_ => _.Collection).Returns(Collection);
 
             MockedTestInstance = new Mock<DataRepository<IData>>(DataRetriever, DataPool, CollectionsManager);
             MockedTestInstance.CallBase = true;
@@ -51,11 +63,10 @@ namespace DAA.StateManagement
 
             MockedTestInstance.Setup(_ => _.AcquireMissingData(It.IsAny<INonTerminalDescriptor>()))
                 .Returns(Task.Delay(200).ContinueWith(_ => awaited = true));
-            MockedCollectionsManager.Setup(_ =>
-                    _.FillCollectionAsync(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()))
+            MockedCollectionsManager.Setup(_ => _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()))
                 .Returns(Task.Delay(0));
 
-            await TestInstance.FillCollectionAsync(Collection, Descriptor);
+            await TestInstance.FillCollectionAsync(FillCollectionArgs);
 
             MockedTestInstance.Verify(_ => _.AcquireMissingData(Descriptor));
             Assert.IsTrue(awaited);
@@ -68,13 +79,12 @@ namespace DAA.StateManagement
 
             MockedTestInstance.Setup(_ => _.AcquireMissingData(It.IsAny<INonTerminalDescriptor>()))
                 .Returns(Task.Delay(0));
-            MockedCollectionsManager.Setup(_ =>
-                    _.FillCollectionAsync(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()))
+            MockedCollectionsManager.Setup(_ => _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()))
                 .Returns(Task.Delay(200).ContinueWith(_ => awaited = true));
 
-            await TestInstance.FillCollectionAsync(Collection, Descriptor);
+            await TestInstance.FillCollectionAsync(FillCollectionArgs);
 
-            MockedCollectionsManager.Verify(_ => _.FillCollectionAsync(Collection, Descriptor));
+            MockedCollectionsManager.Verify(_ => _.FillCollectionAsync(FillCollectionArgs));
             Assert.IsTrue(awaited);
         }
 
@@ -88,14 +98,27 @@ namespace DAA.StateManagement
             MockedTestInstance.Setup(_ => _.AcquireMissingData(It.IsAny<INonTerminalDescriptor>()))
                 .Callback(() => acquireDataCallNumber = ++callCounter)
                 .Returns(Task.Delay(10));
-            MockedCollectionsManager.Setup(_ =>
-                    _.FillCollectionAsync(It.IsAny<ICollection<IData>>(), It.IsAny<INonTerminalDescriptor>()))
+            MockedCollectionsManager.Setup(_ => _.FillCollectionAsync(It.IsAny<IFillCollectionArgs<IData>>()))
                 .Callback(() => fillCollectionCallNumber = ++callCounter)
                 .Returns(Task.Delay(10));
 
-            await TestInstance.FillCollectionAsync(Collection, Descriptor);
+            await TestInstance.FillCollectionAsync(FillCollectionArgs);
             
             Assert.IsTrue(fillCollectionCallNumber > acquireDataCallNumber);
+        }
+
+        [TestMethod]
+        public async Task ChangeBuilderAsync__DelegatesToCollectionManager()
+        {
+            var awaited = false;
+
+            MockedCollectionsManager.Setup(_ => _.ChangeBuilderAsync(It.IsAny<ICollection<IData>>(), It.IsAny<IDataBuilder<IData>>()))
+                .Returns(Task.Delay(200).ContinueWith(_ => awaited = true));
+
+            await TestInstance.ChangeBuilderAsync(Collection, DataBuilder);
+
+            MockedCollectionsManager.Verify(_ => _.ChangeBuilderAsync(Collection, DataBuilder));
+            Assert.IsTrue(awaited);
         }
 
         [TestMethod]

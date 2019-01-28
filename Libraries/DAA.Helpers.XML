@@ -29,7 +29,7 @@
             <param name="coll">The collection that is to be iterated.</param>
             <param name="action">The action that will be executed for each element in the collection.</param>
         </member>
-        <member name="M:DAA.Helpers.CollectionsHelper.Update``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0},System.Action{``0,``0},System.Collections.Generic.IEqualityComparer{``0})">
+        <member name="M:DAA.Helpers.CollectionsHelper.Update``1(System.Collections.Generic.ICollection{``0},System.Collections.Generic.IEnumerable{``0},System.Action{``0,``0},System.Collections.Generic.IEqualityComparer{``0})">
             <summary>
                 <para>Updates the received collection using only the <see cref="M:System.Collections.Generic.ICollection`1.Add(`0)"/>, <see cref="M:System.Collections.Generic.ICollection`1.Remove(`0)"/> and the received updater, making it set equal to the new collection.</para>
                 <para>This method does not support collections with duplicates. The specified comparer can also lead to artificial duplicates.</para>
@@ -40,9 +40,9 @@
             <param name="itemUpdater">The items updater.</param>
             <param name="comparer">The items comparer.</param>
         </member>
-        <member name="M:DAA.Helpers.CollectionsHelper.Update``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+        <member name="M:DAA.Helpers.CollectionsHelper.Update``1(System.Collections.Generic.ICollection{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
             <summary>
-            <para>Calls the <see cref="M:DAA.Helpers.CollectionsHelper.Update``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0},System.Action{``0,``0},System.Collections.Generic.IEqualityComparer{``0})"/> method with a null updater and the specified parameters.</para>
+            <para>Calls the <see cref="M:DAA.Helpers.CollectionsHelper.Update``1(System.Collections.Generic.ICollection{``0},System.Collections.Generic.IEnumerable{``0},System.Action{``0,``0},System.Collections.Generic.IEqualityComparer{``0})"/> method with a null updater and the specified parameters.</para>
             <para>This method does not support collections with duplicates. The specified comparer can also lead to artificial duplicates!</para>
             </summary>
             <typeparam name="T">The type of the collections' items.</typeparam>
@@ -50,9 +50,9 @@
             <param name="newItems">The collection that contains the new items.</param>
             <param name="comparer">The items comparer.</param>
         </member>
-        <member name="M:DAA.Helpers.CollectionsHelper.RemoveClear``1(System.Collections.Generic.IList{``0})">
+        <member name="M:DAA.Helpers.CollectionsHelper.RemoveClear``1(System.Collections.Generic.ICollection{``0})">
             <summary>
-            Clears the received collection by only using the <see cref="M:System.Collections.Generic.IList`1.RemoveAt(System.Int32)"/> method.
+            Clears the received collection by only using the <see cref="M:System.Collections.Generic.ICollection`1.Remove(`0)"/> method.
             </summary>
             <typeparam name="T">The type of the collection's items.</typeparam>
             <param name="coll">The collection that is to be cleared.</param>
@@ -125,13 +125,19 @@
             <param name="needle">The needle whose occurrences will be counted.</param>
             <param name="comparer">An optional comparer. If not specified, the <see cref="M:DAA.Helpers.EqualityComparersHelper`1.Default"/> comparer will be used.</param>
         </member>
-        <member name="M:DAA.Helpers.CollectionsHelper.Remove``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+        <member name="M:DAA.Helpers.CollectionsHelper.Remove``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
             <summary>
             Removes all the items for which the test returns true from the collection.
             </summary>
             <typeparam name="T">The type of the collection's items.</typeparam>
             <param name="coll">The collection from which the items will be removed.</param>
             <param name="test">The test that should return true if an items it to be removed.</param>
+        </member>
+        <member name="M:DAA.Helpers.CollectionsHelper.ShuffledMerge``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Merges the two collections and shuffles the result.
+            </summary>
+            <typeparam name="TItem">The type of items stored in the collections.</typeparam>
         </member>
         <member name="T:DAA.Helpers.EqualityComparersHelper`1">
             <summary>
@@ -453,6 +459,16 @@
             <param name="start">The first <see cref="T:System.DateTime"/> value that could be returned.</param>
             <param name="end">The last <see cref="T:System.DateTime"/> value that could be returned.</param>
         </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.GetPastDateTime">
+            <summary>
+            Gets a pseudo-random <see cref="T:System.DateTime"/> value that has a lower value that <see cref="P:System.DateTime.Today"/>.
+            </summary>
+        </member>
+        <member name="M:DAA.Helpers.RandomizationHelper.GetFutureDateTime">
+            <summary>
+            Gets a pseudo-random <see cref="T:System.DateTime"/> value that has a higher value that <see cref="P:System.DateTime.Today"/>.
+            </summary>
+        </member>
         <member name="M:DAA.Helpers.RandomizationHelper.GetBool">
             <summary>
             Returns a pseudo-random <see cref="T:System.Boolean"/> value.
@@ -489,6 +505,17 @@
             <param name="obj">The object whose method or property is to be invoked.</param>
             <param name="memberName">The name of the desired method or property.</param>
             <param name="arguments">The arguments used when invoking the method or property.</param>
+        </member>
+        <member name="M:DAA.Helpers.ReflectionHelper.InvokeGeneric``1(System.Object,System.String,System.Object[])">
+            <summary>
+            Invokes the generic method with the specified name, on the given object, regardless
+            of the access modifier. The return value of the invokation is returned. If the method
+            returns void, NULL will be returned.
+            </summary>
+            <param name="obj">The object whose method or property is to be invoked.</param>
+            <param name="memberName">The name of the desired method or property.</param>
+            <param name="arguments">The arguments used when invoking the method or property.</param>
+            <typeparam name="T">The type parameter of the method.</typeparam>
         </member>
     </members>
 </doc>
