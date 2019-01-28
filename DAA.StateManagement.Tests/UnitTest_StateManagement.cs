@@ -245,5 +245,20 @@ namespace DAA.StateManagement
                 _ => _.ChangeBuilderAsync(It.IsAny<ICollection<IData>>(), It.IsAny<IDataBuilder<IData>>()),
                 Times.Never);
         }
+
+        [TestMethod]
+        public async Task ChangeBuilderAsync__DelegatedToRepository()
+        {
+            var awaited = false;
+
+            MockedDataRepository.Setup(_ =>
+                    _.ChangeBuilderAsync(It.IsAny<ICollection<IData>>(), It.IsAny<IDataBuilder<IData>>()))
+                .Returns(Task.Delay(10).ContinueWith(_ => awaited = true));
+
+            await TestInstance.ChangeBuilderAsync(Collection, DataBuilder);
+
+            MockedDataRepository.Verify(_ => _.ChangeBuilderAsync(Collection, DataBuilder));
+            Assert.IsTrue(awaited);
+        }
     }
 }

@@ -40,6 +40,12 @@ namespace DAA.StateManagement
             }
         }
 
+        public async Task ChangeBuilderAsync<TData>(ICollection<TData> collection, IDataBuilder<TData> builder)
+            where TData : IData
+        {
+            await GetRepository<TData>().ChangeBuilderAsync(collection, builder);
+        }
+
         public bool IsCollectionRegistered<TData>(ICollection<TData> collection) 
             where TData : IData
         {
