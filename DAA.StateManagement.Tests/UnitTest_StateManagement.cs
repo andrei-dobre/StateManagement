@@ -11,6 +11,9 @@ namespace DAA.StateManagement
     [TestClass]
     public class UnitTest_StateManagement
     {
+        private IData Data => MockedData.Object;
+        private Mock<IData> MockedData { get; set; }
+
         private IDataRepository<IData> DataRepository => MockedDataRepository.Object;
         private Mock<IDataRepository<IData>> MockedDataRepository { get; set; }
 
@@ -34,6 +37,9 @@ namespace DAA.StateManagement
         private INonTerminalDescriptor Descriptor => MockedDescriptor.Object;
         private Mock<INonTerminalDescriptor> MockedDescriptor { get; set; }
 
+        private ITerminalDescriptor TerminalDescriptor => MockedTerminalDescriptor.Object;
+        private Mock<ITerminalDescriptor> MockedTerminalDescriptor { get; set; }
+
         private IDataBuilder<IData> DataBuilder => MockedDataBuilder.Object;
         private Mock<IDataBuilder<IData>> MockedDataBuilder { get; set; }
 
@@ -44,6 +50,7 @@ namespace DAA.StateManagement
         [TestInitialize]
         public void BeforeEach()
         {
+            MockedData = new Mock<IData>();
             MockedDescriptor = new Mock<INonTerminalDescriptor>();
             MockedStateManagementSystemBuilder = new Mock<IStateManagementSystemBuilder<IData>>();
             MockedStateManagementSystem = new Mock<IStateManagementSystem<IData>>();
@@ -52,6 +59,7 @@ namespace DAA.StateManagement
             MockedStateManagementSystemsCatalog = new Mock<IStateManagementSystemsCatalog>();
             MockedCollection = new Mock<ICollection<IData>>();
             MockedDataBuilder = new Mock<IDataBuilder<IData>>();
+            MockedTerminalDescriptor = new Mock<ITerminalDescriptor>();
 
             MockedStateManagementSystemsCatalog.Setup(_ => _.Retrieve<IData>()).Returns(StateManagementSystem);
             MockedStateManagementSystem.Setup(_ => _.Repository).Returns(DataRepository);
@@ -259,6 +267,33 @@ namespace DAA.StateManagement
 
             MockedDataRepository.Verify(_ => _.ChangeBuilderAsync(Collection, DataBuilder));
             Assert.IsTrue(awaited);
+        }
+
+        [TestMethod]
+        public async Task RetrieveAsync__DelegatedToRepository()
+        {
+            MockedTestInstance.Setup(_ => _.GetRepository<IData>()).Returns(DataRepository);
+            MockedDataRepository.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(Data));
+
+            var result = await TestInstance.RetrieveAsync<IData>(TerminalDescriptor);
+
+            Assert.AreSame(Data, result);
+            MockedDataRepository.Verify(_ => _.RetrieveAsync(TerminalDescriptor));
+        }
+
+        [TestMethod]
+        public async Task RetrieveAsync_BuilderSpecified_DelegatedToRepository()
+        {
+            MockedTestInstance.Setup(_ => _.GetRepository<IData>()).Returns(DataRepository);
+            MockedDataRepository.Setup(_ =>
+                    _.RetrieveAsync(It.IsAny<ITerminalDescriptor>(), It.IsAny<IDataBuilder<IData>>()))
+                .Returns(Task.FromResult(Data));
+
+            var result = await TestInstance.RetrieveAsync<IData>(TerminalDescriptor, DataBuilder);
+
+            Assert.AreSame(Data, result);
+            MockedDataRepository.Verify(_ => _.RetrieveAsync(TerminalDescriptor, DataBuilder));
         }
     }
 }

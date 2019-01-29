@@ -20,6 +20,22 @@ namespace DAA.StateManagement
         }
 
 
+        public virtual async Task<TData> RetrieveAsync(ITerminalDescriptor descriptor)
+        {
+            await AcquireMissingData(descriptor);
+
+            return DataPool.Retrieve(descriptor);
+        }
+
+        public async Task<TData> RetrieveAsync(ITerminalDescriptor descriptor, IDataBuilder<TData> builder)
+        {
+            var data = await RetrieveAsync(descriptor);
+
+            await builder.DoWorkAsync(data);
+
+            return data;;
+        }
+
         public async Task FillCollectionAsync(IFillCollectionArgs<TData> args)
         {
             await AcquireMissingData(args.Descriptor);
@@ -50,9 +66,15 @@ namespace DAA.StateManagement
         {
             if (!DataPool.Contains(descriptor))
             {
-                var data = await DataRetriever.RetrieveAsync(descriptor);
+                DataPool.Save(descriptor, await DataRetriever.RetrieveAsync(descriptor));
+            }
+        }
 
-                DataPool.Save(descriptor, data);
+        public virtual async Task AcquireMissingData(ITerminalDescriptor descriptor)
+        {
+            if (!DataPool.Contains(descriptor))
+            {
+                DataPool.Save(descriptor, await DataRetriever.RetrieveAsync(descriptor));
             }
         }
     }

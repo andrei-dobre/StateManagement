@@ -1,6 +1,11 @@
-﻿namespace DAA.StateManagement.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace DAA.StateManagement.Interfaces
 {
     public interface IDataRepository<TData> : ICollectionsManager<TData>
         where TData : IData
-    { }
+    {
+        Task<TData> RetrieveAsync(ITerminalDescriptor descriptor);
+        Task<TData> RetrieveAsync(ITerminalDescriptor descriptor, IDataBuilder<TData> builder);
+    }
 }

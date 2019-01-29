@@ -10,6 +10,9 @@ namespace DAA.StateManagement
     [TestClass]
     public class UnitTest_DataRepository
     {
+        private IData Data => MockedData.Object;
+        private Mock<IData> MockedData { get; set; }
+
         private IDataRetriever<IData> DataRetriever => MockedDataRetriever.Object;
         private Mock<IDataRetriever<IData>> MockedDataRetriever { get; set; }
 
@@ -24,6 +27,9 @@ namespace DAA.StateManagement
 
         private INonTerminalDescriptor Descriptor => MockedDescriptor.Object;
         private Mock<INonTerminalDescriptor> MockedDescriptor { get; set; }
+
+        private ITerminalDescriptor TerminalDescriptor => MockedTerminalDescriptor.Object;
+        private Mock<ITerminalDescriptor> MockedTerminalDescriptor { get; set; }
 
         private IFillCollectionArgs<IData> FillCollectionArgs => MockedFillCollectionArgs.Object;
         private Mock<IFillCollectionArgs<IData>> MockedFillCollectionArgs { get; set; }
@@ -42,9 +48,11 @@ namespace DAA.StateManagement
             MockedDataPool = new Mock<IDataPool<IData>>();
             MockedCollectionsManager = new Mock<ICollectionsManager<IData>>();
 
+            MockedData = new Mock<IData>();
             MockedCollection = new Mock<ICollection<IData>>();
             MockedDescriptor = new Mock<INonTerminalDescriptor>();
             MockedDataBuilder = new Mock<IDataBuilder<IData>>();
+            MockedTerminalDescriptor = new Mock<ITerminalDescriptor>();
 
             MockedFillCollectionArgs = new Mock<IFillCollectionArgs<IData>>();
 
@@ -55,6 +63,81 @@ namespace DAA.StateManagement
             MockedTestInstance.CallBase = true;
         }
 
+
+        [TestMethod]
+        public async Task RetrieveAsync__MissingDataAcquired()
+        {
+            var awaited = false;
+
+            MockedTestInstance.Setup(_ => _.AcquireMissingData(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.Delay(200).ContinueWith(_ => awaited = true));
+
+            await TestInstance.RetrieveAsync(TerminalDescriptor);
+
+            MockedTestInstance.Verify(_ => _.AcquireMissingData(TerminalDescriptor));
+            Assert.IsTrue(awaited);
+        }
+
+        [TestMethod]
+        public async Task RetrieveAsync__DataRetrievedFromPool()
+        {
+            MockedTestInstance.Setup(_ => _.AcquireMissingData(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(0));
+            MockedDataPool.Setup(_ => _.Retrieve(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Data);
+
+            var result = await TestInstance.RetrieveAsync(TerminalDescriptor);
+
+            Assert.AreSame(result, Data);
+            MockedDataPool.Verify(_ => _.Retrieve(TerminalDescriptor));
+        }
+
+        [TestMethod]
+        public async Task RetrieveAsync__DataRetrievedAfterBeingAcquired()
+        {
+            var callCounter = 0;
+            var acquireDataCall = 0;
+            var retrieveDataCall = 0;
+
+            MockedTestInstance.Setup(_ => _.AcquireMissingData(It.IsAny<ITerminalDescriptor>()))
+                .Callback(() => acquireDataCall = ++callCounter)
+                .Returns(Task.FromResult(0));
+            MockedDataPool.Setup(_ => _.Retrieve(It.IsAny<ITerminalDescriptor>()))
+                .Callback(() => retrieveDataCall = ++callCounter)
+                .Returns(Data);
+
+            await TestInstance.RetrieveAsync(TerminalDescriptor);
+
+            Assert.IsTrue(retrieveDataCall > acquireDataCall);
+        }
+
+        [TestMethod]
+        public async Task RetrieveAsync_BuilderSpecified_DataRetrievedAndProvided()
+        {
+            MockedTestInstance.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(Data));
+
+            var result = await TestInstance.RetrieveAsync(TerminalDescriptor, DataBuilder);
+
+            Assert.AreSame(result, Data);
+            MockedTestInstance.Verify(_ => _.RetrieveAsync(TerminalDescriptor));
+        }
+
+        [TestMethod]
+        public async Task RetrieveAsync_BuilderSpecified_DataBuilt()
+        {
+            var awaited = false;
+
+            MockedTestInstance.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(Data));
+            MockedDataBuilder.Setup(_ => _.DoWorkAsync(It.IsAny<IData>()))
+                .Returns(Task.Delay(10).ContinueWith(_ => awaited = true));
+
+            await TestInstance.RetrieveAsync(TerminalDescriptor, DataBuilder);
+
+            MockedDataBuilder.Verify(_ => _.DoWorkAsync(Data));
+            Assert.IsTrue(awaited);
+        }
 
         [TestMethod]
         public async Task FillCollectionAsync__MissingDataAcquired()
@@ -205,6 +288,59 @@ namespace DAA.StateManagement
             await TestInstance.AcquireMissingData(Descriptor);
 
             MockedDataPool.Verify(_ => _.Save(It.IsAny<INonTerminalDescriptor>(), It.IsAny<ICollection<IData>>()),
+                Times.Never);
+        }
+
+
+
+
+
+        [TestMethod]
+        public async Task AcquireMissingData__TerminalDescriptor_DataNotContained__DataCorrectlyRetrieved()
+        {
+            MockedDataPool.Setup(_ => _.Contains(It.IsAny<ITerminalDescriptor>())).Returns(false);
+            MockedDataRetriever.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(Data));
+
+            await TestInstance.AcquireMissingData(TerminalDescriptor);
+
+            MockedDataRetriever.Verify(_ => _.RetrieveAsync(TerminalDescriptor));
+        }
+
+        [TestMethod]
+        public async Task AcquireMissingData__TerminalDescriptor_DataNotContained__RetrievedDataSaved()
+        {
+            MockedDataPool.Setup(_ => _.Contains(It.IsAny<ITerminalDescriptor>())).Returns(false);
+            MockedDataRetriever.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(Data));
+
+            await TestInstance.AcquireMissingData(TerminalDescriptor);
+
+            MockedDataPool.Verify(_ => _.Save(TerminalDescriptor, Data));
+        }
+
+        [TestMethod]
+        public async Task AcquireMissingData__TerminalDescriptor_DataContained__DataNotRetrieved()
+        {
+            MockedDataPool.Setup(_ => _.Contains(It.IsAny<ITerminalDescriptor>())).Returns(true);
+            MockedDataRetriever.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(Data));
+
+            await TestInstance.AcquireMissingData(TerminalDescriptor);
+
+            MockedDataRetriever.Verify(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task AcquireMissingData__TerminalDescriptor_DataContained__DataSaveNotAttempted()
+        {
+            MockedDataPool.Setup(_ => _.Contains(It.IsAny<ITerminalDescriptor>())).Returns(true);
+            MockedDataRetriever.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(Data));
+
+            await TestInstance.AcquireMissingData(TerminalDescriptor);
+
+            MockedDataPool.Verify(_ => _.Save(It.IsAny<ITerminalDescriptor>(), It.IsAny<IData>()),
                 Times.Never);
         }
     }

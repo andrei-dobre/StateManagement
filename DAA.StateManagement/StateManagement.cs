@@ -18,6 +18,18 @@ namespace DAA.StateManagement
         }
 
 
+        public async Task<TData> RetrieveAsync<TData>(ITerminalDescriptor descriptor) 
+            where TData : IData
+        {
+            return await GetRepository<TData>().RetrieveAsync(descriptor);
+        }
+
+        public async Task<TData> RetrieveAsync<TData>(ITerminalDescriptor descriptor, IDataBuilder<TData> builder)
+            where TData : IData
+        {
+            return await GetRepository<TData>().RetrieveAsync(descriptor, builder);
+        }
+
         public async Task FillCollectionAsync<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor) 
             where TData : IData
         {
