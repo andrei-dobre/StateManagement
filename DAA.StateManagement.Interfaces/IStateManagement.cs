@@ -14,5 +14,6 @@ namespace DAA.StateManagement.Interfaces
         bool IsCollectionRegistered<TData>(ICollection<TData> collection) where TData : IData;
         bool IsCollectionRegisteredWithDescriptor<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor) where TData : IData;
         void DropCollection<TData>(ICollection<TData> collection) where TData : IData;
+        void Register<TData>(IStateManagementSystemBuilder<TData> builder) where TData : IData;
     }
 }
