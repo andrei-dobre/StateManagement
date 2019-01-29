@@ -6,6 +6,7 @@ namespace DAA.StateManagement.Interfaces
         where TData : IData
     {
         ITerminalDescriptor Create(TData data);
+        ITerminalDescriptor Create(object identity);
 
         IEnumerable<ITerminalDescriptor> Create(IEnumerable<TData> data);
         IEnumerable<ITerminalDescriptor> Create(IEnumerable<object> identities);
