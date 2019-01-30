@@ -135,9 +135,11 @@ namespace DAA.StateManagement
         public virtual async Task BuildCollectionAsync(ICollection<TData> collection)
         {
             var builder = BuilderByCollection[collection];
-            var tasksToBuildItems = collection.Select(builder.DoWorkAsync).ToArray();
 
-            await Task.WhenAll(tasksToBuildItems);
+            foreach (var item in collection)
+            {
+                await builder.DoWorkAsync(item);
+            }
         }
 
         public virtual INonTerminalDescriptor GetDescriptor(ICollection<TData> collection)
