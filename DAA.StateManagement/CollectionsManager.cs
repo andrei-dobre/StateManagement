@@ -87,7 +87,7 @@ namespace DAA.StateManagement
         public virtual void FillCollectionWithData(ICollection<TData> collection, INonTerminalDescriptor descriptor)
         {
             ClearCollection(collection);
-            DataPool.Retrieve(descriptor).ForEach(collection.Add);
+            AppendToCollection(DataPool.Retrieve(descriptor), collection);
         }
 
         public virtual IEnumerable<ICollection<TData>> FindAffectedCollections(INonTerminalDescriptor changedDescriptor)
@@ -105,7 +105,7 @@ namespace DAA.StateManagement
             var descriptor = GetDescriptor(collection);
             var data = DataPool.Retrieve(descriptor);
 
-            collection.Update(data);
+            UpdateCollectionContent(collection, data);
 
             await BuildCollectionAsync(collection);
         }
@@ -119,13 +119,23 @@ namespace DAA.StateManagement
 
         public virtual void ClearCollection(ICollection<TData> collection)
         {
-            collection.RemoveClear();
+            PerformCollectionMutations(() => collection.RemoveClear());
+        }
+
+        public void UpdateCollectionContent(ICollection<TData> collection, IEnumerable<TData> data)
+        {
+            PerformCollectionMutations(() => collection.Update(data));
+        }
+
+        public void AppendToCollection(IEnumerable<TData> data, ICollection<TData> collection)
+        {
+            PerformCollectionMutations(() => data.ForEach(collection.Add));
         }
 
         public virtual async Task BuildCollectionAsync(ICollection<TData> collection)
         {
             var builder = BuilderByCollection[collection];
-            var tasksToBuildItems = collection.Select(builder.DoWorkAsync);
+            var tasksToBuildItems = collection.Select(builder.DoWorkAsync).ToArray();
 
             await Task.WhenAll(tasksToBuildItems);
         }
@@ -143,6 +153,11 @@ namespace DAA.StateManagement
             }
 
             return CollectionsByDescriptor[descriptor];
+        }
+
+        public virtual void PerformCollectionMutations(Action fn)
+        {
+            fn();
         }
     }
 }

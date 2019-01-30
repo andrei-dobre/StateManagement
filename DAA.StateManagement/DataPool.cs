@@ -39,7 +39,7 @@ namespace DAA.StateManagement
 
         public virtual IEnumerable<TData> Retrieve(INonTerminalDescriptor descriptor)
         {
-            return Compositions.Retrieve(descriptor).Select(Retrieve);
+            return Compositions.Retrieve(descriptor).Select(Retrieve).ToArray();
         }
 
         public void Save(ITerminalDescriptor descriptor, TData data)
