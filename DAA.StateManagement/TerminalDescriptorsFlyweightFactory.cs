@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 
 using DAA.StateManagement.Interfaces;
@@ -13,7 +14,7 @@ namespace DAA.StateManagement
 
         public TerminalDescriptorsFlyweightFactory()
         {
-            IntrinsicStateToTerminalDescriptorMap = new Dictionary<object, ITerminalDescriptor>();
+            IntrinsicStateToTerminalDescriptorMap = new ConcurrentDictionary<object, ITerminalDescriptor>();
         }
 
 

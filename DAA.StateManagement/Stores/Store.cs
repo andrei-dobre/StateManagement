@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace DAA.StateManagement.Stores
@@ -10,7 +11,7 @@ namespace DAA.StateManagement.Stores
 
         public Store()
         {
-            KeyToValueMap = new Dictionary<TKey, TValue>();
+            KeyToValueMap = new ConcurrentDictionary<TKey, TValue>();
         }
 
 

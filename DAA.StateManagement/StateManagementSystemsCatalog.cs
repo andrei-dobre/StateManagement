@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using DAA.StateManagement.Interfaces;
 
@@ -11,7 +12,7 @@ namespace DAA.StateManagement
 
         public StateManagementSystemsCatalog()
         {
-            StateManagementSystemsByType = new Dictionary<Type, object>();
+            StateManagementSystemsByType = new ConcurrentDictionary<Type, object>();
         }
 
 

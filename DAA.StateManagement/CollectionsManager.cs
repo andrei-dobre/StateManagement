@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,9 +24,9 @@ namespace DAA.StateManagement
             DataPool = dataPool;
             EventsAggregator = eventsAggregator;
 
-            CollectionsByDescriptor = new Dictionary<INonTerminalDescriptor, ICollection<ICollection<TData>>>();
-            DescriptorByCollection = new Dictionary<ICollection<TData>, INonTerminalDescriptor>();
-            BuilderByCollection = new Dictionary<ICollection<TData>, IDataBuilder<TData>>();
+            CollectionsByDescriptor = new ConcurrentDictionary<INonTerminalDescriptor, ICollection<ICollection<TData>>>();
+            DescriptorByCollection = new ConcurrentDictionary<ICollection<TData>, INonTerminalDescriptor>();
+            BuilderByCollection = new ConcurrentDictionary<ICollection<TData>, IDataBuilder<TData>>();
 
             EventsAggregator.CompositionChangedEvent += WhenCompositionChanged;
         }
