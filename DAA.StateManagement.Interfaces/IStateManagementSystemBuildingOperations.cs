@@ -19,5 +19,7 @@
         void BuildDataRefresher();
 
         void BuildDataRepository();
+
+        void BuildInstancesBuilder();
     }
 }

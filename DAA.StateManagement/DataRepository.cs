@@ -10,30 +10,32 @@ namespace DAA.StateManagement
         public virtual IDataRetriever<TData> DataRetriever { get; }
         public virtual IDataPool<TData> DataPool { get; }
         public virtual ICollectionsManager<TData> CollectionsManager { get; }
+        public virtual IInstancesBuilder<TData> InstancesBuilder { get; }
 
 
-        public DataRepository(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, ICollectionsManager<TData> collectionsManager)
+        public DataRepository(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, ICollectionsManager<TData> collectionsManager, IInstancesBuilder<TData> instancesBuilder)
         {
             DataRetriever = dataRetriever;
             DataPool = dataPool;
             CollectionsManager = collectionsManager;
+            InstancesBuilder = instancesBuilder;
         }
 
 
         public virtual async Task<TData> RetrieveAsync(ITerminalDescriptor descriptor)
         {
             await AcquireMissingData(descriptor);
+            var instance = DataPool.Retrieve(descriptor);
 
-            return DataPool.Retrieve(descriptor);
+            await InstancesBuilder.BuildInstanceAsync(descriptor, instance);
+            return instance;
         }
 
         public async Task<TData> RetrieveAsync(ITerminalDescriptor descriptor, IDataBuilder<TData> builder)
         {
-            var data = await RetrieveAsync(descriptor);
+            InstancesBuilder.EnqueueBuilderForInstance(descriptor, builder);
 
-            await builder.DoWorkAsync(data);
-
-            return data;;
+            return await RetrieveAsync(descriptor);
         }
 
         public async Task FillCollectionAsync(IFillCollectionArgs<TData> args)

@@ -42,6 +42,7 @@
     <Compile Include="IDataRepository.cs" />
     <Compile Include="IDataRetriever.cs" />
     <Compile Include="IDescriptor.cs" />
+    <Compile Include="IInstancesBuilder.cs" />
     <Compile Include="INonTerminalDescriptor.cs" />
     <Compile Include="IFillCollectionArgs.cs" />
     <Compile Include="IStateManagement.cs" />

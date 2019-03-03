@@ -37,6 +37,9 @@ namespace DAA.StateManagement
         private IDataBuilder<IData> DataBuilder => MockedDataBuilder.Object;
         private Mock<IDataBuilder<IData>> MockedDataBuilder { get; set; }
 
+        private IInstancesBuilder<IData> InstancesBuilder => MockedInstancesBuilder.Object;
+        private Mock<IInstancesBuilder<IData>> MockedInstancesBuilder { get; set; }
+
         private DataRepository<IData> TestInstance => MockedTestInstance.Object;
         private Mock<DataRepository<IData>> MockedTestInstance { get; set; }
 
@@ -47,6 +50,7 @@ namespace DAA.StateManagement
             MockedDataRetriever = new Mock<IDataRetriever<IData>>();
             MockedDataPool = new Mock<IDataPool<IData>>();
             MockedCollectionsManager = new Mock<ICollectionsManager<IData>>();
+            MockedInstancesBuilder = new Mock<IInstancesBuilder<IData>>();
 
             MockedData = new Mock<IData>();
             MockedCollection = new Mock<ICollection<IData>>();
@@ -59,7 +63,7 @@ namespace DAA.StateManagement
             MockedFillCollectionArgs.Setup(_ => _.Descriptor).Returns(Descriptor);
             MockedFillCollectionArgs.Setup(_ => _.Collection).Returns(Collection);
 
-            MockedTestInstance = new Mock<DataRepository<IData>>(DataRetriever, DataPool, CollectionsManager);
+            MockedTestInstance = new Mock<DataRepository<IData>>(DataRetriever, DataPool, CollectionsManager, InstancesBuilder);
             MockedTestInstance.CallBase = true;
         }
 
@@ -93,6 +97,24 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
+        public async Task RetrieveAsync__InstanceBuilt()
+        {
+            var awaited = false;
+
+            MockedTestInstance.Setup(_ => _.AcquireMissingData(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(0));
+            MockedInstancesBuilder.Setup(_ => _.BuildInstanceAsync(It.IsAny<ITerminalDescriptor>(), It.IsAny<IData>()))
+                .Returns(Task.Delay(300).ContinueWith(_ => awaited = true));
+            MockedDataPool.Setup(_ => _.Retrieve(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Data);
+
+            await TestInstance.RetrieveAsync(TerminalDescriptor);
+
+            MockedInstancesBuilder.Verify(_ => _.BuildInstanceAsync(TerminalDescriptor, Data));
+            Assert.IsTrue(awaited);
+        }
+
+        [TestMethod]
         public async Task RetrieveAsync__DataRetrievedAfterBeingAcquired()
         {
             var callCounter = 0;
@@ -112,6 +134,17 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
+        public async Task RetrieveAsync_BuilderSpecified_BuilderEnqueued()
+        {
+            MockedTestInstance.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(Data));
+
+            await TestInstance.RetrieveAsync(TerminalDescriptor, DataBuilder);
+
+            MockedInstancesBuilder.Verify(_ => _.EnqueueBuilderForInstance(TerminalDescriptor, DataBuilder));
+        }
+
+        [TestMethod]
         public async Task RetrieveAsync_BuilderSpecified_DataRetrievedAndProvided()
         {
             MockedTestInstance.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
@@ -121,22 +154,6 @@ namespace DAA.StateManagement
 
             Assert.AreSame(result, Data);
             MockedTestInstance.Verify(_ => _.RetrieveAsync(TerminalDescriptor));
-        }
-
-        [TestMethod]
-        public async Task RetrieveAsync_BuilderSpecified_DataBuilt()
-        {
-            var awaited = false;
-
-            MockedTestInstance.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
-                .Returns(Task.FromResult(Data));
-            MockedDataBuilder.Setup(_ => _.DoWorkAsync(It.IsAny<IData>()))
-                .Returns(Task.Delay(10).ContinueWith(_ => awaited = true));
-
-            await TestInstance.RetrieveAsync(TerminalDescriptor, DataBuilder);
-
-            MockedDataBuilder.Verify(_ => _.DoWorkAsync(Data));
-            Assert.IsTrue(awaited);
         }
 
         [TestMethod]

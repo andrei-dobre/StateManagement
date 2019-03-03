@@ -40,6 +40,7 @@
     <Compile Include="DataQualitySupervisor.cs" />
     <Compile Include="DataRepository.cs" />
     <Compile Include="DataRetriever.cs" />
+    <Compile Include="InstancesBuilder.cs" />
     <Compile Include="NullDataBuilder.cs" />
     <Compile Include="FillCollectionArgs.cs" />
     <Compile Include="StateManagement.cs" />

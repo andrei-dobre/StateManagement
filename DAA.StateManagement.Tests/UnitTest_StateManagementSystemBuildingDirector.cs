@@ -53,6 +53,16 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
+        public void Build__InstancesBuilderBuilt()
+        {
+            BuildingInterfaceMock.Setup(_ => _.BuildInstancesBuilder()).Verifiable();
+
+            TestInstance.Build(BuildingInterface);
+
+            BuildingInterfaceMock.Verify();
+        }
+
+        [TestMethod]
         public void Build__DataRetrieverBuiltAfterTerminalDescriptorsFactory()
         {
             var callCounter = 0;
@@ -90,6 +100,21 @@ namespace DAA.StateManagement
 
             BuildingInterfaceMock.Setup(_ => _.BuildTerminalDescriptorsFactory()).Callback(() => ++callCounter);
             BuildingInterfaceMock.Setup(_ => _.BuildDataPool()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
+
+            TestInstance.Build(BuildingInterface);
+
+            BuildingInterfaceMock.Verify();
+            Assert.IsTrue(callOrderFollowed);
+        }
+
+        [TestMethod]
+        public void Build__DataRepositoryBuiltAfterInstancesBuilder()
+        {
+            var callCounter = 0;
+            var callOrderFollowed = false;
+
+            BuildingInterfaceMock.Setup(_ => _.BuildInstancesBuilder()).Callback(() => ++callCounter);
+            BuildingInterfaceMock.Setup(_ => _.BuildDataRepository()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
 
             TestInstance.Build(BuildingInterface);
 
