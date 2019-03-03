@@ -8,6 +8,7 @@ namespace DAA.StateManagement
     {
         public event EventHandler<IDescriptor> DataChangedEvent;
         public event EventHandler<INonTerminalDescriptor> CompositionChangedEvent;
+        public event EventHandler<InstanceChangedEventArgs<TData>> InstanceChangedEvent;
 
 
         public void PublishDataChangedEvent(IDescriptor descriptor)
@@ -18,6 +19,11 @@ namespace DAA.StateManagement
         public void PublishCompositionChangedEvent(INonTerminalDescriptor descriptor)
         {
             CompositionChangedEvent?.Invoke(this, descriptor);
+        }
+
+        public void PublishInstanceChangedEvent(InstanceChangedEventArgs<TData> args)
+        {
+            InstanceChangedEvent?.Invoke(this, args);
         }
     }
 }

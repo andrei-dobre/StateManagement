@@ -325,6 +325,37 @@ namespace DAA.StateManagement
             Assert.IsTrue(publishEventCallNumber >= saveDataCallNumber);
         }
 
+        [TestMethod]
+        public async Task RefreshDataAsync_TerminalDescriptor_InstanceUpdatedEventPublishedAfterSave()
+        {
+            var callCounter = 0;
+            var saveDataCallNumber = 0;
+            var publishEventCallNumber = 0;
+
+            DataRetrieverMock
+                .Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(new Mock<IData>().Object));
+
+            DataPoolMock
+                .Setup(_ => _.Retrieve(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Data);
+
+            DataPoolMock
+                .Setup(_ => _.Save(It.IsAny<ITerminalDescriptor>(), It.IsAny<IData>()))
+                .Callback(() => saveDataCallNumber = ++callCounter);
+
+            EventsAggregatorMock
+                .Setup(_ => _.PublishInstanceChangedEvent(It.Is<InstanceChangedEventArgs<IData>>(__ =>
+                    __.Descriptor == TerminalDescriptor && __.Instance == Data)))
+                .Callback(() => publishEventCallNumber = ++callCounter)
+                .Verifiable();
+
+            await TestInstance.RefreshDataAsync(TerminalDescriptor);
+
+            EventsAggregatorMock.Verify();
+            Assert.IsTrue(publishEventCallNumber >= saveDataCallNumber);
+        }
+
 
         [TestMethod]
         public async Task RefreshDataAsync_NonTerminalDescriptor_CompositionRetrievedAndUpdated()

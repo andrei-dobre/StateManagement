@@ -13,6 +13,12 @@ namespace DAA.StateManagement
         private INonTerminalDescriptor NonTerminalDescriptor => MockedNonTerminalDescriptor.Object;
         private Mock<INonTerminalDescriptor> MockedNonTerminalDescriptor { get; set; }
 
+        private ITerminalDescriptor TerminalDescriptor => MockedTerminalDescriptor.Object;
+        private Mock<ITerminalDescriptor> MockedTerminalDescriptor { get; set; }
+
+        private IData Data => MockedData.Object;
+        private Mock<IData> MockedData { get; set; }
+
         private StateManagementEventsAggregator<IData> TestInstance => MockedTestInstance.Object;
         private Mock<StateManagementEventsAggregator<IData>> MockedTestInstance { get; set; }
 
@@ -21,7 +27,9 @@ namespace DAA.StateManagement
         public void BeforeEach()
         {
             MockedNonTerminalDescriptor = new Mock<INonTerminalDescriptor>();
+            MockedTerminalDescriptor = new Mock<ITerminalDescriptor>();
             MockedDescriptor = new Mock<IDescriptor>();
+            MockedData = new Mock<IData>();
 
             MockedTestInstance = new Mock<StateManagementEventsAggregator<IData>>();
             MockedTestInstance.CallBase = true;
@@ -79,6 +87,38 @@ namespace DAA.StateManagement
             try
             {
                 TestInstance.PublishCompositionChangedEvent(NonTerminalDescriptor);
+            }
+            catch
+            {
+                caught = true;
+            }
+
+            Assert.IsFalse(caught);
+        }
+
+        [TestMethod]
+        public void PublishInstanceChangedEvent__CorrectlyPublished()
+        {
+            var correctlyPublished = false;
+            var givenArgs = new InstanceChangedEventArgs<IData>(TerminalDescriptor, Data);
+
+            TestInstance.InstanceChangedEvent += (sender, args) =>
+                correctlyPublished = sender == TestInstance && args == givenArgs;
+
+            TestInstance.PublishInstanceChangedEvent(givenArgs);
+
+            Assert.IsTrue(correctlyPublished);
+        }
+
+        [TestMethod]
+        public void PublishInstanceChangedEvent_NoSubscribers_NoError()
+        {
+            var caught = false;
+            var args = new InstanceChangedEventArgs<IData>(TerminalDescriptor, Data);
+
+            try
+            {
+                TestInstance.PublishInstanceChangedEvent(args);
             }
             catch
             {

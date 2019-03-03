@@ -44,10 +44,12 @@ namespace DAA.StateManagement
         public virtual async Task RefreshDataAsync(ITerminalDescriptor descriptor)
         {
             var freshData = await DataRetriever.RetrieveAsync(descriptor);
+            var instance = DataPool.Retrieve(descriptor);
 
             DataPool.Save(descriptor, freshData);
 
             EventsAggregator.PublishDataChangedEvent(descriptor);
+            EventsAggregator.PublishInstanceChangedEvent(new InstanceChangedEventArgs<TData>(descriptor, instance));
         }
 
         public virtual async Task RefreshDataAsync(INonTerminalDescriptor descriptor)

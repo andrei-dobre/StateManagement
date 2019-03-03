@@ -97,24 +97,6 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
-        public async Task RetrieveAsync__InstanceBuilt()
-        {
-            var awaited = false;
-
-            MockedTestInstance.Setup(_ => _.AcquireMissingData(It.IsAny<ITerminalDescriptor>()))
-                .Returns(Task.FromResult(0));
-            MockedInstancesBuilder.Setup(_ => _.BuildInstanceAsync(It.IsAny<ITerminalDescriptor>(), It.IsAny<IData>()))
-                .Returns(Task.Delay(300).ContinueWith(_ => awaited = true));
-            MockedDataPool.Setup(_ => _.Retrieve(It.IsAny<ITerminalDescriptor>()))
-                .Returns(Data);
-
-            await TestInstance.RetrieveAsync(TerminalDescriptor);
-
-            MockedInstancesBuilder.Verify(_ => _.BuildInstanceAsync(TerminalDescriptor, Data));
-            Assert.IsTrue(awaited);
-        }
-
-        [TestMethod]
         public async Task RetrieveAsync__DataRetrievedAfterBeingAcquired()
         {
             var callCounter = 0;
@@ -142,6 +124,22 @@ namespace DAA.StateManagement
             await TestInstance.RetrieveAsync(TerminalDescriptor, DataBuilder);
 
             MockedInstancesBuilder.Verify(_ => _.EnqueueBuilderForInstance(TerminalDescriptor, DataBuilder));
+        }
+
+        [TestMethod]
+        public async Task RetrieveAsync_BuilderSpecified_InstanceBuilt()
+        {
+            var awaited = false;
+
+            MockedTestInstance.Setup(_ => _.RetrieveAsync(It.IsAny<ITerminalDescriptor>()))
+                .Returns(Task.FromResult(Data));
+            MockedDataBuilder.Setup(_ => _.DoWorkAsync(It.IsAny<IData>()))
+                .Returns(Task.Delay(300).ContinueWith(_ => awaited = true));
+
+            await TestInstance.RetrieveAsync(TerminalDescriptor, DataBuilder);
+
+            MockedDataBuilder.Verify(_ => _.DoWorkAsync(Data));
+            Assert.IsTrue(awaited);
         }
 
         [TestMethod]

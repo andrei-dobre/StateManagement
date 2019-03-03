@@ -9,14 +9,19 @@ namespace DAA.StateManagement
     {
         private IDictionary<ITerminalDescriptor, ICollection<IDataBuilder<TData>>> BuildersByDescriptor { get; }
 
+        protected IStateManagementEventsAggregator<TData> EventsAggregator { get; }
 
-        public InstancesBuilder()
+
+        public InstancesBuilder(IStateManagementEventsAggregator<TData> eventsAggregator)
         {
+            EventsAggregator = eventsAggregator;
+            EventsAggregator.InstanceChangedEvent += WhenInstanceChanged;
+
             BuildersByDescriptor = new Dictionary<ITerminalDescriptor, ICollection<IDataBuilder<TData>>>();
         }
 
 
-        public async Task BuildInstanceAsync(ITerminalDescriptor descriptor, TData instance)
+        public virtual async Task BuildInstanceAsync(ITerminalDescriptor descriptor, TData instance)
         {
             if (BuildersByDescriptor.ContainsKey(descriptor))
             {
@@ -35,6 +40,11 @@ namespace DAA.StateManagement
             }
 
             BuildersByDescriptor[descriptor].Add(builder);
+        }
+
+        public void WhenInstanceChanged(object sender, InstanceChangedEventArgs<TData> args)
+        {
+            BuildInstanceAsync(args.Descriptor, args.Instance).ContinueWith(_ => { });
         }
     }
 }

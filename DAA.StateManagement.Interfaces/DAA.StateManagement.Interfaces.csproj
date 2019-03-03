@@ -45,6 +45,7 @@
     <Compile Include="IInstancesBuilder.cs" />
     <Compile Include="INonTerminalDescriptor.cs" />
     <Compile Include="IFillCollectionArgs.cs" />
+    <Compile Include="InstanceUpdatedEventArgs.cs" />
     <Compile Include="IStateManagement.cs" />
     <Compile Include="IStateManagementEventsAggregator.cs" />
     <Compile Include="IDataRefresher.cs" />

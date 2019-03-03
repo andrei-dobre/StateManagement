@@ -25,17 +25,18 @@ namespace DAA.StateManagement
         public virtual async Task<TData> RetrieveAsync(ITerminalDescriptor descriptor)
         {
             await AcquireMissingData(descriptor);
-            var instance = DataPool.Retrieve(descriptor);
 
-            await InstancesBuilder.BuildInstanceAsync(descriptor, instance);
-            return instance;
+            return DataPool.Retrieve(descriptor);
         }
 
         public async Task<TData> RetrieveAsync(ITerminalDescriptor descriptor, IDataBuilder<TData> builder)
         {
-            InstancesBuilder.EnqueueBuilderForInstance(descriptor, builder);
+            var instance = await RetrieveAsync(descriptor);
 
-            return await RetrieveAsync(descriptor);
+            InstancesBuilder.EnqueueBuilderForInstance(descriptor, builder);
+            await builder.DoWorkAsync(instance);
+
+            return instance;
         }
 
         public async Task FillCollectionAsync(IFillCollectionArgs<TData> args)

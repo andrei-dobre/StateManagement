@@ -53,13 +53,18 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
-        public void Build__InstancesBuilderBuilt()
+        public void Build__InstancesBuilderBuiltAfterEventsAggregator()
         {
-            BuildingInterfaceMock.Setup(_ => _.BuildInstancesBuilder()).Verifiable();
+            var callCounter = 0;
+            var callOrderFollowed = false;
+
+            BuildingInterfaceMock.Setup(_ => _.BuildEventsAggregator()).Callback(() => ++callCounter);
+            BuildingInterfaceMock.Setup(_ => _.BuildInstancesBuilder()).Callback(() => callOrderFollowed = callCounter > 0).Verifiable();
 
             TestInstance.Build(BuildingInterface);
 
             BuildingInterfaceMock.Verify();
+            Assert.IsTrue(callOrderFollowed);
         }
 
         [TestMethod]

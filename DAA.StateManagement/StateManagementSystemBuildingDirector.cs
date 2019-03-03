@@ -9,6 +9,7 @@ namespace DAA.StateManagement
             builder.BuildEventsAggregator();
             builder.BuildTerminalDescriptorsFactory();
             builder.BuildDataManipulator();
+
             builder.BuildInstancesBuilder();
 
             builder.BuildDataRetriever();

@@ -8,13 +8,20 @@ namespace DAA.StateManagement
     [TestClass]
     public class UnitTest_InstancesBuilder
     {
-        private InstancesBuilder<IData> TestInstance { get; set; }
+        private IStateManagementEventsAggregator<IData> EventsAggregator => MockEventsAggregator.Object;
+        private Mock<IStateManagementEventsAggregator<IData>> MockEventsAggregator { get; set; }
+
+        private InstancesBuilder<IData> TestInstance => MockedTestInstance.Object;
+        private Mock<InstancesBuilder<IData>> MockedTestInstance { get; set; }
 
 
         [TestInitialize]
         public void BeforeEach()
         {
-            TestInstance = new InstancesBuilder<IData>();
+            MockEventsAggregator = new Mock<IStateManagementEventsAggregator<IData>>();
+
+            MockedTestInstance = new Mock<InstancesBuilder<IData>>(EventsAggregator);
+            MockedTestInstance.CallBase = true;
         }
 
 
@@ -94,6 +101,21 @@ namespace DAA.StateManagement
             }
 
             Assert.IsFalse(caught);
+        }
+
+        [TestMethod]
+        public void WhenInstanceChanged__InstanceBuilt()
+        {
+            var terminalDescriptor = new Mock<ITerminalDescriptor>().Object;
+            var data = new Mock<IData>().Object;
+            var args = new InstanceChangedEventArgs<IData>(terminalDescriptor, data);
+
+            MockedTestInstance.Setup(_ => _.BuildInstanceAsync(It.IsAny<ITerminalDescriptor>(), It.IsAny<IData>()))
+                .Returns(Task.FromResult(0));
+
+            TestInstance.WhenInstanceChanged(new object(), args);
+
+            MockedTestInstance.Verify(_ => _.BuildInstanceAsync(terminalDescriptor, data));
         }
 
         private ITerminalDescriptor CreateDescriptor()
