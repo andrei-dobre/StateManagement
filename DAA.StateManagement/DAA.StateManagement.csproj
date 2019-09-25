@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DAA.Helpers">
-      <HintPath>..\..\soundservice5\Libraries\DAA.Helpers.dll</HintPath>
+      <HintPath>..\Libraries\DAA.Helpers.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
