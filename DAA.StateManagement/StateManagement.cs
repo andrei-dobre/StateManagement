@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DAA.StateManagement.Interfaces;
 
@@ -33,22 +32,23 @@ namespace DAA.StateManagement
         public async Task FillCollectionAsync<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor) 
             where TData : IData
         {
-            if (!IsCollectionRegisteredWithDescriptor(collection, descriptor))
-            {
-                await GetRepository<TData>().FillCollectionAsync(new FillCollectionArgs<TData>(collection, descriptor));
-            }
+            var avoidClearingPopulatedCollection = IsCollectionRegisteredWithDescriptor(collection, descriptor) && collection.Count != 0;
+            if (avoidClearingPopulatedCollection) return;
+
+            await GetRepository<TData>().FillCollectionAsync(new FillCollectionArgs<TData>(collection, descriptor));
         }
 
         public async Task FillCollectionAsync<TData>(ICollection<TData> collection, INonTerminalDescriptor descriptor, IDataBuilder<TData> builder)
             where TData : IData
         {
-            if (!IsCollectionRegisteredWithDescriptor(collection, descriptor))
+            var avoidClearingPopulatedCollection = IsCollectionRegisteredWithDescriptor(collection, descriptor) && collection.Count != 0;
+            if (avoidClearingPopulatedCollection)
             {
-                await GetRepository<TData>().FillCollectionAsync(new FillCollectionArgs<TData>(collection, descriptor, builder));
+                await GetRepository<TData>().ChangeBuilderAsync(collection, builder);
             }
             else
             {
-                await GetRepository<TData>().ChangeBuilderAsync(collection, builder);
+                await GetRepository<TData>().FillCollectionAsync(new FillCollectionArgs<TData>(collection, descriptor, builder));
             }
         }
 

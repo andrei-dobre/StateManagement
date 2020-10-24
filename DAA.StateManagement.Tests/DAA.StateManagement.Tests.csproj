@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DAA.StateManagement</RootNamespace>
     <AssemblyName>DAA.StateManagement.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
@@ -19,6 +19,7 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -85,11 +86,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DAA.StateManagement.Interfaces\DAA.StateManagement.Interfaces.csproj">
-      <Project>{041352f0-ec8b-488f-9239-9ee83bfba1e3}</Project>
+      <Project>{6026391f-ba2a-4549-82e4-a9194c009173}</Project>
       <Name>DAA.StateManagement.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\DAA.StateManagement\DAA.StateManagement.csproj">
-      <Project>{cd6b5d85-d3d0-4787-9d90-a8902b57174c}</Project>
+      <Project>{970698e9-460c-4fcb-9976-4864480ab3a2}</Project>
       <Name>DAA.StateManagement</Name>
     </ProjectReference>
   </ItemGroup>

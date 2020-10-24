@@ -1,61 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{041352F0-EC8B-488F-9239-9EE83BFBA1E3}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DAA.StateManagement.Interfaces</RootNamespace>
-    <AssemblyName>DAA.StateManagement.Interfaces</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageVersion>1.0.1</PackageVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ICollectionsManager.cs" />
-    <Compile Include="IData.cs" />
-    <Compile Include="IDataBuilder.cs" />
-    <Compile Include="IDataManipulator.cs" />
-    <Compile Include="IDataPool.cs" />
-    <Compile Include="IDataQualitySupervisor.cs" />
-    <Compile Include="IDataRepository.cs" />
-    <Compile Include="IDataRetriever.cs" />
-    <Compile Include="IDescriptor.cs" />
-    <Compile Include="IInstancesBuilder.cs" />
-    <Compile Include="INonTerminalDescriptor.cs" />
-    <Compile Include="IFillCollectionArgs.cs" />
-    <Compile Include="InstanceUpdatedEventArgs.cs" />
-    <Compile Include="IStateManagement.cs" />
-    <Compile Include="IStateManagementEventsAggregator.cs" />
-    <Compile Include="IDataRefresher.cs" />
-    <Compile Include="IStateManagementSystem.cs" />
-    <Compile Include="IStateManagementSystemBuilder.cs" />
-    <Compile Include="IStateManagementSystemBuildingOperations.cs" />
-    <Compile Include="IStateManagementSystemsCatalog.cs" />
-    <Compile Include="ITerminalDescriptor.cs" />
-    <Compile Include="ITerminalDescriptorsFactory.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>
