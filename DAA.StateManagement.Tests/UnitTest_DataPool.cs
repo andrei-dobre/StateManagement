@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DAA.Helpers;
 using DAA.StateManagement.Interfaces;
 using DAA.StateManagement.Stores;
@@ -27,8 +28,14 @@ namespace DAA.StateManagement
         private IData Data => DataMock.Object;
         private Mock<IData> DataMock { get; set; }
 
+        private IInstanceRetrievalContext<IData> InstanceRetrievalContext => InstanceRetrievalContextMock.Object;
+        private Mock<IInstanceRetrievalContext<IData>> InstanceRetrievalContextMock { get; set; }
+
         private IEnumerable<IData> DataCollection => DataCollectionMock.Object;
         private Mock<IEnumerable<IData>> DataCollectionMock { get; set; }
+
+        private ICollectionRetrievalContext<IData> CollectionRetrievalContext => CollectionRetrievalContextMocked.Object;
+        private Mock<ICollectionRetrievalContext<IData>> CollectionRetrievalContextMocked { get; set; }
 
         private ITerminalDescriptor TerminalDescriptor => TerminalDescriptorMock.Object;
         private Mock<ITerminalDescriptor> TerminalDescriptorMock { get; set; }
@@ -56,6 +63,16 @@ namespace DAA.StateManagement
             TerminalDescriptorMock = new Mock<ITerminalDescriptor>();
             NonTerminalDescriptorMock = new Mock<INonTerminalDescriptor>();
             TerminalDescriptorsCollectionMock = new Mock<IEnumerable<ITerminalDescriptor>>();
+
+            InstanceRetrievalContextMock = new Mock<IInstanceRetrievalContext<IData>>();
+            InstanceRetrievalContextMock
+                .Setup(x => x.Data)
+                .Returns(Data);
+
+            CollectionRetrievalContextMocked = new Mock<ICollectionRetrievalContext<IData>>();
+            CollectionRetrievalContextMocked
+                .Setup(x => x.Data)
+                .Returns(DataCollection);
 
             TestInstanceMock = new Mock<DataPool<IData>>(TerminalDescriptorsFactory, DataManipulator);
             TestInstanceMock.CallBase = true;
@@ -115,49 +132,6 @@ namespace DAA.StateManagement
             var result = ReflectionHelper.Invoke(dataStore, "DataManipulator");
 
             Assert.AreSame(DataManipulator, result);
-        }
-
-
-        [TestMethod]
-        public void Save_TerminalDescriptor_DataSaved()
-        {
-            TestInstance.Save(TerminalDescriptor, Data);
-
-            DataStoreMock.Verify(_ => _.Save(TerminalDescriptor, Data));
-        }
-
-
-        [TestMethod]
-        public void Save_NonTerminalDescriptor_DataSaved()
-        {
-            TestInstanceMockProtected.Setup("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>());
-
-            TestInstance.Save(NonTerminalDescriptor, DataCollection);
-
-            TestInstanceMockProtected.Verify("DescribeAndSave", Times.Once(), DataCollection);
-        }
-
-        [TestMethod]
-        public void Save_NonTerminalDescriptor_CompositionUpdated()
-        {
-            TestInstanceMockProtected
-                .Setup<IEnumerable<ITerminalDescriptor>>("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>())
-                .Returns(TerminalDescriptorsCollection);
-
-            TestInstance.Save(NonTerminalDescriptor, DataCollection);
-
-            CompositionsMock.Verify(_ => _.Save(NonTerminalDescriptor, TerminalDescriptorsCollection), Times.Once());
-        }
-
-
-        [TestMethod]
-        public void Save_DataCollection_DataDescribedSaved()
-        {
-            TestInstanceMockProtected.Setup("DescribeAndSave", ItExpr.IsAny<IEnumerable<IData>>());
-
-            TestInstance.Save(DataCollection);
-
-            TestInstanceMockProtected.Verify("DescribeAndSave", Times.Once(), DataCollection);
         }
 
 
@@ -257,42 +231,7 @@ namespace DAA.StateManagement
 
             Assert.IsTrue(data.Equivalent(result));
         }
-
-
-        [TestMethod]
-        public void DescribeAndSave__CreatesTerminalDescriptorsAndSavesData_TerminalDescriptorsReturned()
-        {
-            var dataMocks = ArraysHelper.CreateWithContent(new Mock<IData>(), new Mock<IData>(), new Mock<IData>());
-            var data = dataMocks.Select(_ => _.Object);
-            var terminalDescriptors = new ITerminalDescriptor[dataMocks.Length];
-
-            for (var i = 0; i < dataMocks.Length; ++i)
-            {
-                var dataMock = dataMocks[i];
-                var dataItem = dataMock.Object;
-                var terminalDescriptor = new Mock<ITerminalDescriptor>().Object;
-
-                terminalDescriptors[i] = terminalDescriptor;
-
-                TerminalDescriptorsFactoryMock
-                    .Setup<ITerminalDescriptor>(_ => _.Create(dataItem))
-                    .Returns(terminalDescriptor)
-                    .Verifiable();
-
-                DataStoreMock
-                    .Setup(_ => _.Save(terminalDescriptor, dataMock.Object))
-                    .Verifiable();
-            }
-
-            var result = ReflectionHelper.Invoke(TestInstance, "DescribeAndSave", data)
-                            as IEnumerable<ITerminalDescriptor>;
-
-            TerminalDescriptorsFactoryMock.Verify();
-            DataStoreMock.Verify();
-            Assert.IsTrue(terminalDescriptors.Equivalent(result));
-        }
-
-
+        
         [TestMethod]
         public void UpdateCompositionAndProvideAdditions__ProxiesNonTerminalDescriptorCompositionsStore()
         {

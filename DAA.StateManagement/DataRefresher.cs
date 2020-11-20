@@ -46,7 +46,7 @@ namespace DAA.StateManagement
             var freshData = await DataRetriever.RetrieveAsync(descriptor);
             var instance = DataPool.Retrieve(descriptor);
 
-            DataPool.Save(descriptor, freshData);
+            await DataPool.SaveAsync(descriptor, freshData);
 
             EventsAggregator.PublishDataChangedEvent(descriptor);
             EventsAggregator.PublishInstanceChangedEvent(new InstanceChangedEventArgs<TData>(descriptor, instance));
@@ -74,7 +74,7 @@ namespace DAA.StateManagement
             var additionsDescriptors = DataPool.UpdateCompositionAndProvideAdditions(descriptor, freshComposition);
             var additions = await DataRetriever.RetrieveAsync(additionsDescriptors);
 
-            DataPool.Save(additions);
+            await DataPool.SaveAsync(additions);
         }
     }
 }

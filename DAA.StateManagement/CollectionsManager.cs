@@ -13,7 +13,6 @@ namespace DAA.StateManagement
     {
         private IDataPool<TData> DataPool { get; }
         private IStateManagementEventsAggregator<TData> EventsAggregator { get; }
-
         private IDictionary<INonTerminalDescriptor, ICollection<ICollection<TData>>> CollectionsByDescriptor { get; }
         private IDictionary<ICollection<TData>, INonTerminalDescriptor> DescriptorByCollection { get; }
         private IDictionary<ICollection<TData>, IDataBuilder<TData>> BuilderByCollection { get; }

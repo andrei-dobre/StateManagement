@@ -96,7 +96,7 @@ namespace DAA.StateManagement
         }
 
         [TestMethod]
-        public async Task FillCollectionAsync__CollectionBuilt()
+        public async Task FillCollectionAsync_KeepSyncedSpecified_CollectionBuiltUsingRegisteredBuilder()
         {
             var awaited = false;
 

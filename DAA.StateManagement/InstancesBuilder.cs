@@ -7,11 +7,6 @@ namespace DAA.StateManagement
     public class InstancesBuilder<TData> : IInstancesBuilder<TData>
         where TData : IData
     {
-        private IDictionary<ITerminalDescriptor, ICollection<IDataBuilder<TData>>> BuildersByDescriptor { get; }
-
-        protected IStateManagementEventsAggregator<TData> EventsAggregator { get; }
-
-
         public InstancesBuilder(IStateManagementEventsAggregator<TData> eventsAggregator)
         {
             EventsAggregator = eventsAggregator;
@@ -20,6 +15,9 @@ namespace DAA.StateManagement
             BuildersByDescriptor = new Dictionary<ITerminalDescriptor, ICollection<IDataBuilder<TData>>>();
         }
 
+        private IDictionary<ITerminalDescriptor, ICollection<IDataBuilder<TData>>> BuildersByDescriptor { get; }
+
+        protected IStateManagementEventsAggregator<TData> EventsAggregator { get; }
 
         public virtual async Task BuildInstanceAsync(ITerminalDescriptor descriptor, TData instance)
         {

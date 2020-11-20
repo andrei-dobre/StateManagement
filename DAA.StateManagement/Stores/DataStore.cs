@@ -7,12 +7,10 @@ namespace DAA.StateManagement.Stores
     {
         protected IDataManipulator<TData> DataManipulator { get; }
 
-
         public DataStore(IDataManipulator<TData> dataManipulator)
         {
             DataManipulator = dataManipulator;
         }
-
 
         public override void Update(ITerminalDescriptor descriptor, TData data)
         {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DAA.StateManagement.Interfaces;
 using DAA.StateManagement.Stores;
 
@@ -8,11 +9,6 @@ namespace DAA.StateManagement
     public class DataPool<TData> : IDataPool<TData>
         where TData : IData
     {
-        protected virtual DataStore<TData> Data { get;  }
-        protected virtual CompositionsStore Compositions { get; }
-        protected virtual ITerminalDescriptorsFactory<TData> TerminalDescriptorsFactory { get; }
-
-
         public DataPool(ITerminalDescriptorsFactory<TData> terminalDescriptorsFactory, IDataManipulator<TData> dataManipulator)
         {
             TerminalDescriptorsFactory = terminalDescriptorsFactory;
@@ -21,6 +17,11 @@ namespace DAA.StateManagement
             Compositions = new CompositionsStore();
         }
 
+        protected virtual DataStore<TData> Data { get;  }
+
+        protected virtual CompositionsStore Compositions { get; }
+
+        protected virtual ITerminalDescriptorsFactory<TData> TerminalDescriptorsFactory { get; }
 
         public bool Contains(ITerminalDescriptor descriptor)
         {
@@ -42,21 +43,23 @@ namespace DAA.StateManagement
             return Compositions.Retrieve(descriptor).Select(Retrieve).ToArray();
         }
 
-        public void Save(ITerminalDescriptor descriptor, TData data)
+        public async Task SaveAsync(ITerminalDescriptor descriptor, IInstanceRetrievalContext<TData> retrievalContext)
         {
-            Data.Save(descriptor, data);
+            var isExistingInstance = !Data.Add(descriptor, retrievalContext.Data);
+
+            await retrievalContext.CompleteReconstitutionAsync();
+
+            if (isExistingInstance) Data.Update(descriptor, retrievalContext.Data);
         }
 
-        public void Save(INonTerminalDescriptor descriptor, IEnumerable<TData> data)
+        public async Task SaveAsync(INonTerminalDescriptor descriptor, ICollectionRetrievalContext<TData> retrievalContext)
         {
-            var composition = DescribeAndSave(data);
-
-            Compositions.Save(descriptor, composition);
+            Compositions.Save(descriptor, await DescribeAndSaveAsync(retrievalContext));
         }
 
-        public void Save(IEnumerable<TData> data)
+        public async Task SaveAsync(ICollectionRetrievalContext<TData> retrievalContext)
         {
-            DescribeAndSave(data);
+            await DescribeAndSaveAsync(retrievalContext);
         }
 
         public IEnumerable<IDescriptor> FindIntersectingDescriptors(IDescriptor descriptor)
@@ -69,6 +72,33 @@ namespace DAA.StateManagement
             return Compositions.UpdateAndProvideAdditions(descriptor, composition);
         }
 
+        protected virtual async Task<IEnumerable<ITerminalDescriptor>> DescribeAndSaveAsync(ICollectionRetrievalContext<TData> retrievalContext)
+        {
+            var composition = new List<ITerminalDescriptor>();
+            var existingInstances = new List<TData>();
+
+            foreach (var data in retrievalContext.Data)
+            {
+                var terminalDescriptor = TerminalDescriptorsFactory.Create(data);
+                var isExistingInstance = !Data.Add(terminalDescriptor, data);
+                if (isExistingInstance)
+                {
+                    existingInstances.Add(data);
+                }
+
+                composition.Add(terminalDescriptor);
+            }
+
+            await retrievalContext.CompleteReconstitutionAsync();
+
+            foreach (var existingInstance in existingInstances)
+            {
+                Data.Update(TerminalDescriptorsFactory.Create(existingInstance), existingInstance);
+            }
+
+            return composition;
+        }
+
         private ITerminalDescriptor DescribeAndSave(TData data)
         {
             var descriptor = TerminalDescriptorsFactory.Create(data);
@@ -76,11 +106,6 @@ namespace DAA.StateManagement
             Data.Save(descriptor, data);
 
             return descriptor;
-        }
-
-        protected virtual IEnumerable<ITerminalDescriptor> DescribeAndSave(IEnumerable<TData> data)
-        {
-            return data.Select(DescribeAndSave).ToArray();
         }
 
         protected virtual IEnumerable<IDescriptor> RetrieveAllDescriptors()

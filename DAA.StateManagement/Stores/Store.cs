@@ -51,7 +51,24 @@ namespace DAA.StateManagement.Stores
 
             Set(key, value);
         }
-        
+
+        public virtual bool Add(TKey key, TValue value)
+        {
+            if (null == value)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            if (Contains(key))
+            {
+                return false;
+            }
+
+            Set(key, value);
+
+            return true;
+        }
+
         public abstract void Update(TKey key, TValue value);
 
         public virtual IEnumerable<TKey> RetrieveKeys()

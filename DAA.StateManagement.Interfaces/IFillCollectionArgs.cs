@@ -6,7 +6,9 @@ namespace DAA.StateManagement.Interfaces
         where TData : IData
     {
         INonTerminalDescriptor Descriptor { get; }
+        
         IDataBuilder<TData> Builder { get; }
+        
         ICollection<TData> Collection { get; }
     }
 }

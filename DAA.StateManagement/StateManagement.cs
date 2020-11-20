@@ -6,16 +6,15 @@ namespace DAA.StateManagement
 {
     public class StateManagement : IStateManagement
     {
-        public virtual IStateManagementSystemsCatalog StateManagementSystemsCatalog { get; }
-        public virtual StateManagementSystemBuildingDirector SystemBuildingDirector { get; }
-
-
         public StateManagement()
         {
             StateManagementSystemsCatalog = new StateManagementSystemsCatalog();
             SystemBuildingDirector = new StateManagementSystemBuildingDirector();
         }
 
+        public virtual IStateManagementSystemsCatalog StateManagementSystemsCatalog { get; }
+
+        public virtual StateManagementSystemBuildingDirector SystemBuildingDirector { get; }
 
         public async Task<TData> RetrieveAsync<TData>(ITerminalDescriptor descriptor) 
             where TData : IData
@@ -25,6 +24,16 @@ namespace DAA.StateManagement
 
         public async Task<TData> RetrieveAsync<TData>(ITerminalDescriptor descriptor, IDataBuilder<TData> builder)
             where TData : IData
+        {
+            return await GetRepository<TData>().RetrieveAsync(descriptor, builder);
+        }
+
+        public async Task<IEnumerable<TData>> RetrieveAsync<TData>(INonTerminalDescriptor descriptor) where TData : IData
+        {
+            return await GetRepository<TData>().RetrieveAsync(descriptor);
+        }
+
+        public async Task<IEnumerable<TData>> RetrieveAsync<TData>(INonTerminalDescriptor descriptor, IDataBuilder<TData> builder) where TData : IData
         {
             return await GetRepository<TData>().RetrieveAsync(descriptor, builder);
         }
