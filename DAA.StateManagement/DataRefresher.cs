@@ -9,11 +9,6 @@ namespace DAA.StateManagement
     public class DataRefresher<TData> : IDataRefresher<TData>
         where TData: IData
     {
-        protected virtual IStateManagementEventsAggregator<TData> EventsAggregator { get; }
-        protected virtual IDataRetriever<TData> DataRetriever { get; }
-        protected virtual IDataPool<TData> DataPool { get; }
-
-
         public DataRefresher(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, IStateManagementEventsAggregator<TData> eventsAggregator)
         {
             EventsAggregator = eventsAggregator;
@@ -21,12 +16,46 @@ namespace DAA.StateManagement
             DataPool = dataPool;
         }
 
+        protected virtual IStateManagementEventsAggregator<TData> EventsAggregator { get; }
+
+        protected virtual IDataRetriever<TData> DataRetriever { get; }
+
+        protected virtual IDataPool<TData> DataPool { get; }
+
+        public async Task RefreshAsync(IEnumerable<IDescriptor> descriptors)
+        {
+            var intersectingDescriptors =
+                new HashSet<IDescriptor>(descriptors.SelectMany(a => DataPool.FindIntersectingDescriptors(a)));
+            var refreshRetrievalContext = await DataRetriever.RefreshAsync(intersectingDescriptors);
+            
+            foreach (var descriptor in intersectingDescriptors)
+            {
+                if (descriptor is ITerminalDescriptor terminalDescriptor)
+                {
+                    await RefreshDataAsync(terminalDescriptor,
+                        refreshRetrievalContext.GetResult(terminalDescriptor));
+                }
+                
+                if (descriptor is INonTerminalDescriptor nonTerminalDescriptor)
+                {
+                    await RefreshDataAsync(nonTerminalDescriptor,
+                        refreshRetrievalContext.GetResult(nonTerminalDescriptor));
+                }
+            }
+        }
 
         public virtual async Task RefreshAsync(IDescriptor descriptor)
         {
             var intersectingDescriptors = DataPool.FindIntersectingDescriptors(descriptor);
 
             await RefreshDataAsync(intersectingDescriptors);
+        }
+
+        public virtual async Task RefreshDataAsync(IEnumerable<IDescriptor> descriptors)
+        {
+            var tasksToRefreshDescriptors = descriptors.Select(RefreshDataAsync).ToArray();
+
+            await Task.WhenAll(tasksToRefreshDescriptors);
         }
 
         public virtual async Task RefreshDataAsync(IDescriptor descriptor)
@@ -43,7 +72,11 @@ namespace DAA.StateManagement
 
         public virtual async Task RefreshDataAsync(ITerminalDescriptor descriptor)
         {
-            var freshData = await DataRetriever.RetrieveAsync(descriptor);
+            await RefreshDataAsync(descriptor, await DataRetriever.RetrieveAsync(descriptor));
+        }
+
+        private async Task RefreshDataAsync(ITerminalDescriptor descriptor, IInstanceRetrievalContext<TData> freshData)
+        {
             var instance = DataPool.Retrieve(descriptor);
 
             await DataPool.SaveAsync(descriptor, freshData);
@@ -54,19 +87,15 @@ namespace DAA.StateManagement
 
         public virtual async Task RefreshDataAsync(INonTerminalDescriptor descriptor)
         {
-            var freshComposition = await DataRetriever.RetrieveCompositionAsync(descriptor);
+            await RefreshDataAsync(descriptor, await DataRetriever.RetrieveCompositionAsync(descriptor));
+        }
 
+        private async Task RefreshDataAsync(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> freshComposition)
+        {
             await UpdateCompositionAndAcquireAdditionsAsync(descriptor, freshComposition);
 
             EventsAggregator.PublishDataChangedEvent(descriptor);
             EventsAggregator.PublishCompositionChangedEvent(descriptor);
-        }
-
-        public virtual async Task RefreshDataAsync(IEnumerable<IDescriptor> descriptors)
-        {
-            var tasksToRefreshDescriptors = descriptors.Select(RefreshDataAsync).ToArray();
-
-            await Task.WhenAll(tasksToRefreshDescriptors);
         }
 
         protected virtual async Task UpdateCompositionAndAcquireAdditionsAsync(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> freshComposition)

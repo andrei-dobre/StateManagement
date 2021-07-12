@@ -14,6 +14,8 @@ namespace DAA.StateManagement
 
         protected ITerminalDescriptorsFactory<TData> TerminalDescriptorsFactory { get; }
 
+        public abstract Task<IRefreshRetrievalContext<TData>> RefreshAsync(IEnumerable<IDescriptor> descriptors);
+        
         public abstract Task<IInstanceRetrievalContext<TData>> RetrieveAsync(ITerminalDescriptor descriptor);
         
         public abstract Task<ICollectionRetrievalContext<TData>> RetrieveAsync(IEnumerable<ITerminalDescriptor> descriptors);
