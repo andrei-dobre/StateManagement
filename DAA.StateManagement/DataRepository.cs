@@ -103,14 +103,23 @@ namespace DAA.StateManagement
                 return;
             }
 
+            var semaphoreReleased = false;
+            void ReleaseSemaphore()
+            {
+                if (semaphoreReleased) return;
+                
+                semaphore.Release();
+                semaphoreReleased = true;
+            }
+            
             try
             {
                 await DataPool.SaveAsync(descriptor, 
-                    await DataRetriever.RetrieveAsync(descriptor), () => semaphore.Release());
+                    await DataRetriever.RetrieveAsync(descriptor), ReleaseSemaphore);
             }
             finally
             {
-                semaphore.Release();
+                ReleaseSemaphore();
             }
         }
 
@@ -125,14 +134,23 @@ namespace DAA.StateManagement
                 return;
             }
 
+            var semaphoreReleased = false;
+            void ReleaseSemaphore()
+            {
+                if (semaphoreReleased) return;
+                
+                semaphore.Release();
+                semaphoreReleased = true;
+            }
+
             try
             {
                 await DataPool.SaveAsync(descriptor, 
-                    await DataRetriever.RetrieveAsync(descriptor), () => semaphore.Release());
+                    await DataRetriever.RetrieveAsync(descriptor), ReleaseSemaphore);
             }
             finally
             {
-                    semaphore.Release();   
+                ReleaseSemaphore();
             }
         }
     }
