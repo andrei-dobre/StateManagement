@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using DAA.StateManagement.Interfaces;
@@ -94,7 +95,7 @@ namespace DAA.StateManagement
 
         public virtual async Task Acquire(ITerminalDescriptor descriptor)
         {
-            var semaphore = _semaphoreByBucketNo[descriptor.GetHashCode() % 100];
+            var semaphore = _semaphoreByBucketNo[Math.Abs(descriptor.GetHashCode() % 100)];
             await semaphore.WaitAsync();
             
             if (DataPool.Contains(descriptor))
@@ -125,7 +126,7 @@ namespace DAA.StateManagement
 
         public virtual async Task Acquire(INonTerminalDescriptor descriptor)
         {
-            var semaphore = _semaphoreByBucketNo[descriptor.GetHashCode() % 100];
+            var semaphore = _semaphoreByBucketNo[Math.Abs(descriptor.GetHashCode() % 100)];
             await semaphore.WaitAsync();
             
             if (DataPool.Contains(descriptor))
