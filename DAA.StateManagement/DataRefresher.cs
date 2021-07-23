@@ -24,8 +24,9 @@ namespace DAA.StateManagement
 
         public async Task RefreshAsync(IEnumerable<IDescriptor> descriptors)
         {
-            var intersectingDescriptors =
-                new HashSet<IDescriptor>(descriptors.SelectMany(a => DataPool.FindIntersectingDescriptors(a)));
+            var intersectingDescriptors = new HashSet<IDescriptor>(descriptors.SelectMany(a => DataPool.FindIntersectingDescriptors(a)));
+            if (intersectingDescriptors.Count == 0) return;
+            
             var refreshRetrievalContext = await DataRetriever.RefreshAsync(intersectingDescriptors);
             
             foreach (var descriptor in intersectingDescriptors)

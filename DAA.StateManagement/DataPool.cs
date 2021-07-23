@@ -75,15 +75,16 @@ namespace DAA.StateManagement
         protected virtual async Task<IEnumerable<ITerminalDescriptor>> DescribeAndSaveAsync(ICollectionRetrievalContext<TData> retrievalContext)
         {
             var composition = new List<ITerminalDescriptor>();
-            var existingInstances = new List<TData>();
+            var existingInstancesByDescriptor = new Dictionary<ITerminalDescriptor, TData>();
 
             foreach (var data in retrievalContext.Data)
             {
                 var terminalDescriptor = TerminalDescriptorsFactory.Create(data);
+                
                 var isExistingInstance = !Data.Add(terminalDescriptor, data);
                 if (isExistingInstance)
                 {
-                    existingInstances.Add(data);
+                    existingInstancesByDescriptor[terminalDescriptor] = data;
                 }
 
                 composition.Add(terminalDescriptor);
@@ -91,21 +92,12 @@ namespace DAA.StateManagement
 
             await retrievalContext.CompleteReconstitutionAsync();
 
-            foreach (var existingInstance in existingInstances)
+            foreach (var existingInstanceByDescriptor in existingInstancesByDescriptor)
             {
-                Data.Update(TerminalDescriptorsFactory.Create(existingInstance), existingInstance);
+                Data.Update(existingInstanceByDescriptor.Key, existingInstanceByDescriptor.Value);
             }
 
             return composition;
-        }
-
-        private ITerminalDescriptor DescribeAndSave(TData data)
-        {
-            var descriptor = TerminalDescriptorsFactory.Create(data);
-
-            Data.Save(descriptor, data);
-
-            return descriptor;
         }
 
         protected virtual IEnumerable<IDescriptor> RetrieveAllDescriptors()

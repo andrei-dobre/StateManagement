@@ -6,11 +6,6 @@ namespace DAA.StateManagement.Stores
 {
     public class CompositionsStore : StateManagementStore<INonTerminalDescriptor, IEnumerable<ITerminalDescriptor>>
     {
-        public override void Update(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
-        {
-            Set(descriptor, composition);
-        }
-
         public virtual IEnumerable<ITerminalDescriptor> UpdateAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> newComposition)
         {
             var additions = CompareToInitialCompositionAndFindAdditions(descriptor, newComposition);
@@ -20,6 +15,10 @@ namespace DAA.StateManagement.Stores
             return additions;
         }
 
+        public override void Update(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
+        {
+            Set(descriptor, composition);
+        }
 
         protected virtual IEnumerable<ITerminalDescriptor> CompareToInitialCompositionAndFindAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> newComposition)
         {

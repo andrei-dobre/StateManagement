@@ -25,8 +25,23 @@ namespace DAA.StateManagement
 
         public virtual async Task<TData> RetrieveAsync(ITerminalDescriptor descriptor)
         {
-            await AcquireMissingData(descriptor);
+            await Acquire(descriptor);
+            
             return DataPool.Retrieve(descriptor);
+        }
+
+        public virtual async Task<IEnumerable<TData>> RetrieveAsync(INonTerminalDescriptor descriptor)
+        {
+            await Acquire(descriptor);
+            
+            return DataPool.Retrieve(descriptor);
+        }
+
+        public async Task FillCollectionAsync(IFillCollectionArgs<TData> args)
+        {
+            await Acquire(args.Descriptor);
+            
+            await CollectionsManager.FillCollectionAsync(args);
         }
 
         public virtual async Task<TData> RetrieveAsync(ITerminalDescriptor descriptor, IDataBuilder<TData> builder)
@@ -39,12 +54,6 @@ namespace DAA.StateManagement
             return instance;
         }
 
-        public virtual async Task<IEnumerable<TData>> RetrieveAsync(INonTerminalDescriptor descriptor)
-        {
-            await AcquireMissingData(descriptor);
-            return DataPool.Retrieve(descriptor);
-        }
-
         public async Task<IEnumerable<TData>> RetrieveAsync(INonTerminalDescriptor descriptor, IDataBuilder<TData> builder)
         {
             var data = await RetrieveAsync(descriptor);
@@ -55,12 +64,6 @@ namespace DAA.StateManagement
             }
 
             return data;
-        }
-
-        public async Task FillCollectionAsync(IFillCollectionArgs<TData> args)
-        {
-            await AcquireMissingData(args.Descriptor);
-            await CollectionsManager.FillCollectionAsync(args);
         }
 
         public async Task ChangeBuilderAsync(ICollection<TData> collection, IDataBuilder<TData> builder)
@@ -83,18 +86,26 @@ namespace DAA.StateManagement
             CollectionsManager.DropCollection(collection);
         }
 
-        public virtual async Task AcquireMissingData(INonTerminalDescriptor descriptor)
+        public virtual async Task Acquire(ITerminalDescriptor descriptor)
         {
-            if (DataPool.Contains(descriptor)) return;
-                
-            await DataPool.SaveAsync(descriptor, await DataRetriever.RetrieveAsync(descriptor));
+            if (DataPool.Contains(descriptor))
+            {
+                return;
+            }
+
+            var retrievalContext = await DataRetriever.RetrieveAsync(descriptor);
+            await DataPool.SaveAsync(descriptor, retrievalContext);
         }
 
-        public virtual async Task AcquireMissingData(ITerminalDescriptor descriptor)
+        public virtual async Task Acquire(INonTerminalDescriptor descriptor)
         {
-            if (DataPool.Contains(descriptor)) return;
-            
-            await DataPool.SaveAsync(descriptor, await DataRetriever.RetrieveAsync(descriptor));
+            if (DataPool.Contains(descriptor))
+            {
+                return;
+            }
+
+            var retrievalContext = await DataRetriever.RetrieveAsync(descriptor);
+            await DataPool.SaveAsync(descriptor, retrievalContext);
         }
     }
 }

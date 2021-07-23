@@ -6,14 +6,12 @@ namespace DAA.StateManagement.Stores
 {
     public abstract class Store<TKey, TValue>
     {
-        protected IDictionary<TKey, TValue> KeyToValueMap { get; set; }
-
-
         public Store()
         {
             KeyToValueMap = new ConcurrentDictionary<TKey, TValue>();
         }
 
+        protected ConcurrentDictionary<TKey, TValue> KeyToValueMap { get; }
 
         public virtual bool Contains(TKey key)
         {
@@ -27,29 +25,18 @@ namespace DAA.StateManagement.Stores
         
         public virtual void Save(TKey key, TValue value)
         {
-            if (Contains(key))
+            if (!Add(key, value))
             {
                 Update(key, value);
-            }
-            else
-            {
-                Insert(key, value);
             }
         }
 
         public virtual void Insert(TKey key, TValue value)
         {
-            if (null == value)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            if (Contains(key))
+            if (!Add(key, value))
             {
                 throw new InvalidOperationException();
             }
-
-            Set(key, value);
         }
 
         public virtual bool Add(TKey key, TValue value)
@@ -58,15 +45,8 @@ namespace DAA.StateManagement.Stores
             {
                 throw new ArgumentNullException(nameof(value));
             }
-
-            if (Contains(key))
-            {
-                return false;
-            }
-
-            Set(key, value);
-
-            return true;
+            
+            return KeyToValueMap.TryAdd(key, value);
         }
 
         public abstract void Update(TKey key, TValue value);
@@ -78,7 +58,7 @@ namespace DAA.StateManagement.Stores
 
         protected virtual void Set(TKey key, TValue value)
         {
-            KeyToValueMap[key] = value;
+            KeyToValueMap.AddOrUpdate(key, value, (keyDuplicate, valueDuplicate) => value);
         }
     }
 }
