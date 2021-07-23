@@ -99,11 +99,19 @@ namespace DAA.StateManagement
             
             if (DataPool.Contains(descriptor))
             {
+                semaphore.Release();
                 return;
             }
 
-            var retrievalContext = await DataRetriever.RetrieveAsync(descriptor);
-            await DataPool.SaveAsync(descriptor, retrievalContext, () => semaphore.Release());
+            try
+            {
+                await DataPool.SaveAsync(descriptor, 
+                    await DataRetriever.RetrieveAsync(descriptor), () => semaphore.Release());
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         public virtual async Task Acquire(INonTerminalDescriptor descriptor)
@@ -113,11 +121,19 @@ namespace DAA.StateManagement
             
             if (DataPool.Contains(descriptor))
             {
+                semaphore.Release();
                 return;
             }
 
-            var retrievalContext = await DataRetriever.RetrieveAsync(descriptor);
-            await DataPool.SaveAsync(descriptor, retrievalContext, () => semaphore.Release());
+            try
+            {
+                await DataPool.SaveAsync(descriptor, 
+                    await DataRetriever.RetrieveAsync(descriptor), () => semaphore.Release());
+            }
+            finally
+            {
+                    semaphore.Release();   
+            }
         }
     }
 }
