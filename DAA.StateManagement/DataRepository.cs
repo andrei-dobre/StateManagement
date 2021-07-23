@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using DAA.StateManagement.Interfaces;
 
@@ -7,8 +8,13 @@ namespace DAA.StateManagement
     public class DataRepository<TData> : IDataRepository<TData>
         where TData : IData
     {
+        private readonly IDictionary<int, SemaphoreSlim> _semaphoreByBucketNo;
+        
         public DataRepository(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, ICollectionsManager<TData> collectionsManager, IInstancesBuilder<TData> instancesBuilder)
         {
+            _semaphoreByBucketNo = new Dictionary<int, SemaphoreSlim>();
+            for (var i = 0; i <= 99; ++i) _semaphoreByBucketNo[i] = new SemaphoreSlim(1, 1);
+            
             DataRetriever = dataRetriever;
             DataPool = dataPool;
             CollectionsManager = collectionsManager;
@@ -88,24 +94,30 @@ namespace DAA.StateManagement
 
         public virtual async Task Acquire(ITerminalDescriptor descriptor)
         {
+            var semaphore = _semaphoreByBucketNo[descriptor.GetHashCode() % 100];
+            await semaphore.WaitAsync();
+            
             if (DataPool.Contains(descriptor))
             {
                 return;
             }
 
             var retrievalContext = await DataRetriever.RetrieveAsync(descriptor);
-            await DataPool.SaveAsync(descriptor, retrievalContext);
+            await DataPool.SaveAsync(descriptor, retrievalContext, () => semaphore.Release());
         }
 
         public virtual async Task Acquire(INonTerminalDescriptor descriptor)
         {
+            var semaphore = _semaphoreByBucketNo[descriptor.GetHashCode() % 100];
+            await semaphore.WaitAsync();
+            
             if (DataPool.Contains(descriptor))
             {
                 return;
             }
 
             var retrievalContext = await DataRetriever.RetrieveAsync(descriptor);
-            await DataPool.SaveAsync(descriptor, retrievalContext);
+            await DataPool.SaveAsync(descriptor, retrievalContext, () => semaphore.Release());
         }
     }
 }

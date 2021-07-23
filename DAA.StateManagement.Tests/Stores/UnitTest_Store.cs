@@ -28,25 +28,11 @@ namespace DAA.StateManagement.Stores
             TestInstanceMock.CallBase = true;
         }
 
-
-        [TestMethod]
-        public void Save_KeyNotContained_Inserted()
-        {
-            TestInstanceMock.Setup(_ => _.Insert(It.IsAny<object>(), It.IsAny<object>()));
-            TestInstanceMock.Setup(_ => _.Update(It.IsAny<object>(), It.IsAny<object>()));
-            TestInstanceMock.Setup(_ => _.Contains(It.IsAny<object>())).Returns(false);
-
-            TestInstance.Save(Key, Value);
-
-            TestInstanceMock.Verify(_ => _.Insert(Key, Value), Times.Once());
-        }
-
         [TestMethod]
         public void Save_KeyNotContained_NotUpdated()
         {
-            TestInstanceMock.Setup(_ => _.Insert(It.IsAny<object>(), It.IsAny<object>()));
             TestInstanceMock.Setup(_ => _.Update(It.IsAny<object>(), It.IsAny<object>()));
-            TestInstanceMock.Setup(_ => _.Contains(It.IsAny<object>())).Returns(false);
+            TestInstanceMock.Setup(_ => _.Add(It.IsAny<object>(), It.IsAny<object>())).Returns(true);
 
             TestInstance.Save(Key, Value);
 
@@ -56,34 +42,21 @@ namespace DAA.StateManagement.Stores
         [TestMethod]
         public void Save_KeyContained_Updated()
         {
-            TestInstanceMock.Setup(_ => _.Insert(It.IsAny<object>(), It.IsAny<object>()));
             TestInstanceMock.Setup(_ => _.Update(It.IsAny<object>(), It.IsAny<object>()));
-            TestInstanceMock.Setup(_ => _.Contains(It.IsAny<object>())).Returns(true);
+            TestInstanceMock.Setup(_ => _.Add(It.IsAny<object>(), It.IsAny<object>())).Returns(false);
 
             TestInstance.Save(Key, Value);
 
             TestInstanceMock.Verify(_ => _.Update(Key, Value), Times.Once());
         }
 
-        [TestMethod]
-        public void Save_KeyContained_NotInserted()
-        {
-            TestInstanceMock.Setup(_ => _.Insert(It.IsAny<object>(), It.IsAny<object>()));
-            TestInstanceMock.Setup(_ => _.Update(It.IsAny<object>(), It.IsAny<object>()));
-            TestInstanceMock.Setup(_ => _.Contains(It.IsAny<object>())).Returns(true);
-
-            TestInstance.Save(Key, Value);
-
-            TestInstanceMock.Verify(_ => _.Insert(Key, Value), Times.Never());
-        }
-
 
         [TestMethod]
-        public void Insert_KeyNotContained_Set()
+        public void Insert_KeyNotContained_Added()
         {
-            TestInstanceMockProtected
-                .Setup("Set", Key, Value)
-                .Verifiable();
+            TestInstanceMock
+                .Setup(a => a.Add(Key, Value))
+                .Returns(true).Verifiable();
 
             TestInstance.Insert(Key, Value);
 

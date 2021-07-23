@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DAA.StateManagement.Interfaces;
@@ -45,21 +46,42 @@ namespace DAA.StateManagement
 
         public async Task SaveAsync(ITerminalDescriptor descriptor, IInstanceRetrievalContext<TData> retrievalContext)
         {
+            await SaveAsync(descriptor, retrievalContext, doAfterDataAdded: null);
+        }
+        
+        public async Task SaveAsync(ITerminalDescriptor descriptor, IInstanceRetrievalContext<TData> retrievalContext, Action doAfterDataAdded)
+        {
             var isExistingInstance = !Data.Add(descriptor, retrievalContext.Data);
-
+            
+            doAfterDataAdded?.Invoke();
             await retrievalContext.CompleteReconstitutionAsync();
 
-            if (isExistingInstance) Data.Update(descriptor, retrievalContext.Data);
+            if (isExistingInstance)
+            {
+                Data.Update(descriptor, retrievalContext.Data);
+            }
         }
 
         public async Task SaveAsync(INonTerminalDescriptor descriptor, ICollectionRetrievalContext<TData> retrievalContext)
         {
-            Compositions.Save(descriptor, await DescribeAndSaveAsync(retrievalContext));
+            await SaveAsync(descriptor, retrievalContext, doAfterDataAdded: null);
+        }
+
+        public async Task SaveAsync(INonTerminalDescriptor descriptor, ICollectionRetrievalContext<TData> retrievalContext, Action doAfterDataAdded)
+        {
+            var composition = await SaveAndDescribeAsync(retrievalContext, doAfterDataAdded);
+            
+            Compositions.Save(descriptor, composition);
         }
 
         public async Task SaveAsync(ICollectionRetrievalContext<TData> retrievalContext)
         {
-            await DescribeAndSaveAsync(retrievalContext);
+            await SaveAsync(retrievalContext, doAfterDataAdded: null);
+        }
+
+        public async Task SaveAsync(ICollectionRetrievalContext<TData> retrievalContext, Action doAfterDataAdded)
+        {
+            await SaveAndDescribeAsync(retrievalContext, doAfterDataAdded);
         }
 
         public IEnumerable<IDescriptor> FindIntersectingDescriptors(IDescriptor descriptor)
@@ -71,8 +93,8 @@ namespace DAA.StateManagement
         {
             return Compositions.UpdateAndProvideAdditions(descriptor, composition);
         }
-
-        protected virtual async Task<IEnumerable<ITerminalDescriptor>> DescribeAndSaveAsync(ICollectionRetrievalContext<TData> retrievalContext)
+        
+        protected virtual async Task<IEnumerable<ITerminalDescriptor>> SaveAndDescribeAsync(ICollectionRetrievalContext<TData> retrievalContext, Action doAfterDataAdded)
         {
             var composition = new List<ITerminalDescriptor>();
             var existingInstancesByDescriptor = new Dictionary<ITerminalDescriptor, TData>();
@@ -90,6 +112,7 @@ namespace DAA.StateManagement
                 composition.Add(terminalDescriptor);
             }
 
+            doAfterDataAdded?.Invoke();
             await retrievalContext.CompleteReconstitutionAsync();
 
             foreach (var existingInstanceByDescriptor in existingInstancesByDescriptor)
@@ -102,10 +125,9 @@ namespace DAA.StateManagement
 
         protected virtual IEnumerable<IDescriptor> RetrieveAllDescriptors()
         {
-            var terminalDescriptors = Data.RetrieveDescriptors().Cast<IDescriptor>();
-            var nonTerminalDescriptors = Compositions.RetrieveDescriptors().Cast<IDescriptor>();
-
-            return terminalDescriptors.Concat(nonTerminalDescriptors);
+            return Data
+                .RetrieveDescriptors().Cast<IDescriptor>()
+                .Concat(Compositions.RetrieveDescriptors());
         }
     }
 }

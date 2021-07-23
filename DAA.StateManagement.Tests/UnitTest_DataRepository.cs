@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DAA.Helpers;
 using DAA.StateManagement.Interfaces;
@@ -371,7 +372,7 @@ namespace DAA.StateManagement
 
             await TestInstance.Acquire(Descriptor);
 
-            MockedDataPool.Verify(_ => _.SaveAsync(Descriptor, CollectionRetrievalContext));
+            MockedDataPool.Verify(_ => _.SaveAsync(Descriptor, CollectionRetrievalContext, It.IsAny<Action>()));
         }
 
         [TestMethod]
@@ -424,7 +425,7 @@ namespace DAA.StateManagement
 
             await TestInstance.Acquire(TerminalDescriptor);
 
-            MockedDataPool.Verify(_ => _.SaveAsync(TerminalDescriptor, InstanceRetrievalContext));
+            MockedDataPool.Verify(_ => _.SaveAsync(TerminalDescriptor, InstanceRetrievalContext, It.IsAny<Action>()));
         }
 
         [TestMethod]
