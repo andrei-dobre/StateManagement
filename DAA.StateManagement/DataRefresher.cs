@@ -28,21 +28,13 @@ namespace DAA.StateManagement
             if (intersectingDescriptors.Count == 0) return;
             
             var refreshRetrievalContext = await DataRetriever.RefreshAsync(intersectingDescriptors);
-            
-            foreach (var descriptor in intersectingDescriptors)
+
+            async Task DoRefreshAsync(IDescriptor descriptor)
             {
-                if (descriptor is ITerminalDescriptor terminalDescriptor)
-                {
-                    await RefreshDataAsync(terminalDescriptor,
-                        refreshRetrievalContext.GetResult(terminalDescriptor));
-                }
-                
-                if (descriptor is INonTerminalDescriptor nonTerminalDescriptor)
-                {
-                    await RefreshDataAsync(nonTerminalDescriptor,
-                        refreshRetrievalContext.GetResult(nonTerminalDescriptor));
-                }
+                await RefreshDataAsync(descriptor, refreshRetrievalContext);
             }
+
+            await Task.WhenAll(intersectingDescriptors.Select(DoRefreshAsync).ToArray());
         }
 
         public virtual async Task RefreshAsync(IDescriptor descriptor)
@@ -76,6 +68,21 @@ namespace DAA.StateManagement
             await RefreshDataAsync(descriptor, await DataRetriever.RetrieveAsync(descriptor));
         }
 
+        private async Task RefreshDataAsync(IDescriptor descriptor, IRefreshRetrievalContext<TData> refreshRetrievalContext)
+        {
+            if (descriptor is ITerminalDescriptor terminalDescriptor)
+            {
+                await RefreshDataAsync(terminalDescriptor,
+                    refreshRetrievalContext.GetResult(terminalDescriptor));
+            }
+                
+            if (descriptor is INonTerminalDescriptor nonTerminalDescriptor)
+            {
+                await RefreshDataAsync(nonTerminalDescriptor,
+                    refreshRetrievalContext.GetResult(nonTerminalDescriptor));
+            }
+        }
+        
         private async Task RefreshDataAsync(ITerminalDescriptor descriptor, IInstanceRetrievalContext<TData> freshData)
         {
             var instance = DataPool.Retrieve(descriptor);
