@@ -80,7 +80,8 @@ namespace DAA.StateManagement
                 .Setup(x => x.Data)
                 .Returns(Collection);
 
-            MockedTestInstance = new Mock<DataRepository<IData>>(DataRetriever, DataPool, CollectionsManager, InstancesBuilder);
+            MockedTestInstance = new Mock<DataRepository<IData>>(DataRetriever, DataPool, CollectionsManager, 
+                InstancesBuilder, new Mock<IStateManagementEventsAggregator<IData>>().Object);
             MockedTestInstance.CallBase = true;
         }
 

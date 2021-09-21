@@ -7,12 +7,16 @@ namespace DAA.StateManagement
     public abstract class DataRetriever<TData> : IDataRetriever<TData>
         where TData : IData
     {
-        public DataRetriever(ITerminalDescriptorsFactory<TData> terminalDescriptorsFactory)
+        public DataRetriever(ITerminalDescriptorsFactory<TData> terminalDescriptorsFactory, 
+            IStateManagementEventsAggregator<TData> eventsAggregator)
         {
             TerminalDescriptorsFactory = terminalDescriptorsFactory;
+            EventsAggregator = eventsAggregator;
         }
 
         protected ITerminalDescriptorsFactory<TData> TerminalDescriptorsFactory { get; }
+        
+        protected IStateManagementEventsAggregator<TData> EventsAggregator { get; }
 
         public abstract Task<IRefreshRetrievalContext<TData>> RefreshAsync(IEnumerable<IDescriptor> descriptors);
         

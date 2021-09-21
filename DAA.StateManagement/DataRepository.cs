@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DAA.StateManagement.Interfaces;
 
@@ -9,17 +7,22 @@ namespace DAA.StateManagement
     public class DataRepository<TData> : IDataRepository<TData>
         where TData : IData
     {
-        private readonly IDictionary<int, SemaphoreSlim> _semaphoreByBucketNo;
+        private readonly DescriptorSemaphore _semaphore;
         
-        public DataRepository(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, ICollectionsManager<TData> collectionsManager, IInstancesBuilder<TData> instancesBuilder)
+        public DataRepository(IDataRetriever<TData> dataRetriever, IDataPool<TData> dataPool, 
+            ICollectionsManager<TData> collectionsManager, IInstancesBuilder<TData> instancesBuilder, 
+            IStateManagementEventsAggregator<TData> eventsAggregator)
         {
-            _semaphoreByBucketNo = new Dictionary<int, SemaphoreSlim>();
-            for (var i = 0; i <= 99; ++i) _semaphoreByBucketNo[i] = new SemaphoreSlim(1, 1);
+            _semaphore = new DescriptorSemaphore();
             
             DataRetriever = dataRetriever;
             DataPool = dataPool;
             CollectionsManager = collectionsManager;
             InstancesBuilder = instancesBuilder;
+            EventsAggregator = eventsAggregator;
+            
+            EventsAggregator.TerminalDataAvailableEvent += OnTerminalDataAvailableEvent;
+            EventsAggregator.NonTerminalDataAvailableEvent += OnNonTerminalDataAvailableEvent;
         }
 
         public virtual IDataRetriever<TData> DataRetriever { get; }
@@ -29,6 +32,8 @@ namespace DAA.StateManagement
         public virtual ICollectionsManager<TData> CollectionsManager { get; }
 
         public virtual IInstancesBuilder<TData> InstancesBuilder { get; }
+
+        public virtual IStateManagementEventsAggregator<TData> EventsAggregator { get; }
 
         public virtual async Task<TData> RetrieveAsync(ITerminalDescriptor descriptor)
         {
@@ -95,63 +100,65 @@ namespace DAA.StateManagement
 
         public virtual async Task Acquire(ITerminalDescriptor descriptor)
         {
-            var semaphore = _semaphoreByBucketNo[Math.Abs(descriptor.GetHashCode() % 100)];
-            await semaphore.WaitAsync();
-            
-            if (DataPool.Contains(descriptor))
-            {
-                semaphore.Release();
-                return;
-            }
+            var semaphore = await _semaphore.WaitAsync(descriptor);
 
-            var semaphoreReleased = false;
-            void ReleaseSemaphore()
-            {
-                if (semaphoreReleased) return;
-                
-                semaphore.Release();
-                semaphoreReleased = true;
-            }
-            
             try
             {
-                await DataPool.SaveAsync(descriptor, 
-                    await DataRetriever.RetrieveAsync(descriptor), ReleaseSemaphore);
+                if (DataPool.Contains(descriptor) == false)
+                {
+                    await DataPool.SaveAsync(descriptor, 
+                        await DataRetriever.RetrieveAsync(descriptor), semaphore.Release);
+                }
             }
             finally
             {
-                ReleaseSemaphore();
+                semaphore.Release();
             }
         }
 
         public virtual async Task Acquire(INonTerminalDescriptor descriptor)
         {
-            var semaphore = _semaphoreByBucketNo[Math.Abs(descriptor.GetHashCode() % 100)];
-            await semaphore.WaitAsync();
-            
-            if (DataPool.Contains(descriptor))
-            {
-                semaphore.Release();
-                return;
-            }
-
-            var semaphoreReleased = false;
-            void ReleaseSemaphore()
-            {
-                if (semaphoreReleased) return;
-                
-                semaphore.Release();
-                semaphoreReleased = true;
-            }
+            var semaphore = await _semaphore.WaitAsync(descriptor);
 
             try
             {
-                await DataPool.SaveAsync(descriptor, 
-                    await DataRetriever.RetrieveAsync(descriptor), ReleaseSemaphore);
+                if (DataPool.Contains(descriptor) == false)
+                {
+                    await DataPool.SaveAsync(descriptor,
+                        await DataRetriever.RetrieveAsync(descriptor), semaphore.Release);
+                }
             }
             finally
             {
-                ReleaseSemaphore();
+                semaphore.Release();
+            }
+        }
+
+        private async void OnTerminalDataAvailableEvent(object sender, TerminalDataAvailableEventArgs<TData> e)
+        {
+            var semaphore = await _semaphore.WaitAsync(e.Descriptor);
+
+            try
+            {
+                await DataPool.SaveAsync(e.Descriptor, e.RetrievalContext, semaphore.Release);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        }
+
+        private async void OnNonTerminalDataAvailableEvent(object sender, NonTerminalDataAvailableEventArgs<TData> e)
+        {
+            var semaphore = await _semaphore.WaitAsync(e.Descriptor);
+
+            try
+            {
+                await DataPool.SaveAsync(e.Descriptor, e.RetrievalContext, semaphore.Release);
+            }
+            finally
+            {
+                semaphore.Release();
             }
         }
     }
