@@ -22,6 +22,11 @@ namespace DAA.StateManagement
 
         protected virtual IDataPool<TData> DataPool { get; }
 
+        public virtual Task RefreshAsync(IDescriptor descriptor)
+        {
+            return RefreshAsync(new[] {descriptor});
+        }
+
         public async Task RefreshAsync(IEnumerable<IDescriptor> descriptors)
         {
             var intersectingDescriptors = new HashSet<IDescriptor>(descriptors.SelectMany(a => DataPool.FindIntersectingDescriptors(a)));
@@ -36,38 +41,7 @@ namespace DAA.StateManagement
 
             await Task.WhenAll(intersectingDescriptors.Select(DoRefreshAsync).ToArray());
         }
-
-        public virtual async Task RefreshAsync(IDescriptor descriptor)
-        {
-            var intersectingDescriptors = DataPool.FindIntersectingDescriptors(descriptor);
-
-            await RefreshDataAsync(intersectingDescriptors);
-        }
-
-        public virtual async Task RefreshDataAsync(IEnumerable<IDescriptor> descriptors)
-        {
-            var tasksToRefreshDescriptors = descriptors.Select(RefreshDataAsync).ToArray();
-
-            await Task.WhenAll(tasksToRefreshDescriptors);
-        }
-
-        public virtual async Task RefreshDataAsync(IDescriptor descriptor)
-        {
-            if (descriptor is ITerminalDescriptor terminalDescriptor)
-            {
-                await RefreshDataAsync(terminalDescriptor);
-            }
-            else
-            {
-                await RefreshDataAsync(descriptor as INonTerminalDescriptor);
-            }
-        }
-
-        public virtual async Task RefreshDataAsync(ITerminalDescriptor descriptor)
-        {
-            await RefreshDataAsync(descriptor, await DataRetriever.RetrieveAsync(descriptor));
-        }
-
+        
         private async Task RefreshDataAsync(IDescriptor descriptor, IRefreshRetrievalContext<TData> refreshRetrievalContext)
         {
             if (descriptor is ITerminalDescriptor terminalDescriptor)
@@ -91,11 +65,6 @@ namespace DAA.StateManagement
 
             EventsAggregator.PublishDataChangedEvent(descriptor);
             EventsAggregator.PublishInstanceChangedEvent(new InstanceChangedEventArgs<TData>(descriptor, instance));
-        }
-
-        public virtual async Task RefreshDataAsync(INonTerminalDescriptor descriptor)
-        {
-            await RefreshDataAsync(descriptor, await DataRetriever.RetrieveCompositionAsync(descriptor));
         }
 
         private async Task RefreshDataAsync(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> freshComposition)

@@ -54,8 +54,11 @@ namespace DAA.StateManagement
             var isExistingInstance = !Data.Add(descriptor, retrievalContext.Data);
             
             doAfterDataAdded?.Invoke();
+            
+            retrievalContext.PublishDataAddedEvent();
             await retrievalContext.CompleteReconstitutionAsync();
-
+            retrievalContext.PublishDataReconstitutedEvent();
+            
             if (isExistingInstance)
             {
                 Data.Update(descriptor, retrievalContext.Data);
@@ -113,7 +116,10 @@ namespace DAA.StateManagement
             }
 
             doAfterDataAdded?.Invoke();
+            
+            retrievalContext.PublishDataAddedEvent();
             await retrievalContext.CompleteReconstitutionAsync();
+            retrievalContext.PublishDataReconstitutedEvent();
 
             foreach (var existingInstanceByDescriptor in existingInstancesByDescriptor)
             {

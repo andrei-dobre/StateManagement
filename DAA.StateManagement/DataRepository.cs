@@ -106,8 +106,7 @@ namespace DAA.StateManagement
             {
                 if (DataPool.Contains(descriptor) == false)
                 {
-                    await DataPool.SaveAsync(descriptor, 
-                        await DataRetriever.RetrieveAsync(descriptor), semaphore.Release);
+                    await DataPool.SaveAsync(descriptor, await DataRetriever.RetrieveAsync(descriptor), semaphore.Release);
                 }
             }
             finally

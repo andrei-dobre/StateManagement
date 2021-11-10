@@ -3,12 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageVersion>1.0.14</PackageVersion>
-    <AssemblyVersion>1.0.14</AssemblyVersion>
+    <PackageVersion>1.0.16</PackageVersion>
+    <AssemblyVersion>1.0.16</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DAA.StateManagement.Interfaces" Version="1.0.14" />
+    <PackageReference Include="DAA.StateManagement.Interfaces" Version="1.0.18" />
   </ItemGroup>
 
   <ItemGroup>

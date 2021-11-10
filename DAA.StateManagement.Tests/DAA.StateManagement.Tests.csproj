@@ -75,7 +75,6 @@
     <Compile Include="UnitTest_DataPool.cs" />
     <Compile Include="Stores\UnitTest_DataStore.cs" />
     <Compile Include="Stores\UnitTest_Store.cs" />
-    <Compile Include="UnitTest_DataRefresher.cs" />
     <Compile Include="Stores\UnitTest_CompositionsStore.cs" />
     <Compile Include="UnitTest_TerminalDescriptorsFlyweightFactory.cs" />
     <Compile Include="UnitTest_StateManagementSystemBuildingDirector.cs" />
