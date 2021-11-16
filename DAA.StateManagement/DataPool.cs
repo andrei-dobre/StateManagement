@@ -72,9 +72,13 @@ namespace DAA.StateManagement
 
         public async Task SaveAsync(INonTerminalDescriptor descriptor, ICollectionRetrievalContext<TData> retrievalContext, Action doAfterDataAdded)
         {
-            var composition = await SaveAndDescribeAsync(retrievalContext, doAfterDataAdded);
+            Compositions.Save(descriptor, Describe(retrievalContext.Data));
             
-            Compositions.Save(descriptor, composition);
+            await SaveAsync(retrievalContext, () =>
+            {
+                Compositions.Save(descriptor, Describe(retrievalContext.Data));
+                doAfterDataAdded?.Invoke();
+            });
         }
 
         public async Task SaveAsync(ICollectionRetrievalContext<TData> retrievalContext)
@@ -84,22 +88,6 @@ namespace DAA.StateManagement
 
         public async Task SaveAsync(ICollectionRetrievalContext<TData> retrievalContext, Action doAfterDataAdded)
         {
-            await SaveAndDescribeAsync(retrievalContext, doAfterDataAdded);
-        }
-
-        public IEnumerable<IDescriptor> FindIntersectingDescriptors(IDescriptor descriptor)
-        {
-            return RetrieveAllDescriptors().Where(_ => _.Intersects(descriptor)).ToArray();
-        }
-
-        public virtual IEnumerable<ITerminalDescriptor> UpdateCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
-        {
-            return Compositions.UpdateAndProvideAdditions(descriptor, composition);
-        }
-        
-        protected virtual async Task<IEnumerable<ITerminalDescriptor>> SaveAndDescribeAsync(ICollectionRetrievalContext<TData> retrievalContext, Action doAfterDataAdded)
-        {
-            var composition = new List<ITerminalDescriptor>();
             var existingInstancesByDescriptor = new Dictionary<ITerminalDescriptor, TData>();
 
             foreach (var data in retrievalContext.Data)
@@ -111,8 +99,6 @@ namespace DAA.StateManagement
                 {
                     existingInstancesByDescriptor[terminalDescriptor] = data;
                 }
-
-                composition.Add(terminalDescriptor);
             }
 
             doAfterDataAdded?.Invoke();
@@ -125,8 +111,21 @@ namespace DAA.StateManagement
             {
                 Data.Update(existingInstanceByDescriptor.Key, existingInstanceByDescriptor.Value);
             }
+        }
 
-            return composition;
+        public IEnumerable<IDescriptor> FindIntersectingDescriptors(IDescriptor descriptor)
+        {
+            return RetrieveAllDescriptors().Where(_ => _.Intersects(descriptor)).ToArray();
+        }
+
+        public virtual IEnumerable<ITerminalDescriptor> UpdateCompositionAndProvideAdditions(INonTerminalDescriptor descriptor, IEnumerable<ITerminalDescriptor> composition)
+        {
+            return Compositions.UpdateAndProvideAdditions(descriptor, composition);
+        }
+
+        private IEnumerable<ITerminalDescriptor> Describe(IEnumerable<TData> data)
+        {
+            return data.Select(TerminalDescriptorsFactory.Create).ToArray();
         }
 
         protected virtual IEnumerable<IDescriptor> RetrieveAllDescriptors()
