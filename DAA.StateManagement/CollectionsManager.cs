@@ -33,6 +33,12 @@ namespace DAA.StateManagement
 
         public async Task FillCollectionAsync(IFillCollectionArgs<TData> args)
         {
+            if (IsCollectionRegistered(args.Collection, out var registeredDescriptor) &&
+                Equals(registeredDescriptor, args.Descriptor))
+            {
+                return;
+            }
+            
             RegisterCollection(args.Collection, args.Descriptor, args.Builder);
             FillCollectionWithData(args.Collection, args.Descriptor);
 
@@ -62,6 +68,18 @@ namespace DAA.StateManagement
         public virtual bool IsCollectionRegistered(ICollection<TData> collection)
         {
             return DescriptorByCollection.ContainsKey(collection);
+        }
+
+        public virtual bool IsCollectionRegistered(ICollection<TData> collection, out IDescriptor descriptor)
+        {
+            if (DescriptorByCollection.ContainsKey(collection))
+            {
+                descriptor = DescriptorByCollection[collection];
+                return true;
+            }
+
+            descriptor = null;
+            return false;
         }
 
         public virtual bool IsCollectionRegisteredWithDescriptor(ICollection<TData> collection, INonTerminalDescriptor descriptor)
